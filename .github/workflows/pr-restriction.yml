@@ -1,0 +1,20 @@
+name: Dev에서 Main으로만 PR 가능하게 제한
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  check-pr:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 리포지토리 체크아웃
+        uses: actions/checkout@v3
+
+      - name: PR이 dev 브랜치에서 왔는지 확인
+        run: |
+          if [[ "${{ github.head_ref }}" != "dev" ]]; then
+            echo "ERROR: Pull request는 dev 브랜치에서만 가능합니다!" && exit 1;
+          fi
