@@ -1,0 +1,24 @@
+name: "📋 상위 이슈 생성"
+description: "상위 이슈 생성 템플릿입니다."
+labels: ["parent-issue", "BE"]
+body:
+  - type: textarea
+    attributes:
+      label: 📄 설명
+      description: 상위 이슈에 대한 설명을 작성해주세요.
+      placeholder: 제목에 포함하지 못한 추가적인 내용이 있다면 적어주세요. 없다면 -
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: ✅ 작업할 내용
+      description: 할 일을 체크박스 형태로 작성해주세요.
+      placeholder: |
+        - [ ] 로 체크 박스 만들고 작성해주세요. 없다면 -
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: 🙋🏻 참고 자료
+      description: 이해를 돕기 위한 추가적인 자료가 있다면 첨부하여 주세요.
+      placeholder: 없다면 비워두셔도 됩니다.
