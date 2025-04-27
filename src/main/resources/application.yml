@@ -1,0 +1,22 @@
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/mydb
+    username: admin
+    password: 1234
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+      default_schema: oauth
+    show_sql : true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+
+jwt:
+  #32?? ?? ???? ??? : songsuapasswordsecretsongsuapasswordsecretsongsuapasswordsecret
+  expiration: 3000
+  secret : c29uZ3N1YXBhc3N3b3Jkc2VjcmV0c29uZ3N1YXBhc3N3b3Jkc2VjcmV0c29uZ3N1YXBhc3N3b3Jkc2VjcmV0
+
