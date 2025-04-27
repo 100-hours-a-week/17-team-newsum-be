@@ -1,0 +1,9 @@
+name: "🔽 하위 이슈 생성"
+description: "하위 이슈 생성 템플릿입니다."
+labels: ["sub-issue", "BE"]
+body:
+  - type: textarea
+    attributes:
+      label: 📄 설명
+      description: 하위 이슈에 대한 설명을 작성해주세요.
+      placeholder: 작성하고 싶은 내용이 있다면 작성해주시면 됩니다.
