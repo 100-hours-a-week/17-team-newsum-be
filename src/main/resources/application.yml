@@ -35,8 +35,11 @@ spring:
             user-name-attribute: id
 
 jwt:
-  expiration: 3000
-  secret: c29uZ3N1YXBhc3N3b3Jkc2VjcmV0c29uZ3N1YXBhc3N3b3Jkc2VjcmV0c29uZ3N1YXBhc3N3b3Jkc2VjcmV0
+  secret: c29uZ3N1YXBhc3N3b3Jkc2VjcmV0c29uZ3N1YXBhc3N3b3Jkc2VjcmV0
+  access-token:
+    expiration: 30000
+  refresh-token:
+    expiration: 1209600000
 
 logging:
   level:
