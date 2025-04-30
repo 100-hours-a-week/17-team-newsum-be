@@ -13,14 +13,16 @@ public class TokenProvider {
 
     private final String secretKey;
     private final long accessTokenValidityInMillis;
-    private final long refreshTokenValidityInMillis = 1000L * 60 * 60 * 24 * 7; // 7일
+    private final long refreshTokenValidityInMillis;
 
     public TokenProvider(
             @Value("${jwt.secret}") String secretKey,
-            @Value("${jwt.expiration}") long expirationSeconds
+            @Value("${jwt.access-token.expiration}") long accessTokenExpirationSeconds,
+            @Value("${jwt.refresh-token.expiration}") long refreshTokenExpirationSeconds
     ) {
         this.secretKey = secretKey;
-        this.accessTokenValidityInMillis = expirationSeconds * 1000;
+        this.accessTokenValidityInMillis = accessTokenExpirationSeconds * 1000;
+        this.refreshTokenValidityInMillis = refreshTokenExpirationSeconds * 1000;
     }
 
     public String createAccessToken(Long userId, String email, Role role) {

@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 
 
 
-@Table(name = "sociallogin", schema = "oauth")
+@Table(name = "social_login", schema = "oauth")
 @Entity
 @Getter
 @NoArgsConstructor
@@ -30,7 +30,4 @@ public class SocialLogin {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private ProviderType providerType;
-
-
-
 }

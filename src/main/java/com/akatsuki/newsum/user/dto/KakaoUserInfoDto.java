@@ -1,29 +1,24 @@
 package com.akatsuki.newsum.user.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-import java.util.Map;
-
-@Data
-@AllArgsConstructor
+@Getter
+@Setter
 @NoArgsConstructor
 public class KakaoUserInfoDto {
     private String email;
     private String nickname;
-    private String profile_image_url;
-    private String social_id;
+    private String profileImageUrl;
+    private String socialId;
 
-    public KakaoUserInfoDto(Map<String, Object> attributes) {
-        this.email = (String) ((Map<String, Object>) attributes.get("kakao_account")).get("email");
-        this.nickname = (String) ((Map<String, Object>) attributes.get("properties")).get("nickname");
-        String originalProfileImg = (String) ((Map<String, Object>) attributes.get("properties")).get("profile_image");
-        this.profile_image_url = (originalProfileImg == null || originalProfileImg.isEmpty())
-                ? "http://localhost:8080/images/default-profile.png"
-                : originalProfileImg;
-        this.social_id = String.valueOf(attributes.get("id"));
 
+    public KakaoUserInfoDto(String email, String nickname, String profileImageUrl, String socialId) {
+        this.email = email;
+        this.nickname = nickname;
+        this.profileImageUrl = profileImageUrl;
+        this.socialId = socialId;
     }
 }
 

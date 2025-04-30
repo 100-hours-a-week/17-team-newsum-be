@@ -1,13 +1,12 @@
 package com.akatsuki.newsum.common.security;
 
 import com.akatsuki.newsum.user.domain.ProviderType;
+import com.akatsuki.newsum.user.domain.Role;
 import com.akatsuki.newsum.user.domain.SocialLogin;
 import com.akatsuki.newsum.user.domain.User;
-import com.akatsuki.newsum.user.domain.Role;
 import com.akatsuki.newsum.user.dto.KakaoUserInfoDto;
 import com.akatsuki.newsum.user.repository.SocialLoginRepository;
 import com.akatsuki.newsum.user.repository.UserRepository;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -34,64 +33,82 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request,
                                         HttpServletResponse response,
-                                        Authentication authentication) throws IOException, ServletException {
+                                        Authentication authentication) throws IOException {
 
         OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
+        Map<String, Object> attributes = oAuth2User.getAttributes();
 
-        KakaoUserInfoDto kakaoUser = new KakaoUserInfoDto(oAuth2User.getAttributes());
 
-        String email = kakaoUser.getEmail();
-        String nickname = kakaoUser.getNickname();
-        String profileImg = kakaoUser.getProfile_image_url(); // 항상 null-safe
-        String socialId = kakaoUser.getSocial_id();
+        Map<String, Object> kakaoAccount = (Map<String, Object>) attributes.get("kakao_account");
+        Map<String, Object> properties = (Map<String, Object>) attributes.get("properties");
 
+        String email = (String) kakaoAccount.get("email");
+        String nickname = (String) properties.get("nickname");
+        String originalProfileImg = (String) properties.get("profile_image");
+        String profileImg = (originalProfileImg == null || originalProfileImg.isEmpty())
+                ? "http://localhost:8080/images/default-profile.png"
+                : originalProfileImg;
+        String socialId = String.valueOf(attributes.get("id"));
 
         ProviderType providerType = ProviderType.KAKAO;
 
-        User user = userRepository.findByEmail(email).orElseGet(() -> {
-            User newUser = User.builder()
-                    .email(email)
-                    .nickname(nickname)
-                    .profile_image_url(profileImg)
-                    .socialId(socialId)
-                    .createdAt(LocalDateTime.now())
-                    .role(Role.USER_BASIC)
-                    .build();
-            return userRepository.save(newUser);
-        });
+        // 👉 정제된 값만 넘기기
+        KakaoUserInfoDto kakaoUser = new KakaoUserInfoDto(email, nickname, profileImg, socialId);
 
-        // 2) SocialLogin 저장 (중복 방지)
-        if (!socialLoginRepository.existsByUserAndProviderType(user, providerType)) {
-            SocialLogin sl = SocialLogin.builder()
-                    .user(user)
-                    .providerId(socialId)
-                    .providerType(providerType)
-                    .build();
-            socialLoginRepository.save(sl);
-        }
+        User user = userRepository.findByEmail(email)
+                .orElseGet(() -> {
+                    User newUser = User.builder()
+                            .email(email)
+                            .nickname(nickname)
+                            .profileImageUrl(profileImg)
+                            .socialId(socialId)
+                            .createdAt(LocalDateTime.now())
+                            .role(Role.USER_BASIC)
+                            .build();
+                    return userRepository.save(newUser);
+                });
+
+        checkDuplicateSocialProviderAndSave(user, providerType, socialId);
 
         try {
             log.info("✔️ 사용자 ID: {}", user.getId());
             log.info("✔️ 사용자 ROLE: {}", user.getRole());
 
-            // 3) 토큰 생성
             String accessToken = tokenProvider.createAccessToken(user.getId(), user.getEmail(), user.getRole());
+            String refreshToken = tokenProvider.createRefreshToken();
 
-            // 4) 쿠키 생성 및 설정
-            Cookie cookie = new Cookie("access_token", accessToken);
-            cookie.setHttpOnly(true);        // JS 접근 차단
-            cookie.setSecure(false);         // 개발 환경에서는 false
-            cookie.setPath("/");            // 앱 전역에서 전송
-            cookie.setMaxAge(60 * 60 * 24);   // 1일(초 단위)
-            response.addCookie(cookie);
+            Cookie accessCookie = new Cookie("access_token", accessToken);
+            accessCookie.setHttpOnly(true);
+            accessCookie.setSecure(false);
+            accessCookie.setPath("/");
+            accessCookie.setMaxAge(60 * 60 * 24);
 
-            // 5) 리다이렉트
+            Cookie refreshCookie = new Cookie("refresh_token", refreshToken);
+            refreshCookie.setHttpOnly(true);
+            refreshCookie.setSecure(false);
+            refreshCookie.setPath("/");
+            refreshCookie.setMaxAge(60 * 60 * 24 * 7);
+
+            response.addCookie(accessCookie);
+            response.addCookie(refreshCookie);
+
+            // refreshTokenService.save(user.getId(), refreshToken);
+
             response.sendRedirect("http://localhost:5173/");
         } catch (Exception e) {
             log.error("🔥 로그인 후 처리 중 오류 발생", e);
             response.sendRedirect("/error");
         }
+    }
 
+    private void checkDuplicateSocialProviderAndSave(User user, ProviderType providerType, String socialId) {
+        if (!socialLoginRepository.existsByUserAndProviderType(user, providerType)) {
+            SocialLogin socialLogin = SocialLogin.builder()
+                    .user(user)
+                    .providerId(socialId)
+                    .providerType(providerType)
+                    .build();
+            socialLoginRepository.save(socialLogin);
+        }
     }
 }
-
