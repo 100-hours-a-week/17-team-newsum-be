@@ -3,6 +3,8 @@ plugins {
     id 'org.springframework.boot' version '3.2.12'
     id 'io.spring.dependency-management' version '1.1.7'
     id 'org.flywaydb.flyway' version '9.22.3'
+    id 'org.ec4j.editorconfig' version '0.0.3'
+
 }
 
 group = 'com.akatsuki'
@@ -27,10 +29,10 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
     implementation 'org.springframework.boot:spring-boot-starter-cache'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
-    
+
     // Database
     runtimeOnly 'org.postgresql:postgresql:42.6.0'
-    
+
     // P6Spy
     implementation 'com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.9.1'
 
@@ -39,22 +41,29 @@ dependencies {
 
     // Caffeine Cache
     implementation 'com.github.ben-manes.caffeine:caffeine:3.1.8'
-    
+
     // JWT
     implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
     runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
     runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
-    
+
     // Swagger/OpenAPI Documentation
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0'
 
     // Utility
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
-    
+
     // Testing
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
+
+editorconfig {
+    excludes = ['build']
+}
+
+// checkstyle이 설정 되어 있을 시, editorconfigCheck 후 checkstyle 진행
+check.dependsOn editorconfigCheck
 
 test {
     useJUnitPlatform()

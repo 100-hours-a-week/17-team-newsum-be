@@ -19,28 +19,28 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class WebtoonDetail {
-    
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "webtoon_id", nullable = false)
-    private Webtoon webtoon;
-    
-    @Column(name = "image_url", nullable = false, length = 1000)
-    private String imageUrl;
-    
-    @Column(nullable = false, length = 255)
-    private String content;
-    
-    @Column(name = "image_seq", nullable = false)
-    private Byte imageSeq;
-    
-    @Builder
-    public WebtoonDetail(String imageUrl, String content, Byte imageSeq) {
-        this.imageUrl = imageUrl;
-        this.content = content;
-        this.imageSeq = imageSeq;
-    }
+
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "webtoon_id", nullable = false)
+	private Webtoon webtoon;
+
+	@Column(name = "image_url", nullable = false, length = 1000)
+	private String imageUrl;
+
+	@Column(nullable = false, length = 255)
+	private String content;
+
+	@Column(name = "image_seq", nullable = false)
+	private Byte imageSeq;
+
+	@Builder
+	public WebtoonDetail(String imageUrl, String content, Byte imageSeq) {
+		this.imageUrl = imageUrl;
+		this.content = content;
+		this.imageSeq = imageSeq;
+	}
 }
