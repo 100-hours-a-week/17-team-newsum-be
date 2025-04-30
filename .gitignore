@@ -39,3 +39,7 @@ out/
 
 ##api key
 src/main/resources/application.yml
+
+
+.DS_Store
+
