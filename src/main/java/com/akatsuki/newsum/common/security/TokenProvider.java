@@ -5,7 +5,7 @@ import java.util.Date;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import com.akatsuki.newsum.user.domain.Role;
+import com.akatsuki.newsum.domain.user.entity.UserRole;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -27,7 +27,7 @@ public class TokenProvider {
 		this.refreshTokenValidityInMillis = refreshTokenExpirationSeconds * 1000;
 	}
 
-	public String createAccessToken(Long userId, String email, Role role) {
+	public String createAccessToken(Long userId, String email, UserRole role) {
 		Date now = new Date();
 		return Jwts.builder()
 			.setSubject(email)

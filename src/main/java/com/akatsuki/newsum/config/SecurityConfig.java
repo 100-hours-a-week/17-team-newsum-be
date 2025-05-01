@@ -1,4 +1,4 @@
-package com.akatsuki.newsum.common.config;
+package com.akatsuki.newsum.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

@@ -21,7 +21,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "user")
+@Table(name = "users")
 @Getter
 @SQLDelete(sql = "UPDATE user SET deleted_at = now() WHERE id = ?")
 @SQLRestriction(value = "deleted_at IS NULL")
@@ -43,7 +43,7 @@ public class User extends BaseTimeEntity {
 
 	@Enumerated(EnumType.STRING)
 	@Column(name = "role", nullable = false, length = 20)
-	private UserRole userRole;
+	private UserRole role;
 
 	@Enumerated(EnumType.STRING)
 	@Column(name = "status", nullable = false, length = 20)
@@ -52,11 +52,11 @@ public class User extends BaseTimeEntity {
 	private LocalDateTime deletedAt;
 
 	@Builder
-	public User(String email, String nickname, String profileImageUrl, UserRole userRole) {
+	public User(String email, String nickname, String profileImageUrl, UserRole role, Status status) {
 		this.email = email;
 		this.nickname = nickname;
-		this.profileImageUrl = profileImageUrl != null ? profileImageUrl : "BASIC_PROFILE_IMAGE_URL";
-		this.userRole = userRole != null ? userRole : UserRole.USER_BASIC;
-		this.status = Status.ACTIVATE;
+		this.profileImageUrl = profileImageUrl;
+		this.role = role;
+		this.status = status;
 	}
 }

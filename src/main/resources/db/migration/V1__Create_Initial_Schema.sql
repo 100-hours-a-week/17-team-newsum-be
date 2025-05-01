@@ -1,6 +1,7 @@
 -- V1__Create_Initial_Schema.sql
 -- 사용자 테이블
-CREATE TABLE IF NOT EXISTS "user" (
+CREATE TABLE IF NOT EXISTS users
+(
     id BIGSERIAL PRIMARY KEY,
     email VARCHAR(100) NOT NULL UNIQUE,
     nickname VARCHAR(20) NOT NULL,
@@ -67,7 +68,13 @@ CREATE TABLE IF NOT EXISTS comment (
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     deleted_at TIMESTAMP,
-    CONSTRAINT fk_comment_user FOREIGN KEY (user_id) REFERENCES "user"(id),
+    CONSTRAINT fk_comment_user FOREIGN KEY
+(
+    user_id
+) REFERENCES users
+(
+    id
+),
     CONSTRAINT fk_comment_webtoon FOREIGN KEY (webtoon_id) REFERENCES webtoon(id),
     CONSTRAINT fk_comment_parent FOREIGN KEY (parent_comment_id) REFERENCES comment(id)
 );
@@ -77,7 +84,13 @@ CREATE TABLE IF NOT EXISTS social_login (
     user_id BIGINT NOT NULL,
     provider_id BIGINT NOT NULL,
     provider VARCHAR(20) NOT NULL,
-    CONSTRAINT fk_social_login_user FOREIGN KEY (user_id) REFERENCES "user"(id)
+    CONSTRAINT fk_social_login_user FOREIGN KEY
+(
+    user_id
+) REFERENCES users
+(
+    id
+)
 );
 
 -- 최근 조회 테이블 추가
@@ -86,6 +99,15 @@ CREATE TABLE IF NOT EXISTS recent_view (
     user_id BIGINT NOT NULL,
     webtoon_id BIGINT NOT NULL,
     viewed_at TIMESTAMP NOT NULL,
-    CONSTRAINT fk_recent_view_user FOREIGN KEY (user_id) REFERENCES "user"(id),
+    CONSTRAINT
+    fk_recent_view_user
+    FOREIGN
+    KEY
+(
+    user_id
+) REFERENCES users
+(
+    id
+),
     CONSTRAINT fk_recent_view_webtoon FOREIGN KEY (webtoon_id) REFERENCES webtoon(id)
 );
