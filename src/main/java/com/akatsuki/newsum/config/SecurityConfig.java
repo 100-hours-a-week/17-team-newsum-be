@@ -15,11 +15,15 @@ public class SecurityConfig {
 
 	private final OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
 
+	//TODO: 설정 필요
+	private final String[] excludePaths = {"/swagger-ui/**", "/v3/api-docs/**", "/swagger-resources/**", "/error",
+		"/**"};
+
 	@Bean
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 		http
 			.authorizeHttpRequests(auth -> auth
-				.requestMatchers("/", "/login/**", "/oauth2/**")
+				.requestMatchers(excludePaths)
 				.permitAll()
 				.anyRequest()
 				.authenticated()
