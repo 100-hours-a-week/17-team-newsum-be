@@ -1,6 +1,6 @@
 name: "🔽 하위 이슈 생성"
 description: "하위 이슈 생성 템플릿입니다."
-labels: ["sub-issue", "BE"]
+labels: [ "sub-issue", "BE" ]
 body:
   - type: textarea
     attributes:

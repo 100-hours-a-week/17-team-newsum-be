@@ -36,10 +36,9 @@ out/
 ### VS Code ###
 .vscode/
 
-
-##api key
-src/main/resources/application.yml
-
-
 .DS_Store
 
+### Environment Variables ###
+.env
+.env.*
+!.env.example

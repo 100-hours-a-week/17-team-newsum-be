@@ -1,6 +1,6 @@
 name: "📋 상위 이슈 생성"
 description: "상위 이슈 생성 템플릿입니다."
-labels: ["parent-issue", "BE"]
+labels: [ "parent-issue", "BE" ]
 body:
   - type: textarea
     attributes:
