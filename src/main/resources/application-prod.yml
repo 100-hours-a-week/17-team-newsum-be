@@ -27,31 +27,34 @@ spring:
       host: ${REDIS_HOST}
       port: ${REDIS_PORT}
       password: ${REDIS_PASSWORD}
-  
-  # Flyway 설정
-  flyway:
-    enabled: true
-    baseline-on-migrate: true
-    locations: classpath:db/migration
 
-  cache:
-    type: redis
-    cache-names: webtoons, comments, users
-    redis:
-      time-to-live: 3600000
+  # Security 설정
+  security:
+    oauth2:
+      client:
+        registration:
+          kakao:
+            client-id: ${OAUTH2_KAKAO_CLIENT_ID}
+            client-secret: ${OAUTH2_KAKAO_CLIENT_SECRET}
+            redirect-uri: "http://localhost:8080/login/oauth2/code/kakao"
+            authorization-grant-type: authorization_code
+            scope:
+              - profile_nickname
+              - account_email
+            client-name: Kakao
+        provider:
+          kakao:
+            authorization-uri: https://kauth.kakao.com/oauth/authorize
+            token-uri: https://kauth.kakao.com/oauth/token
+            user-info-uri: https://kapi.kakao.com/v2/user/me
+            user-name-attribute: id
 
-# 로깅 설정
-logging:
-  level:
-    com.akatsuki.newsum: WARN
-    org.springframework.web: WARN
-    org.hibernate.SQL: WARN
-  file:
-    name: /var/log/newsum/application.log
-  logback:
-    rollingpolicy:
-      max-file-size: 10MB
-      max-history: 30
+jwt:
+  secret: ${JWT_SECRET_KEY}
+  access-token:
+    expiration: ${JWT_ACCESS_TOKEN_EXPIRE}
+  refresh-token:
+    expiration: ${JWT_REFRESH_TOKEN_EXPIRE}
 
 # Swagger API 문서 비활성화
 springdoc:
@@ -59,9 +62,3 @@ springdoc:
     enabled: false
   swagger-ui:
     enabled: false
-
-# P6spy 설정
-decorator:
-  datasource:
-    p6spy:
-      enable-logging: false
