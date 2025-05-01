@@ -3,6 +3,7 @@ package com.akatsuki.newsum.domain.webtoon.entity.webtoon;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
@@ -24,7 +25,6 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -75,14 +75,20 @@ public class Webtoon extends BaseTimeEntity {
 	@JoinColumn(name = "webtoon_id")
 	private List<Comment> comments = new ArrayList<>();
 
-	@Builder
-	public Webtoon(AiAuthor aiAuthor, Category category, String title, String content, String thumbnailImageUrl) {
-		this.aiAuthor = aiAuthor;
-		this.category = category;
-		this.title = title;
-		this.content = content;
-		this.thumbnailImageUrl = thumbnailImageUrl;
-		this.viewCount = 0L;
-		this.likeCount = 0L;
+	public Long getCommentCount() {
+		return (long)comments.size();
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (o == null || getClass() != o.getClass())
+			return false;
+		Webtoon webtoon = (Webtoon)o;
+		return Objects.equals(id, webtoon.id);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hashCode(id);
 	}
 }
