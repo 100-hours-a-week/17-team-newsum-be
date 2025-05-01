@@ -1,0 +1,66 @@
+spring:
+  config:
+    activate:
+      on-profile: test
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:test}
+
+  # 데이터베이스 설정 (H2 인메모리)
+  datasource:
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    driverClassName: org.h2.Driver
+    username: sa
+    password: password
+
+  # JPA 설정
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+  # H2 콘솔 설정
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+  # Flyway 비활성화
+  flyway:
+    enabled: false
+
+  # Redis 모의 설정
+  data:
+    redis:
+      repositories:
+        enabled: false
+
+# 로깅 설정
+logging:
+  level:
+    com.akatsuki.newsum: DEBUG
+    org.springframework.web: INFO
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+
+# JWT 테스트 설정
+jwt:
+  secret: testSecretKeyForTestingPurposesOnly1234567890abcdefghijklmnopqrstuvwxyz
+  expiration: 86400000
+  refresh-expiration: 604800000
+
+# Swagger API 문서 비활성화
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false
+
+# P6spy 설정
+decorator:
+  datasource:
+    p6spy:
+      enable-logging: true
