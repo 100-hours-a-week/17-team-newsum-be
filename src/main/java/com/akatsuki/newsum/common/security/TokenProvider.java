@@ -1,12 +1,18 @@
 package com.akatsuki.newsum.common.security;
 
 import java.util.Date;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import com.akatsuki.newsum.common.dto.ErrorCodeAndMessage;
+import com.akatsuki.newsum.common.exception.UnauthorizedException;
 import com.akatsuki.newsum.domain.user.entity.UserRole;
 
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jws;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 
@@ -46,5 +52,39 @@ public class TokenProvider {
 			.setExpiration(new Date(now.getTime() + refreshTokenValidityInMillis))
 			.signWith(SignatureAlgorithm.HS256, secretKey.getBytes())
 			.compact();
+	}
+
+	public String getPrincipal(String token) {
+		try {
+			return Jwts.parser()
+				.setSigningKey(secretKey)
+				.parseClaimsJws(token)
+				.getBody()
+				.getSubject();
+		} catch (JwtException | IllegalArgumentException e) {
+			throw new UnauthorizedException(ErrorCodeAndMessage.UNAUTHORIZED);
+		}
+	}
+
+	public List<String> getRoles(String token) {
+		try {
+			return Jwts.parser()
+				.setSigningKey(secretKey)
+				.parseClaimsJws(token)
+				.getBody()
+				.get("roles", List.class);
+		} catch (JwtException | IllegalArgumentException e) {
+			throw new UnauthorizedException(ErrorCodeAndMessage.UNAUTHORIZED);
+		}
+	}
+
+	public boolean validateToken(String token) {
+		try {
+			Jws<Claims> claims = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
+
+			return !claims.getBody().getExpiration().before(new Date());
+		} catch (JwtException | IllegalArgumentException e) {
+			return false;
+		}
 	}
 }
