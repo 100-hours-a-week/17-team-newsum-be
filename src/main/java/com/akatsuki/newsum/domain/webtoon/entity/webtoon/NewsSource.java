@@ -10,7 +10,6 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -33,10 +32,4 @@ public class NewsSource {
 
 	@Column(nullable = false, length = 1000)
 	private String url;
-
-	@Builder
-	public NewsSource(String headline, String url) {
-		this.headline = headline;
-		this.url = url;
-	}
 }
