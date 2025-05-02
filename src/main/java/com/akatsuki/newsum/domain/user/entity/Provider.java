@@ -6,7 +6,8 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum Provider {
-	KAKAO("kakao_account", "id", "email");
+	KAKAO("kakao_account", "id", "email"),
+	GOOGLE(null, "id", "email");
 
 	/** JSON 최상위 키 (null이면 루트를 바로 사용) */
 	private final String attributeRootKey;
