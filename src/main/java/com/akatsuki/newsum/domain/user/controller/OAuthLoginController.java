@@ -14,13 +14,13 @@ import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/oauth2/authorization")
+@RequestMapping("/api/v1/oauth2")
 
 public class OAuthLoginController {
 
 	private final GoogleOAuthService googleOAuthService;
 
-	@PostMapping("/google")
+	@PostMapping("/google/callback")
 	public ResponseEntity<TokenResponse> googleLogin(@RequestBody CodeRequestDto request) {
 		String code = request.getCode();
 		TokenResponse token = googleOAuthService.loginWithCode(code);

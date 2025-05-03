@@ -30,13 +30,13 @@ public class SocialLogin {
 	private User user;
 
 	@Column(name = "provider_id", nullable = false)
-	private Long providerId;
+	private String providerId;
 
 	@Column(name = "provider", nullable = false, length = 20)
 	@Enumerated(EnumType.STRING)
 	private Provider provider;
 
-	public SocialLogin(User user, Long providerId, Provider provider) {
+	public SocialLogin(User user, String providerId, Provider provider) {
 		this.user = user;
 		this.providerId = providerId;
 		this.provider = provider;

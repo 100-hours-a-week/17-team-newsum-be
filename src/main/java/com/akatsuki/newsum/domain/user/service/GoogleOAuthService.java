@@ -9,6 +9,8 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import com.akatsuki.newsum.common.security.TokenProvider;
@@ -16,6 +18,7 @@ import com.akatsuki.newsum.common.security.TokenResponse;
 import com.akatsuki.newsum.domain.user.dto.GoogleUserInfo;
 import com.akatsuki.newsum.domain.user.entity.Provider;
 import com.akatsuki.newsum.domain.user.entity.SocialLogin;
+import com.akatsuki.newsum.domain.user.entity.Status;
 import com.akatsuki.newsum.domain.user.entity.User;
 import com.akatsuki.newsum.domain.user.entity.UserRole;
 import com.akatsuki.newsum.domain.user.repository.SocialLoginRepository;
@@ -55,8 +58,7 @@ public class GoogleOAuthService {
 
 		// 4. SocialLogin 등록 (없으면)
 		if (!socialLoginRepository.existsByUserAndProvider(user, Provider.GOOGLE)) {
-			String googleId = userInfo.getId(); // 구글 유저 고유 ID (문자열)
-			Long providerId = Long.parseLong(googleId); // 💡 Long으로 변환
+			String providerId = userInfo.getId();
 
 			SocialLogin socialLogin = new SocialLogin(user, providerId, Provider.GOOGLE);
 			socialLoginRepository.save(socialLogin);
@@ -66,20 +68,21 @@ public class GoogleOAuthService {
 		String accessJwt = tokenProvider.createAccessToken(user.getId(), user.getEmail(), user.getRole());
 		String refreshJwt = tokenProvider.createRefreshToken();
 
-		return new TokenResponse(accessJwt, refreshJwt);
+		return new TokenResponse(accessJwt, refreshJwt, userInfo);
 	}
 
 	private String getAccessToken(String code) {
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
-		HttpEntity<Map<String, String>> request = new HttpEntity<>(Map.of(
-			"code", code,
-			"client_id", clientId,
-			"client_secret", clientSecret,
-			"redirect_uri", redirectUri,
-			"grant_type", "authorization_code"
-		), headers);
+		MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
+		formData.add("code", code);
+		formData.add("client_id", clientId);
+		formData.add("client_secret", clientSecret);
+		formData.add("redirect_uri", redirectUri);
+		formData.add("grant_type", "authorization_code");
+
+		HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(formData, headers);
 
 		ResponseEntity<Map> response = restTemplate.exchange(
 			"https://oauth2.googleapis.com/token",
@@ -117,6 +120,7 @@ public class GoogleOAuthService {
 			.nickname(userInfo.getName())
 			.profileImageUrl(userInfo.getPicture())
 			.role(UserRole.USER_BASIC)
+			.status(Status.ACTIVATE)
 			.build());
 	}
 }
