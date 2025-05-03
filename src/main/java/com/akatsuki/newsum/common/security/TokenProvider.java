@@ -15,6 +15,7 @@ import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import jakarta.servlet.http.HttpServletRequest;
 
 @Component
 public class TokenProvider {
@@ -57,7 +58,7 @@ public class TokenProvider {
 	public String getPrincipal(String token) {
 		try {
 			return Jwts.parser()
-				.setSigningKey(secretKey)
+				.setSigningKey(secretKey.getBytes())
 				.parseClaimsJws(token)
 				.getBody()
 				.getSubject();
@@ -69,7 +70,7 @@ public class TokenProvider {
 	public List<String> getRoles(String token) {
 		try {
 			return Jwts.parser()
-				.setSigningKey(secretKey)
+				.setSigningKey(secretKey.getBytes())
 				.parseClaimsJws(token)
 				.getBody()
 				.get("roles", List.class);
@@ -78,13 +79,37 @@ public class TokenProvider {
 		}
 	}
 
+	public Long getUserIdFromToken(String token) {
+		try {
+			return Jwts.parser()
+				.setSigningKey(secretKey.getBytes())
+				.parseClaimsJws(token)
+				.getBody()
+				.get("userId", Integer.class)  // DB에서 userId가 Long이면 Long.class 써도 됩니다.
+				.longValue();
+		} catch (JwtException | IllegalArgumentException e) {
+			throw new UnauthorizedException(ErrorCodeAndMessage.UNAUTHORIZED);
+		}
+	}
+
 	public boolean validateToken(String token) {
 		try {
-			Jws<Claims> claims = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
+			Jws<Claims> claims = Jwts.parser()
+				.setSigningKey(secretKey.getBytes())
+				.parseClaimsJws(token);
 
 			return !claims.getBody().getExpiration().before(new Date());
 		} catch (JwtException | IllegalArgumentException e) {
 			return false;
 		}
 	}
+
+	public String resolveToken(HttpServletRequest request) {
+		String bearerToken = request.getHeader("Authorization");
+		if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
+			return bearerToken.substring(7); // "Bearer " 제거 후 토큰 반환
+		}
+		return null;
+	}
+
 }
