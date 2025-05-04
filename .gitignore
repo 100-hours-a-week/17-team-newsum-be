@@ -44,3 +44,4 @@ out/
 !.env.example
 
 src/main/generated/**src/main/resources/application.yml
+docker-compose.yml
