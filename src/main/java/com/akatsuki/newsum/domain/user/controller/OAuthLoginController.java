@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.akatsuki.newsum.common.security.TokenResponse;
 import com.akatsuki.newsum.domain.user.dto.CodeRequestDto;
 import com.akatsuki.newsum.domain.user.service.GoogleOAuthService;
+import com.akatsuki.newsum.domain.user.service.KakaoOAuthService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -19,6 +20,7 @@ import lombok.RequiredArgsConstructor;
 public class OAuthLoginController {
 
 	private final GoogleOAuthService googleOAuthService;
+	private final KakaoOAuthService kakaoOAuthService;
 
 	@PostMapping("/google/callback")
 	public ResponseEntity<TokenResponse> googleLogin(@RequestBody CodeRequestDto request) {
@@ -30,7 +32,7 @@ public class OAuthLoginController {
 	@PostMapping("/kakao/callback")
 	public ResponseEntity<TokenResponse> kakaoLogin(@RequestBody CodeRequestDto request) {
 		String code = request.getCode();
-		TokenResponse token = googleOAuthService.loginWithCode(code);
+		TokenResponse token = kakaoOAuthService.loginWithCode(code);
 		return ResponseEntity.ok(token);
 	}
 

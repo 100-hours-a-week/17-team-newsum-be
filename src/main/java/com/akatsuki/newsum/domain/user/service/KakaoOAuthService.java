@@ -38,7 +38,7 @@ public class KakaoOAuthService {
 	@Value("${oauth.kakao.client-id}")
 	private String clientId;
 
-	@Value("${oauth.kakao.client-secret}")
+	@Value("${oauth.kakao.client-secret:}")
 	private String clientSecret;
 
 	@Value("${oauth.kakao.redirect-uri}")

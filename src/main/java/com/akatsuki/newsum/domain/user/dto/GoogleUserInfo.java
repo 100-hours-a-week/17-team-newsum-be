@@ -11,5 +11,5 @@ public class GoogleUserInfo implements OAuthUserInfo {
 	private String picture;
 	private String id;
 
-	}
 }
+

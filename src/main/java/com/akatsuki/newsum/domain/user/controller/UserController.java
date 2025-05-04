@@ -23,7 +23,8 @@ public class UserController {
 		UserProfileDto dto = new UserProfileDto(
 			user.getEmail(),
 			user.getNickname(),
-			user.getProfileImageUrl()
+			user.getProfileImageUrl(),
+			String.valueOf(user.getId())
 		);
 
 		return ResponseEntity.ok(dto);
