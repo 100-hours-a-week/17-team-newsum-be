@@ -35,13 +35,13 @@ public class KakaoOAuthService {
 	private final TokenProvider tokenProvider;
 	private final RestTemplate restTemplate = new RestTemplate();
 
-	@Value("${oauth.kakao.client-id}")
+	@Value("${KAKAO_CLIENT_ID}")
 	private String clientId;
 
-	@Value("${oauth.kakao.client-secret:}")
+	@Value("${KAKAO_CLIENT_SECRET:}")
 	private String clientSecret;
 
-	@Value("${oauth.kakao.redirect-uri}")
+	@Value("${KAKAO_REDIRECT_URI}")
 	private String redirectUri;
 
 	public TokenResponse loginWithCode(String code) {

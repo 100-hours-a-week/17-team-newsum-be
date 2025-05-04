@@ -34,13 +34,13 @@ public class GoogleOAuthService {
 	private final SocialLoginRepository socialLoginRepository;
 	private final TokenProvider tokenProvider;
 
-	@Value("${oauth.google.client-id}")
+	@Value("${GOOGLE_CLIENT_ID}")
 	private String clientId;
 
-	@Value("${oauth.google.client-secret}")
+	@Value("${GOOGLE_CLIENT_SECRET}")
 	private String clientSecret;
 
-	@Value("${oauth.google.redirect-uri}")
+	@Value("${GOOGLE_REDIRECT_URI}")
 	private String redirectUri;
 
 	private final RestTemplate restTemplate = new RestTemplate();
