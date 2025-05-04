@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class GoogleUserInfo {
+public class GoogleUserInfo i{
 	private String email;
 	private String name;
 	private String picture;

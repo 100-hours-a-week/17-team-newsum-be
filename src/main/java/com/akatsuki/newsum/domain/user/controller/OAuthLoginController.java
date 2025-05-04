@@ -27,4 +27,11 @@ public class OAuthLoginController {
 		return ResponseEntity.ok(token);
 	}
 
+	@PostMapping("/kakao/callback")
+	public ResponseEntity<TokenResponse> kakaoLogin(@RequestBody CodeRequestDto request) {
+		String code = request.getCode();
+		TokenResponse token = googleOAuthService.loginWithCode(code);
+		return ResponseEntity.ok(token);
+	}
+
 }

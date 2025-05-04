@@ -11,11 +11,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.client.RestTemplate;
 
 import com.akatsuki.newsum.common.security.TokenProvider;
 import com.akatsuki.newsum.common.security.TokenResponse;
 import com.akatsuki.newsum.domain.user.dto.GoogleUserInfo;
+import com.akatsuki.newsum.domain.user.dto.UserProfileDto;
 import com.akatsuki.newsum.domain.user.entity.Provider;
 import com.akatsuki.newsum.domain.user.entity.SocialLogin;
 import com.akatsuki.newsum.domain.user.entity.Status;
@@ -28,29 +28,23 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class GoogleOAuthService {
-
+public class KakaoOAuthService {
 	private final UserRepository userRepository;
 	private final SocialLoginRepository socialLoginRepository;
 	private final TokenProvider tokenProvider;
 
-	@Value("${oauth.google.client-id}")
+	@Value("${oauth.kakao.client-id}")
 	private String clientId;
 
-	@Value("${oauth.google.client-secret}")
-	private String clientSecret;
-
-	@Value("${oauth.google.redirect-uri}")
+	@Value("${oauth.kakao.redirect-uri.redirect-uri}")
 	private String redirectUri;
-
-	private final RestTemplate restTemplate = new RestTemplate();
 
 	public TokenResponse loginWithCode(String code) {
 		// 1. access token 요청
 		String accessToken = getAccessToken(code);
 
 		// 2. 사용자 정보 요청
-		GoogleUserInfo userInfo = getUserInfo(accessToken);
+		UserProfileDto userInfo = getUserInfo(accessToken);
 
 		// 3. User 조회 또는 생성
 		User user = userRepository.findByEmail(userInfo.getEmail())
