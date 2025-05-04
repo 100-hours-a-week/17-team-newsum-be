@@ -43,4 +43,4 @@ out/
 .env.*
 !.env.example
 
-src/main/generated/**
+src/main/generated/**src/main/resources/application.yml
