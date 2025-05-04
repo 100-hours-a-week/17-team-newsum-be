@@ -1,6 +1,6 @@
 package com.akatsuki.newsum.common.security;
 
-import com.akatsuki.newsum.domain.user.dto.GoogleUserInfo;
+import com.akatsuki.newsum.domain.user.dto.OAuthUserInfo;
 
 import lombok.Getter;
 
@@ -9,9 +9,9 @@ public class TokenResponse {
 
 	private String accessToken;
 	private String refreshToken;
-	private GoogleUserInfo userInfo;
+	private OAuthUserInfo userInfo;
 
-	public TokenResponse(String accessToken, String refreshToken, GoogleUserInfo userInfo) {
+	public TokenResponse(String accessToken, String refreshToken, OAuthUserInfo userInfo) {
 		this.accessToken = accessToken;
 		this.refreshToken = refreshToken;
 		this.userInfo = userInfo;
