@@ -2,6 +2,9 @@ package com.akatsuki.newsum.domain.webtoon.entity.comment.entity;
 
 import java.time.LocalDateTime;
 
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
+
 import com.akatsuki.newsum.common.entity.BaseTimeEntity;
 
 import jakarta.persistence.Column;
@@ -17,6 +20,8 @@ import lombok.NoArgsConstructor;
 @Entity
 @Table(name = "comment")
 @Getter
+@SQLDelete(sql = "UPDATE comment SET deleted_at = now() WHERE id = ?")
+@SQLRestriction(value = "deleted_at IS NULL")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Comment extends BaseTimeEntity {
 
@@ -40,4 +45,15 @@ public class Comment extends BaseTimeEntity {
 	private Long likeCount = 0L;
 
 	private LocalDateTime deletedAt;
+
+	public void editComment(String content) {
+		this.content = content;
+	}
+
+	public Comment(Long userId, Long webtoonId, Long parentCommentId, String content) {
+		this.userId = userId;
+		this.webtoonId = webtoonId;
+		this.parentCommentId = parentCommentId;
+		this.content = content;
+	}
 }
