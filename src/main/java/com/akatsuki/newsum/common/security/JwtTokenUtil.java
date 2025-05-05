@@ -15,9 +15,4 @@ public class JwtTokenUtil {
 		}
 		return null;
 	}
-
-	public static Long extractUserEmailFromBearerToken(String bearerToken) {
-		String accessToken = parseBearerToken(bearerToken);
-		return 1L;
-	}
 }
