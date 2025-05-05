@@ -25,7 +25,11 @@ public enum ResponseCodeAndMessage {
 	USER_REGISTER_SUCCESS(HttpStatus.CREATED.value(), "회원가입이 성공적으로 완료되었습니다."),
 	USER_LOGIN_SUCCESS(HttpStatus.OK.value(), "로그인이 성공적으로 완료되었습니다."),
 	USER_INFO_SUCCESS(HttpStatus.OK.value(), "사용자 정보 조회에 성공했습니다."),
-	;
+
+	COMMENT_FIND_SUCCESS(HttpStatus.OK.value(), "댓글 목록 조회에 성공했습니다."),
+	COMMENT_DELETE_SUCCESS(HttpStatus.NO_CONTENT.value(), "댓글 삭제에 성공했습니다."),
+	COMMEND_EDIT_SUCCESS(HttpStatus.OK.value(), "댓글 수정에 성공했습니다."),
+	COMMENT_ADD_SUCCESS(HttpStatus.CREATED.value(), "댓글 생성에 성공했습니다.");
 
 	private final int code;
 	private final String message;

@@ -1,7 +1,6 @@
 package com.akatsuki.newsum.common.security;
 
 import java.util.Date;
-import java.util.List;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -66,13 +65,13 @@ public class TokenProvider {
 		}
 	}
 
-	public List<String> getRoles(String token) {
+	public String getRoles(String token) {
 		try {
 			return Jwts.parser()
 				.setSigningKey(secretKey)
 				.parseClaimsJws(token)
 				.getBody()
-				.get("roles", List.class);
+				.get("role", String.class);
 		} catch (JwtException | IllegalArgumentException e) {
 			throw new UnauthorizedException(ErrorCodeAndMessage.UNAUTHORIZED);
 		}
