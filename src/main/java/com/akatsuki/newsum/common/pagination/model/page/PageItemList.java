@@ -1,4 +1,4 @@
-package com.akatsuki.newsum.common.dto.pagination.model;
+package com.akatsuki.newsum.common.pagination.model.page;
 
 import java.util.Collection;
 import java.util.Iterator;

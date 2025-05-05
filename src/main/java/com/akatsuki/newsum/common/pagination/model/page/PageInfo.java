@@ -1,6 +1,6 @@
-package com.akatsuki.newsum.common.dto.pagination.model;
+package com.akatsuki.newsum.common.pagination.model.page;
 
-import com.akatsuki.newsum.common.dto.pagination.model.cursor.Cursor;
+import com.akatsuki.newsum.common.pagination.model.cursor.Cursor;
 
 public record PageInfo(
 	String nextCursor,

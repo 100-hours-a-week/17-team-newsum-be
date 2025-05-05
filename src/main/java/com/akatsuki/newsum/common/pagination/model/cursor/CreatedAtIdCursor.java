@@ -1,4 +1,4 @@
-package com.akatsuki.newsum.common.dto.pagination.model.cursor;
+package com.akatsuki.newsum.common.pagination.model.cursor;
 
 import java.time.LocalDateTime;
 
