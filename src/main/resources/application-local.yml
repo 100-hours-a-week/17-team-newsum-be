@@ -2,7 +2,6 @@ spring:
   config:
     activate:
       on-profile: local
-  
   # 데이터베이스 설정 (PostgreSQL)
   datasource:
     url: ${DB_URL}
@@ -28,14 +27,23 @@ spring:
       client:
         registration:
           kakao:
-            client-id: ${OAUTH2_KAKAO_CLIENT_ID}
-            client-secret: ${OAUTH2_KAKAO_CLIENT_SECRET}
-            redirect-uri: http://localhost:8080/login/oauth2/code/kakao
+            client-id: ${KAKAO_CLIENT_ID}
+            redirect-uri: ${KAKAO_REDIRECT_URI}
             authorization-grant-type: authorization_code
             scope:
               - profile_nickname
+              - profile_image
               - account_email
             client-name: Kakao
+          google:
+            client-id: ${GOOGLE_CLIENT_ID}
+            client-secret: ${GOOGLE_CLIENT_SECRET}
+            redirect-uri: ${GOOGLE_REDIRECT_URI}
+            authorization-grant-type: authorization_code
+            scope:
+              - profile
+              - email
+            client-name: Google
         provider:
           kakao:
             authorization-uri: https://kauth.kakao.com/oauth/authorize

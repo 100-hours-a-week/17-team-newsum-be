@@ -28,6 +28,7 @@ public enum ErrorCodeAndMessage {
 	INVALID_WEBTOON_ID(HttpStatus.BAD_REQUEST.value(), "유효하지 않은 웹툰 ID입니다."),
 	DUPLICATE_WEBTOON_LIKE(HttpStatus.CONFLICT.value(), "이미 좋아요한 웹툰입니다."),
 	DUPLICATE_WEBTOON_BOOKMARK(HttpStatus.CONFLICT.value(), "이미 북마크한 웹툰입니다."),
+
 	COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "댓글을 찾을 수 없습니다."),
 	COMMENT_FORBIDDEN(HttpStatus.FORBIDDEN.value(), "댓글에 대한 접근 권한이 없습니다."),
 

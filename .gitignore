@@ -44,3 +44,4 @@ out/
 !.env.example
 
 src/main/generated/**
+

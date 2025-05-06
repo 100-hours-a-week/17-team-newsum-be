@@ -48,7 +48,7 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
 		String profileImg = (originalProfileImg == null || originalProfileImg.isEmpty())
 			? "http://localhost:8080/images/default-profile.png"
 			: originalProfileImg;
-		Long providerId = (Long)attributes.get("id");
+		String providerId = String.valueOf(attributes.get("id"));
 
 		Provider provider = Provider.KAKAO;
 
@@ -95,7 +95,8 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
 		}
 	}
 
-	private void checkDuplicateSocialProviderAndSave(User user, Provider provider, Long providerId) {
+	private void checkDuplicateSocialProviderAndSave(User user, Provider provider, String providerId) {
+
 		if (!socialLoginRepository.existsByUserAndProvider(user, provider)) {
 			SocialLogin socialLogin = new SocialLogin(user, providerId, provider);
 			socialLoginRepository.save(socialLogin);
