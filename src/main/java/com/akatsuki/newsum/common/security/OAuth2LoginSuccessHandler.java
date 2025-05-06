@@ -96,6 +96,7 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
 	}
 
 	private void checkDuplicateSocialProviderAndSave(User user, Provider provider, String providerId) {
+
 		if (!socialLoginRepository.existsByUserAndProvider(user, provider)) {
 			SocialLogin socialLogin = new SocialLogin(user, providerId, provider);
 			socialLoginRepository.save(socialLogin);

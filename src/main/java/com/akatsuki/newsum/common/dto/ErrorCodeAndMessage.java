@@ -20,11 +20,17 @@ public enum ErrorCodeAndMessage {
 	PRECONDITION_FAILED(HttpStatus.PRECONDITION_FAILED.value(), "사전 조건이 충족되지 않았습니다."),
 	UNPROCESSABLE_ENTITY(HttpStatus.UNPROCESSABLE_ENTITY.value(), "요청은 유효하나 처리할 수 없습니다."),
 
+	//커서, 페이지 네이션 관련 오류
+	CURSOR_WRONG_EXPRESSION(HttpStatus.BAD_REQUEST.value(), "지원하지 않는 커서 형식입니다."),
+
 	// 웹툰 관련 클라이언트 오류
 	WEBTOON_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "존재하지 않는 웹툰입니다."),
 	INVALID_WEBTOON_ID(HttpStatus.BAD_REQUEST.value(), "유효하지 않은 웹툰 ID입니다."),
 	DUPLICATE_WEBTOON_LIKE(HttpStatus.CONFLICT.value(), "이미 좋아요한 웹툰입니다."),
 	DUPLICATE_WEBTOON_BOOKMARK(HttpStatus.CONFLICT.value(), "이미 북마크한 웹툰입니다."),
+
+	COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "댓글을 찾을 수 없습니다."),
+	COMMENT_FORBIDDEN(HttpStatus.FORBIDDEN.value(), "댓글에 대한 접근 권한이 없습니다."),
 
 	// 사용자 관련 클라이언트 오류
 	USER_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "존재하지 않는 사용자입니다."),

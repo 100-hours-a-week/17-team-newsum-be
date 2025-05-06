@@ -2,11 +2,10 @@ spring:
   config:
     activate:
       on-profile: local
-
   # 데이터베이스 설정 (PostgreSQL)
   datasource:
     url: ${DB_URL}
-    driver-class-name: ${DB_DRIVER}
+    driverClassName: ${DB_DRIVER}
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
 
@@ -22,7 +21,7 @@ spring:
       host: ${REDIS_HOST:localhost}
       port: ${REDIS_PORT:6379}
 
-  # Spring Security OAuth2 설정
+  # Security 설정
   security:
     oauth2:
       client:
@@ -52,7 +51,6 @@ spring:
             user-info-uri: https://kapi.kakao.com/v2/user/me
             user-name-attribute: id
 
-# JWT 설정
 jwt:
   secret: ${JWT_SECRET_KEY}
   access-token:
