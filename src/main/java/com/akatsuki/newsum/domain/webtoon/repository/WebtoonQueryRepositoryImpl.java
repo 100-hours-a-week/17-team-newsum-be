@@ -4,9 +4,16 @@ import static com.akatsuki.newsum.domain.aiAuthor.entity.QAiAuthor.*;
 import static com.akatsuki.newsum.domain.webtoon.entity.webtoon.QNewsSource.*;
 import static com.akatsuki.newsum.domain.webtoon.entity.webtoon.QWebtoon.*;
 
+import java.util.List;
 import java.util.Optional;
 
+import com.akatsuki.newsum.common.pagination.model.cursor.CreatedAtIdCursor;
+import com.akatsuki.newsum.common.pagination.model.cursor.Cursor;
+import com.akatsuki.newsum.common.pagination.querybuilder.CursorQueryBuilder;
+import com.akatsuki.newsum.common.pagination.querybuilder.registry.CursorQueryRegistry;
+import com.akatsuki.newsum.domain.webtoon.entity.webtoon.Category;
 import com.akatsuki.newsum.domain.webtoon.entity.webtoon.Webtoon;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import lombok.RequiredArgsConstructor;
@@ -15,6 +22,21 @@ import lombok.RequiredArgsConstructor;
 public class WebtoonQueryRepositoryImpl implements WebtoonQueryRepository {
 
 	private final JPAQueryFactory queryFactory;
+	private final CursorQueryRegistry cursorQueryRegistry;
+
+	@Override
+	public List<Webtoon> findWebtoonByCategoryWithCursor(Category category, Cursor cursor, int size) {
+		//TODO : CursorQueryBuilder 수정 필요
+		CursorQueryBuilder<Cursor> queryBuilder = cursorQueryRegistry.resolve(cursor);
+
+		return queryFactory.selectFrom(webtoon)
+			.where(webtoon.category.eq(category)
+				.and(buildBooleanExpression(cursor)))
+			.orderBy(webtoon.createdAt.asc())
+			.orderBy(webtoon.createdAt.desc())
+			.limit(size + 1)
+			.fetch();
+	}
 
 	@Override
 	public Optional<Webtoon> findWebtoonAndAiAuthorById(Long webtoonId) {
@@ -34,5 +56,11 @@ public class WebtoonQueryRepositoryImpl implements WebtoonQueryRepository {
 			.where(webtoon.id.eq(webtoonId))
 			.fetch()
 			.stream().findFirst();
+	}
+
+	private BooleanExpression buildBooleanExpression(Cursor cursor) {
+		CreatedAtIdCursor createdAtIdCursor = (CreatedAtIdCursor)cursor;
+		return webtoon.createdAt.gt(createdAtIdCursor.getCreatedAt())
+			.or(webtoon.createdAt.eq(createdAtIdCursor.getCreatedAt()).and(webtoon.id.goe(createdAtIdCursor.getId())));
 	}
 }

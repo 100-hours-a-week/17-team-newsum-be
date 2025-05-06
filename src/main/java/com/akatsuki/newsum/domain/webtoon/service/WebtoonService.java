@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.akatsuki.newsum.common.pagination.model.cursor.Cursor;
 import com.akatsuki.newsum.domain.aiAuthor.entity.AiAuthor;
 import com.akatsuki.newsum.domain.webtoon.dto.AiAuthorInfoDto;
 import com.akatsuki.newsum.domain.webtoon.dto.WebtoonCardDto;
@@ -19,6 +20,7 @@ import com.akatsuki.newsum.domain.webtoon.dto.WebtoonDetailResponse;
 import com.akatsuki.newsum.domain.webtoon.dto.WebtoonResponse;
 import com.akatsuki.newsum.domain.webtoon.dto.WebtoonSlideDto;
 import com.akatsuki.newsum.domain.webtoon.dto.WebtoonSourceDto;
+import com.akatsuki.newsum.domain.webtoon.entity.webtoon.Category;
 import com.akatsuki.newsum.domain.webtoon.entity.webtoon.NewsSource;
 import com.akatsuki.newsum.domain.webtoon.entity.webtoon.Webtoon;
 import com.akatsuki.newsum.domain.webtoon.entity.webtoon.WebtoonDetail;
@@ -37,6 +39,15 @@ public class WebtoonService {
 	private final int RELATED_CATEGORY_SIZE = 2;
 	private final int RELATED_AI_AUTHOR_SIZE = 2;
 	private final int RELATED_NEWS_SIZE = RELATED_CATEGORY_SIZE + RELATED_AI_AUTHOR_SIZE;
+
+	public List<WebtoonCardDto> findWebtoonsByCategory(String category, Cursor cursor, int size) {
+		List<Webtoon> webtoons = webtoonRepository.findWebtoonByCategoryWithCursor(Category.valueOf(category), cursor,
+			size);
+
+		return webtoons.stream()
+			.map(this::mapWebToonCardDto)
+			.toList();
+	}
 
 	public WebtoonResponse getWebtoon(Long webtoonId, Long userId) {
 		Webtoon webtoon = findWebtoonWithAiAuthorByIdOrThrow(webtoonId);
@@ -117,7 +128,8 @@ public class WebtoonService {
 	}
 
 	private WebtoonCardDto mapWebToonCardDto(Webtoon webtoon) {
-		return new WebtoonCardDto(webtoon.getId(), webtoon.getTitle(), webtoon.getThumbnailImageUrl());
+		return new WebtoonCardDto(webtoon.getId(), webtoon.getTitle(), webtoon.getThumbnailImageUrl(),
+			webtoon.getCreatedAt());
 	}
 
 	private AiAuthorInfoDto mapAiAuthorToAiAuthorInfoDto(AiAuthor aiAuthor) {

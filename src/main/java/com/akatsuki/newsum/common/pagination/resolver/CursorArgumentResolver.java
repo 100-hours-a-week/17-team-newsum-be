@@ -9,7 +9,7 @@ import org.springframework.web.method.support.ModelAndViewContainer;
 
 import com.akatsuki.newsum.common.pagination.annotation.CursorParam;
 import com.akatsuki.newsum.common.pagination.deserializer.CursorDeserializer;
-import com.akatsuki.newsum.common.pagination.deserializer.registry.CursorParserRegistry;
+import com.akatsuki.newsum.common.pagination.deserializer.registry.CursorDeserializerRegistry;
 import com.akatsuki.newsum.common.pagination.model.cursor.Cursor;
 
 import lombok.RequiredArgsConstructor;
@@ -18,7 +18,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class CursorArgumentResolver implements HandlerMethodArgumentResolver {
 
-	private final CursorParserRegistry parserRegistry;
+	private final CursorDeserializerRegistry deserializerRegistry;
 
 	@Override
 	public boolean supportsParameter(MethodParameter parameter) {
@@ -34,7 +34,7 @@ public class CursorArgumentResolver implements HandlerMethodArgumentResolver {
 		CursorParam annotation = parameter.getParameterAnnotation(CursorParam.class);
 		Class<? extends Cursor> cursorType = annotation.cursorType();
 		String rawCursor = webRequest.getParameter("cursor");
-		CursorDeserializer<? extends Cursor> parser = parserRegistry.resolve(cursorType);
+		CursorDeserializer<? extends Cursor> parser = deserializerRegistry.resolve(cursorType);
 
 		if (rawCursor == null || rawCursor.isBlank()) {
 			return parser.defaultCursor();
