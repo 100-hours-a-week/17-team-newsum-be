@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import com.akatsuki.newsum.common.pagination.model.cursor.Cursor;
 import com.akatsuki.newsum.domain.webtoon.entity.webtoon.Category;
+import com.akatsuki.newsum.domain.webtoon.entity.webtoon.RecentView;
 import com.akatsuki.newsum.domain.webtoon.entity.webtoon.Webtoon;
 
 public interface WebtoonQueryRepository {
@@ -14,4 +15,6 @@ public interface WebtoonQueryRepository {
 	Optional<Webtoon> findWebtoonAndAiAuthorById(Long webtoonId);
 
 	Optional<Webtoon> findWebtoonAndNewsSourceById(Long webtoonId);
+
+	List<RecentView> findRecentWebtoons(Long id);
 }
