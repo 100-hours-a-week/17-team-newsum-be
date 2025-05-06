@@ -7,5 +7,6 @@ public record WebtoonCardDto(
 	String title,
 	String thumbnailUrl,
 	LocalDateTime createdAt
+
 ) {
 }

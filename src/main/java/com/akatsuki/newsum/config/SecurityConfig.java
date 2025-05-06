@@ -27,10 +27,12 @@ public class SecurityConfig {
 		"/v3/api-docs/**",
 		"/swagger-resources/**",
 		"/error",
-		"/api/oauth/login/google",
-		"/api/oauth/login/kakao",
+		//"/api/oauth/login/google",
+		//"/api/oauth/login/kakao",
 		"/api/v1/oauth2/kakao/callback",
-		"/api/v1/oauth2/google/callback"
+		"/api/v1/oauth2/google/callback",
+		"/api/v1/webtoons/**",
+
 	};
 
 	@Bean
