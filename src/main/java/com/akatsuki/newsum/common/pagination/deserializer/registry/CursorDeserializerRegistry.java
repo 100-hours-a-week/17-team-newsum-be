@@ -13,7 +13,7 @@ import lombok.RequiredArgsConstructor;
 
 @Component
 @RequiredArgsConstructor
-public class CursorParserRegistry {
+public class CursorDeserializerRegistry {
 
 	private final List<CursorDeserializer<? extends Cursor>> deserializers;
 
