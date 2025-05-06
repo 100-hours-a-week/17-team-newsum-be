@@ -27,8 +27,10 @@ public class SecurityConfig {
 		"/v3/api-docs/**",
 		"/swagger-resources/**",
 		"/error",
-		"/api/oauth/login/google", // ✅ 프론트에서 인가코드 받아서 보내는 API
-		"/api/oauth/login/kakao",  // (추후 카카오도 같이 처리)
+		"/api/oauth/login/google",
+		"/api/oauth/login/kakao",
+		"/api/v1/oauth2/kakao/callback",
+		"/api/v1/oauth2/google/callback"
 	};
 
 	@Bean
