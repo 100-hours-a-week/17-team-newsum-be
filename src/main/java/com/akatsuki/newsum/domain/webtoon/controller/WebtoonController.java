@@ -137,8 +137,7 @@ public class WebtoonController {
 		Map<String, List<WebtoonCardDto>> webtoonsByCategory = webtoonService.getWebtoonsByCategoryLimit3();
 
 		return ResponseEntity.ok(
-			ApiResponse.success(ResponseCodeAndMessage.WEBTOON_MAIN_SUCCESS,
-				Map.of("webtoonsByCategory", webtoonsByCategory))
+			ApiResponse.success(ResponseCodeAndMessage.WEBTOON_MAIN_SUCCESS, webtoonsByCategory)
 		);
 	}
 

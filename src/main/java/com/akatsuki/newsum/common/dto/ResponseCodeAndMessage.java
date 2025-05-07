@@ -22,7 +22,7 @@ public enum ResponseCodeAndMessage {
 	WEBTOON_BOOKMARK_SUCCESS(HttpStatus.OK.value(), "웹툰 북마크가 성공적으로 처리되었습니다."),
 	WEBTOON_TOP_SUCCESS(HttpStatus.OK.value(), "홈 화면용 데이터 조회에 성공했습니다."),
 	WEBTOON_CREATE_SUCCESS(HttpStatus.CREATED.value(), "웹툰 생성에 성공했습니다."),
-
+	WEBTOON_MAIN_SUCCESS(HttpStatus.OK.value(), "카테고리별 웹툰 목록 조회에 성공했습니다."),
 	// 사용자 관련 성공 응답
 	USER_REGISTER_SUCCESS(HttpStatus.CREATED.value(), "회원가입이 성공적으로 완료되었습니다."),
 	USER_LOGIN_SUCCESS(HttpStatus.OK.value(), "로그인이 성공적으로 완료되었습니다."),
