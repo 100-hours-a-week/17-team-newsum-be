@@ -110,7 +110,7 @@ public class CommentController {
 		}
 		String accessToken = JwtTokenUtil.parseBearerToken(bearerToken);
 		if (tokenProvider.validateToken(accessToken)) {
-			return Long.parseLong(tokenProvider.getPrincipal(accessToken));
+			return tokenProvider.getUserIdFromToken(accessToken);
 		}
 		return null;
 	}
