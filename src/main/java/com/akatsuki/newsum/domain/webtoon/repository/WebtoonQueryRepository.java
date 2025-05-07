@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import com.akatsuki.newsum.common.pagination.model.cursor.Cursor;
 import com.akatsuki.newsum.domain.webtoon.entity.webtoon.Category;
+import com.akatsuki.newsum.domain.webtoon.entity.webtoon.RecentView;
 import com.akatsuki.newsum.domain.webtoon.entity.webtoon.Webtoon;
 
 public interface WebtoonQueryRepository {
@@ -18,4 +19,6 @@ public interface WebtoonQueryRepository {
 	List<Webtoon> findTop3TodayByViewCount();
 
 	List<Webtoon> findTodayNewsTop3();
+
+	List<RecentView> findRecentWebtoons(Long id);
 }

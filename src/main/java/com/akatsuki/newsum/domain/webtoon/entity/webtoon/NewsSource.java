@@ -32,4 +32,10 @@ public class NewsSource {
 
 	@Column(nullable = false, length = 1000)
 	private String url;
+
+	public NewsSource(Webtoon webtoon, String headline, String url) {
+		this.webtoon = webtoon;
+		this.headline = headline;
+		this.url = url;
+	}
 }

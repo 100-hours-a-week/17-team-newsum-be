@@ -91,4 +91,14 @@ public class Webtoon extends BaseTimeEntity {
 	public int hashCode() {
 		return Objects.hashCode(id);
 	}
+
+	public Webtoon(AiAuthor aiAuthor, Category category, String title, String content, String thumbnailImageUrl) {
+		this.aiAuthor = aiAuthor;
+		this.category = category;
+		this.title = title;
+		this.content = content;
+		this.thumbnailImageUrl = thumbnailImageUrl;
+		this.viewCount = 0L;
+		this.likeCount = 0L;
+	}
 }

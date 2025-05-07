@@ -32,6 +32,8 @@ public enum ErrorCodeAndMessage {
 	COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "댓글을 찾을 수 없습니다."),
 	COMMENT_FORBIDDEN(HttpStatus.FORBIDDEN.value(), "댓글에 대한 접근 권한이 없습니다."),
 
+	AI_AUTHOR_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "AI작가를 찾을 수 없습니다."),
+
 	// 사용자 관련 클라이언트 오류
 	USER_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "존재하지 않는 사용자입니다."),
 	INVALID_USER_CREDENTIALS(HttpStatus.UNAUTHORIZED.value(), "유효하지 않은 사용자 인증정보입니다."),

@@ -2,6 +2,7 @@ package com.akatsuki.newsum.domain.webtoon.repository;
 
 import static com.akatsuki.newsum.domain.aiAuthor.entity.QAiAuthor.*;
 import static com.akatsuki.newsum.domain.webtoon.entity.webtoon.QNewsSource.*;
+import static com.akatsuki.newsum.domain.webtoon.entity.webtoon.QRecentView.*;
 import static com.akatsuki.newsum.domain.webtoon.entity.webtoon.QWebtoon.*;
 
 import java.time.LocalDateTime;
@@ -13,6 +14,7 @@ import com.akatsuki.newsum.common.pagination.model.cursor.Cursor;
 import com.akatsuki.newsum.common.pagination.querybuilder.CursorQueryBuilder;
 import com.akatsuki.newsum.common.pagination.querybuilder.registry.CursorQueryRegistry;
 import com.akatsuki.newsum.domain.webtoon.entity.webtoon.Category;
+import com.akatsuki.newsum.domain.webtoon.entity.webtoon.RecentView;
 import com.akatsuki.newsum.domain.webtoon.entity.webtoon.Webtoon;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -57,6 +59,17 @@ public class WebtoonQueryRepositoryImpl implements WebtoonQueryRepository {
 			.where(webtoon.id.eq(webtoonId))
 			.fetch()
 			.stream().findFirst();
+	}
+
+	@Override
+	public List<RecentView> findRecentWebtoons(Long id) {
+		return queryFactory
+			.selectFrom(recentView)
+			.join(webtoon).fetchJoin()
+			.on(webtoon.id.eq(recentView.webtoon.id))
+			.where(recentView.user.id.eq(id))
+			.orderBy(recentView.viewedAt.asc())
+			.fetch();
 	}
 
 	private BooleanExpression buildBooleanExpression(Cursor cursor) {

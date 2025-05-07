@@ -10,7 +10,6 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -37,8 +36,8 @@ public class WebtoonDetail {
 	@Column(name = "image_seq", nullable = false)
 	private Byte imageSeq;
 
-	@Builder
-	public WebtoonDetail(String imageUrl, String content, Byte imageSeq) {
+	public WebtoonDetail(Webtoon webtoon, String imageUrl, String content, Byte imageSeq) {
+		this.webtoon = webtoon;
 		this.imageUrl = imageUrl;
 		this.content = content;
 		this.imageSeq = imageSeq;

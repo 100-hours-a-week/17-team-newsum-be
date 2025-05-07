@@ -27,12 +27,9 @@ public class SecurityConfig {
 		"/v3/api-docs/**",
 		"/swagger-resources/**",
 		"/error",
-		//"/api/oauth/login/google",
-		//"/api/oauth/login/kakao",
-		"/api/v1/oauth2/kakao/callback",
-		"/api/v1/oauth2/google/callback",
-		"/api/v1/webtoons/**",
-
+		"/api/oauth/login/**",
+		"/api/v1/oauth2/**",
+		"/**"
 	};
 
 	@Bean
@@ -66,7 +63,8 @@ public class SecurityConfig {
 	@Bean
 	public CorsConfigurationSource corsConfigurationSource() {
 		CorsConfiguration configuration = new CorsConfiguration();
-		configuration.setAllowedOrigins(List.of("http://localhost:5173")); // 프론트 주소만 허용
+		// configuration.setAllowedOrigins(List.of("http://localhost:5173")); // 프론트 주소만 허용
+		configuration.setAllowedOriginPatterns(List.of("*"));
 		configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
 		configuration.setAllowedHeaders(List.of("*"));
 		configuration.setAllowCredentials(true); // 쿠키 포함 허용
