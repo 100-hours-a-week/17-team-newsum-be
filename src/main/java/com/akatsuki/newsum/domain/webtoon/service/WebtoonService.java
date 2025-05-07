@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -218,34 +219,26 @@ public class WebtoonService {
 	}
 
 	public List<WebtoonCardDto> getTop3TodayByViewCount() {
-		List<Webtoon> topWebtoons = webtoonRepository.findTop3TodayByViewCount();
-
-		return topWebtoons.stream()
-			.map(w -> new WebtoonCardDto(
-				w.getId(),
-				w.getTitle(),
-				w.getThumbnailImageUrl(),
-				w.getCreatedAt()
-			)).toList();
+		return webtoonRepository.findTop3TodayByViewCount().stream()
+			.map(WebtoonCardDto::toDto)
+			.toList();
 	}
 
 	public List<WebtoonCardDto> getTodayNewsCards() {
 		return webtoonRepository.findTodayNewsTop3().stream()
-			.map(w -> new WebtoonCardDto(w.getId(), w.getTitle(), w.getThumbnailImageUrl(), w.getCreatedAt()))
+			.map(WebtoonCardDto::toDto)
 			.toList();
 	}
 
 	public Map<String, List<WebtoonCardDto>> getWebtoonsByCategoryLimit3() {
 		Map<String, List<WebtoonCardDto>> result = new LinkedHashMap<>();
-
 		for (Category category : Category.values()) {
-			List<Webtoon> webtoons = webtoonRepository.findTop3ByCategoryOrderByCreatedAtDesc(category);
-			List<WebtoonCardDto> dtoList = webtoons.stream()
-				.map(WebtoonCardDto::from)
+			List<WebtoonCardDto> dtoList = webtoonRepository.findTop3ByCategoryOrderByCreatedAtDesc(category)
+				.stream()
+				.map(WebtoonCardDto::toDto)
 				.toList();
-			result.put(category.name(), dtoList); // 또는 category.toString()
+			result.put(category.name(), dtoList);
 		}
-
 		return result;
 	}
 
