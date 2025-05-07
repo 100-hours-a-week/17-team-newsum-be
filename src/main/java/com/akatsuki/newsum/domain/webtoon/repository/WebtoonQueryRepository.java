@@ -14,4 +14,7 @@ public interface WebtoonQueryRepository {
 	Optional<Webtoon> findWebtoonAndAiAuthorById(Long webtoonId);
 
 	Optional<Webtoon> findWebtoonAndNewsSourceById(Long webtoonId);
+
+	List<Webtoon> findTop3TodayByViewCount();
+
 }
