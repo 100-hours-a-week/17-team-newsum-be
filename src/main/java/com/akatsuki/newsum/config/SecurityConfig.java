@@ -27,6 +27,7 @@ public class SecurityConfig {
 		"/swagger-resources/**",
 		"/error",
 		"/api/oauth/login/**",
+		"/**"
 	};
 
 	@Bean
