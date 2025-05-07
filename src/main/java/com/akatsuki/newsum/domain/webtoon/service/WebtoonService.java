@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -32,6 +33,7 @@ import com.akatsuki.newsum.domain.webtoon.entity.webtoon.Webtoon;
 import com.akatsuki.newsum.domain.webtoon.entity.webtoon.WebtoonDetail;
 import com.akatsuki.newsum.domain.webtoon.exception.WebtoonNotFoundException;
 import com.akatsuki.newsum.domain.webtoon.repository.NewsSourceRepository;
+import com.akatsuki.newsum.domain.webtoon.repository.RecentViewRepository;
 import com.akatsuki.newsum.domain.webtoon.repository.WebtoonDetailRepository;
 import com.akatsuki.newsum.domain.webtoon.repository.WebtoonRepository;
 import com.akatsuki.newsum.extern.dto.CreateWebtoonApiRequest;
@@ -244,8 +246,27 @@ public class WebtoonService {
 	}
 
 	public List<WebtoonCardDto> getRecentWebtoons(Long userId) {
-		return recentViewQueryRepository.findRecentWebtoonsByUserId(userId, 3).stream()
-			.map(WebtoonCardDto::toDto)
+		var recent = recentViewRepository.findRecentWebtoonsByUserId(userId, 3);
+
+		if (recent == null || recent.isEmpty()) {
+			log.warn("최근 웹툰 없음 userId={}", userId);
+			return List.of();
+		}
+
+		log.info("최근 본 웹툰 목록 userId={} : {}", userId, recent);
+
+		return recent.stream()
+			.filter(Objects::nonNull)
+			.map(webtoon -> {
+				try {
+					return WebtoonCardDto.toDto(webtoon);
+				} catch (Exception e) {
+					log.error("WebtoonCardDto 변환 중 오류 발생: {}", webtoon, e);
+					return null; // 오류 무시하고 넘어감
+				}
+			})
+			.filter(Objects::nonNull)
 			.toList();
 	}
+
 }
