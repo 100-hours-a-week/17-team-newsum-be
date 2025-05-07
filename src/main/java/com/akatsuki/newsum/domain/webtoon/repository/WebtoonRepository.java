@@ -13,4 +13,7 @@ public interface WebtoonRepository extends JpaRepository<Webtoon, Long>, Webtoon
 	List<Webtoon> findWebtoonByCategory(Category category);
 
 	List<Webtoon> findWebtoonByAiAuthor(AiAuthor aiAuthor);
+
+	List<Webtoon> findTop3ByCategoryOrderByCreatedAtDesc(Category category);
+
 }

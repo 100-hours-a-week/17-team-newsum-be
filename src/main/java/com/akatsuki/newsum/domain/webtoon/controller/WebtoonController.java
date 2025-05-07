@@ -134,14 +134,11 @@ public class WebtoonController {
 	//카테고리별페이지
 	@GetMapping("/main")
 	public ResponseEntity<ApiResponse<Map<String, List<WebtoonCardDto>>>> getMain() {
-		// Map<String, List<WebtoonCardDto>> webtoonsByCategory = webtoonService.getWebtoonsByCategoryLimit3();
-		//
-		// return ResponseEntity.ok(
-		// 	ApiResponse.success(ResponseCodeAndMessage.WEBTOON_MAIN_SUCCESS, Map.of(
-		// 		"webtoonsByCategory", webtoonsByCategory
-		// 	))
-		// );
-		return null;
+		Map<String, List<WebtoonCardDto>> webtoonsByCategory = webtoonService.getWebtoonsByCategoryLimit3();
+
+		return ResponseEntity.ok(
+			ApiResponse.success(ResponseCodeAndMessage.WEBTOON_MAIN_SUCCESS, webtoonsByCategory)
+		);
 	}
 
 	//최근조회페이지
