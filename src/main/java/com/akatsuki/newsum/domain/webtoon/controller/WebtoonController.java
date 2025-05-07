@@ -150,6 +150,7 @@ public class WebtoonController {
 		List<WebtoonCardDto> recentWebtoons = webtoonService.getRecentWebtoons(userId);
 
 		return ResponseEntity.ok(ApiResponse.success(
+			ResponseCodeAndMessage.USER_RECENTLY_VIEWED_WEBTOON_LIST_SUCCESS,
 			Map.of("recentWebtoons", recentWebtoons)
 		));
 	}
