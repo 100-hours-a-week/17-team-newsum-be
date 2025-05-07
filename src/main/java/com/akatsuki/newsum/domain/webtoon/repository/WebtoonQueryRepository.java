@@ -17,4 +17,5 @@ public interface WebtoonQueryRepository {
 
 	List<Webtoon> findTop3TodayByViewCount();
 
+	List<Webtoon> findTodayNewsTop3();
 }
