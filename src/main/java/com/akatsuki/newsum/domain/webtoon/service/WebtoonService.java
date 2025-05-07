@@ -167,7 +167,4 @@ public class WebtoonService {
 		return webtoonRepository.findWebtoonAndNewsSourceById(webtoonId)
 			.orElseThrow(WebtoonNotFoundException::new);
 	}
-
-	//메인페이지
-
 }
