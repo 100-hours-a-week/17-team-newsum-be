@@ -60,3 +60,5 @@ jwt:
 
 ai-server:
   base-url: ${AI_SERVER_BASE_URL}
+server:
+  port: ${SERVER_PORT}
