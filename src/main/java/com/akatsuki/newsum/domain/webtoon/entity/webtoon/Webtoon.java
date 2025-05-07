@@ -75,8 +75,10 @@ public class Webtoon extends BaseTimeEntity {
 	@JoinColumn(name = "webtoon_id")
 	private List<Comment> comments = new ArrayList<>();
 
-	public Long getCommentCount() {
-		return (long)comments.size();
+	public Long getParentCommentCount() {
+		return (long)comments.stream()
+			.filter(comment -> comment.getParentCommentId() == null)
+			.count();
 	}
 
 	@Override

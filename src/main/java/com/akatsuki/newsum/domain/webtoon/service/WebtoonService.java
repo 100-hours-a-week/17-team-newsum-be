@@ -96,7 +96,7 @@ public class WebtoonService {
 
 		LocalDateTime createdAt = webtoon.getCreatedAt();
 
-		Long commentCount = webtoon.getCommentCount();
+		Long commentCount = webtoon.getParentCommentCount();
 
 		return new WebtoonDetailResponse(sources,
 			relatedNews,
