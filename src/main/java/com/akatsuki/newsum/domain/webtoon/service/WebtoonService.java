@@ -167,4 +167,16 @@ public class WebtoonService {
 		return webtoonRepository.findWebtoonAndNewsSourceById(webtoonId)
 			.orElseThrow(WebtoonNotFoundException::new);
 	}
+
+	public List<WebtoonCardDto> getTop3TodayByViewCount() {
+		List<Webtoon> topWebtoons = webtoonRepository.findTop3TodayByViewCount();
+
+		return topWebtoons.stream()
+			.map(w -> new WebtoonCardDto(
+				w.getId(),
+				w.getTitle(),
+				w.getThumbnailImageUrl(),
+				w.getCreatedAt()
+			)).toList();
+	}
 }
