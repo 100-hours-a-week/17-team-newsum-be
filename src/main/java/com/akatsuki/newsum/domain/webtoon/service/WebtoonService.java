@@ -12,9 +12,13 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.akatsuki.newsum.common.dto.ErrorCodeAndMessage;
+import com.akatsuki.newsum.common.exception.NotFoundException;
 import com.akatsuki.newsum.common.pagination.model.cursor.Cursor;
 import com.akatsuki.newsum.domain.aiAuthor.entity.AiAuthor;
+import com.akatsuki.newsum.domain.aiAuthor.repository.AiAuthorRepository;
 import com.akatsuki.newsum.domain.webtoon.dto.AiAuthorInfoDto;
+import com.akatsuki.newsum.domain.webtoon.dto.CreateWebtoonReqeust;
 import com.akatsuki.newsum.domain.webtoon.dto.WebtoonCardDto;
 import com.akatsuki.newsum.domain.webtoon.dto.WebtoonDetailResponse;
 import com.akatsuki.newsum.domain.webtoon.dto.WebtoonResponse;
@@ -25,16 +29,26 @@ import com.akatsuki.newsum.domain.webtoon.entity.webtoon.NewsSource;
 import com.akatsuki.newsum.domain.webtoon.entity.webtoon.Webtoon;
 import com.akatsuki.newsum.domain.webtoon.entity.webtoon.WebtoonDetail;
 import com.akatsuki.newsum.domain.webtoon.exception.WebtoonNotFoundException;
+import com.akatsuki.newsum.domain.webtoon.repository.NewsSourceRepository;
+import com.akatsuki.newsum.domain.webtoon.repository.WebtoonDetailRepository;
 import com.akatsuki.newsum.domain.webtoon.repository.WebtoonRepository;
+import com.akatsuki.newsum.extern.dto.CreateWebtoonApiRequest;
+import com.akatsuki.newsum.extern.service.AiServerApiService;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class WebtoonService {
 
 	private final WebtoonRepository webtoonRepository;
+	private final AiAuthorRepository aiAuthorRepository;
+	private final WebtoonDetailRepository webtoonDetailRepository;
+	private final NewsSourceRepository newsSourceRepository;
+	private final AiServerApiService aiServerApiService;
 
 	private final int RELATED_CATEGORY_SIZE = 2;
 	private final int RELATED_AI_AUTHOR_SIZE = 2;
@@ -88,6 +102,40 @@ public class WebtoonService {
 			relatedNews,
 			createdAt,
 			commentCount);
+	}
+
+	@Transactional
+	public void createWebtoon(CreateWebtoonReqeust request) {
+		AiAuthor aiAuthor = findAiAuthorById(request.aiAuthorId());
+
+		Webtoon webtoon = new Webtoon(aiAuthor,
+			Category.valueOf(request.category()),
+			request.title(),
+			request.content(),
+			request.thumbnailImageUrl());
+
+		Webtoon save = webtoonRepository.save(webtoon);
+
+		List<NewsSource> newsSources = request.sourceNews().stream()
+			.map(newsSourceDto -> new NewsSource(save, newsSourceDto.headline(), newsSourceDto.url()))
+			.toList();
+
+		List<WebtoonDetail> webtoonDetails = request.slides().stream()
+			.map(webtoonSlideDto -> new WebtoonDetail(save, webtoonSlideDto.imageUrl(), webtoonSlideDto.content(),
+				webtoonSlideDto.slideSeq()))
+			.toList();
+
+		webtoonDetailRepository.saveAll(webtoonDetails);
+		newsSourceRepository.saveAll(newsSources);
+	}
+
+	public void createWebtoonTest(Long authorId) {
+		aiServerApiService.createWebtoonApi(new CreateWebtoonApiRequest(authorId, null));
+	}
+
+	private AiAuthor findAiAuthorById(Long id) {
+		return aiAuthorRepository.findById(id)
+			.orElseThrow(() -> new NotFoundException(ErrorCodeAndMessage.AI_AUTHOR_NOT_FOUND));
 	}
 
 	private List<WebtoonCardDto> fetchRelatedNews(Webtoon webtoon) {
