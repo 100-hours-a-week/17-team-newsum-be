@@ -12,6 +12,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import com.akatsuki.newsum.common.security.OAuth2LoginSuccessHandler;
 
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 
 @Configuration
@@ -37,13 +38,23 @@ public class SecurityConfig {
 			.cors(cors -> cors.configurationSource(corsConfigurationSource()))
 			.csrf(csrf -> csrf.disable())
 			.authorizeHttpRequests(auth -> auth
-				.requestMatchers(excludePaths)
-				.permitAll()
-				.anyRequest()
-				.authenticated()
+				.requestMatchers(excludePaths).permitAll()
+				.anyRequest().authenticated()
 			)
 			.oauth2Login(oauth2 -> oauth2
-				.successHandler(oAuth2LoginSuccessHandler) // 로그인 성공 시 핸들러
+				.successHandler(oAuth2LoginSuccessHandler)
+			)
+			.exceptionHandling(exception -> exception
+				.authenticationEntryPoint((request, response, authException) -> {
+					response.setContentType("application/json");
+					response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+					response.getWriter().write("""
+							{
+							  "code": 401,
+							  "message": "인증되지 않은 요청입니다"
+							}
+						""");
+				})
 			);
 
 		return http.build();

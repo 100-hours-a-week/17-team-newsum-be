@@ -5,6 +5,7 @@ import static com.akatsuki.newsum.domain.webtoon.entity.webtoon.QNewsSource.*;
 import static com.akatsuki.newsum.domain.webtoon.entity.webtoon.QRecentView.*;
 import static com.akatsuki.newsum.domain.webtoon.entity.webtoon.QWebtoon.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -75,5 +76,29 @@ public class WebtoonQueryRepositoryImpl implements WebtoonQueryRepository {
 		CreatedAtIdCursor createdAtIdCursor = (CreatedAtIdCursor)cursor;
 		return webtoon.createdAt.gt(createdAtIdCursor.getCreatedAt())
 			.or(webtoon.createdAt.eq(createdAtIdCursor.getCreatedAt()).and(webtoon.id.goe(createdAtIdCursor.getId())));
+	}
+
+	@Override
+	public List<Webtoon> findTop3TodayByViewCount() {
+		LocalDateTime startOfToday = LocalDateTime.now().toLocalDate().atStartOfDay();
+
+		return queryFactory
+			.selectFrom(webtoon)
+			.where(webtoon.createdAt.goe(startOfToday))
+			.orderBy(webtoon.viewCount.desc())
+			.limit(3)
+			.fetch();
+	}
+
+	@Override
+	public List<Webtoon> findTodayNewsTop3() {
+		LocalDateTime startOfToday = LocalDateTime.now().toLocalDate().atStartOfDay();
+
+		return queryFactory
+			.selectFrom(webtoon)
+			.where(webtoon.createdAt.goe(startOfToday))
+			.orderBy(webtoon.createdAt.desc())
+			.limit(3)
+			.fetch();
 	}
 }
