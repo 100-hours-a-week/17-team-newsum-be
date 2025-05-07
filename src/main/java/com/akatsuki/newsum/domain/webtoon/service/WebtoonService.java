@@ -32,7 +32,6 @@ import com.akatsuki.newsum.domain.webtoon.entity.webtoon.Webtoon;
 import com.akatsuki.newsum.domain.webtoon.entity.webtoon.WebtoonDetail;
 import com.akatsuki.newsum.domain.webtoon.exception.WebtoonNotFoundException;
 import com.akatsuki.newsum.domain.webtoon.repository.NewsSourceRepository;
-import com.akatsuki.newsum.domain.webtoon.repository.RecentViewQueryRepository;
 import com.akatsuki.newsum.domain.webtoon.repository.WebtoonDetailRepository;
 import com.akatsuki.newsum.domain.webtoon.repository.WebtoonRepository;
 import com.akatsuki.newsum.extern.dto.CreateWebtoonApiRequest;
@@ -52,7 +51,7 @@ public class WebtoonService {
 	private final WebtoonDetailRepository webtoonDetailRepository;
 	private final NewsSourceRepository newsSourceRepository;
 	private final AiServerApiService aiServerApiService;
-	private final RecentViewQueryRepository recentViewQueryRepository;
+	private final RecentViewRepository recentViewRepository;
 
 	private final int RELATED_CATEGORY_SIZE = 2;
 	private final int RELATED_AI_AUTHOR_SIZE = 2;
