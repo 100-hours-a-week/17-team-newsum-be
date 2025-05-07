@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -233,4 +234,19 @@ public class WebtoonService {
 			.map(w -> new WebtoonCardDto(w.getId(), w.getTitle(), w.getThumbnailImageUrl(), w.getCreatedAt()))
 			.toList();
 	}
+
+	public Map<String, List<WebtoonCardDto>> getWebtoonsByCategoryLimit3() {
+		Map<String, List<WebtoonCardDto>> result = new LinkedHashMap<>();
+
+		for (Category category : Category.values()) {
+			List<Webtoon> webtoons = webtoonRepository.findTop3ByCategoryOrderByCreatedAtDesc(category);
+			List<WebtoonCardDto> dtoList = webtoons.stream()
+				.map(WebtoonCardDto::from)
+				.toList();
+			result.put(category.name(), dtoList); // 또는 category.toString()
+		}
+
+		return result;
+	}
+
 }
