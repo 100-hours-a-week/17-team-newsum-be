@@ -62,3 +62,6 @@ springdoc:
     enabled: false
   swagger-ui:
     enabled: false
+
+ai-server:
+  base-url: ${AI_SERVER_BASE_URL}

@@ -5,6 +5,8 @@ import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -19,6 +21,7 @@ import com.akatsuki.newsum.common.pagination.model.cursor.Cursor;
 import com.akatsuki.newsum.common.pagination.model.page.CursorPage;
 import com.akatsuki.newsum.common.security.JwtTokenUtil;
 import com.akatsuki.newsum.common.security.TokenProvider;
+import com.akatsuki.newsum.domain.webtoon.dto.CreateWebtoonReqeust;
 import com.akatsuki.newsum.domain.webtoon.dto.WebtoonCardDto;
 import com.akatsuki.newsum.domain.webtoon.dto.WebtoonDetailResponse;
 import com.akatsuki.newsum.domain.webtoon.dto.WebtoonListResponse;
@@ -77,7 +80,29 @@ public class WebtoonController {
 		);
 	}
 
+	@PostMapping
+	public ResponseEntity<ApiResponse> createWWebtoons(
+		@RequestBody CreateWebtoonReqeust request
+	) {
+		webtoonService.createWebtoon(request);
+		return ResponseEntity.ok(
+			ApiResponse.success(ResponseCodeAndMessage.WEBTOON_CREATE_SUCCESS, null)
+		);
+	}
+
+	//TODO : 테스트 용도의 API, 삭제해야함.
+	@PostMapping("/testCreate/{authorId}")
+	public ResponseEntity<ApiResponse> testCreateWebtoons(
+		@RequestParam Long authorId
+	) {
+		webtoonService.createWebtoonTest(authorId);
+		return ResponseEntity.ok(
+			ApiResponse.success(ResponseCodeAndMessage.WEBTOON_CREATE_SUCCESS, null)
+		);
+	}
+
 	private Long validateTokenAndExtractPrincipal(String bearerToken) {
+
 		if (bearerToken == null) {
 			return null;
 		}

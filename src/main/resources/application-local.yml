@@ -57,3 +57,6 @@ jwt:
     expiration: ${JWT_ACCESS_TOKEN_EXPIRE}
   refresh-token:
     expiration: ${JWT_REFRESH_TOKEN_EXPIRE}
+
+ai-server:
+  base-url: ${AI_SERVER_BASE_URL}

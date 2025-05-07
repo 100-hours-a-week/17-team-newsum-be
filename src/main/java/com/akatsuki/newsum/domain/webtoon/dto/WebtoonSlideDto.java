@@ -1,7 +1,7 @@
 package com.akatsuki.newsum.domain.webtoon.dto;
 
 public record WebtoonSlideDto(
-	int slideSeq,
+	Byte slideSeq,
 	String imageUrl,
 	String content
 ) {
