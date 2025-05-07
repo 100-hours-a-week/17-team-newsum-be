@@ -179,4 +179,10 @@ public class WebtoonService {
 				w.getCreatedAt()
 			)).toList();
 	}
+
+	public List<WebtoonCardDto> getTodayNewsCards() {
+		return webtoonRepository.findTodayNewsTop3().stream()
+			.map(w -> new WebtoonCardDto(w.getId(), w.getTitle(), w.getThumbnailImageUrl(), w.getCreatedAt()))
+			.toList();
+	}
 }

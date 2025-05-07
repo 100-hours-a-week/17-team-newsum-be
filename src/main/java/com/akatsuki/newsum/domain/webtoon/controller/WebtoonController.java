@@ -91,22 +91,19 @@ public class WebtoonController {
 
 	//메인페이지
 
-	//조회수탑3
 	@GetMapping("/top")
 	public ResponseEntity<ApiResponse<Map<String, List<WebtoonCardDto>>>> getTop() {
-		// List<WebtoonCardDto> topToons = webtoonService.getTop3TodayWebtoons();
-		// List<WebtoonCardDto> newsCards = webtoonService.getTodayNewsCards();
-		//
-		// Map<String, List<WebtoonCardDto>> response = Map.of(
-		// 	"topToons", topToons,
-		// 	"todaysNews", newsCards
-		// );
-		//
-		// return ResponseEntity.ok(
-		// 	ApiResponse.success(ResponseCodeAndMessage.WEBTOON_TOP_SUCCESS, response)
-		// );
-		return null;
+		List<WebtoonCardDto> topToons = webtoonService.getTop3TodayByViewCount();
+		List<WebtoonCardDto> newsCards = webtoonService.getTodayNewsCards();
 
+		Map<String, List<WebtoonCardDto>> response = Map.of(
+			"topToons", topToons,
+			"todaysNews", newsCards
+		);
+
+		return ResponseEntity.ok(
+			ApiResponse.success(ResponseCodeAndMessage.WEBTOON_TOP_SUCCESS, response)
+		);
 	}
 
 	//카테고리별페이지
