@@ -65,11 +65,11 @@ public class CommentController {
 	public ResponseEntity<ApiResponse<CommentListResponse>> createComment(
 		@PathVariable Long webtoonId,
 		@RequestBody CommentCreateRequest request,
-		@RequestHeader(value = "Authorization", required = false) String bearerToken
+		@RequestHeader(value = "Authorization") String bearerToken
 	) {
-		// Long id = validateTokenAndExtractPrincipal(bearerToken);
+		Long id = validateTokenAndExtractPrincipal(bearerToken);
 
-		commentService.addComment(request, webtoonId, 1L);
+		commentService.addComment(request, webtoonId, id);
 		return ResponseEntity.ok(
 			ApiResponse.success(ResponseCodeAndMessage.COMMENT_ADD_SUCCESS, null)
 		);
@@ -80,11 +80,11 @@ public class CommentController {
 		@PathVariable Long webtoonId,
 		@PathVariable Long commentId,
 		@RequestBody CommentEditRequest request,
-		@RequestHeader(value = "Authorization", required = false) String bearerToken
+		@RequestHeader(value = "Authorization") String bearerToken
 	) {
-		// Long id = validateTokenAndExtractPrincipal(bearerToken);
+		Long id = validateTokenAndExtractPrincipal(bearerToken);
 
-		commentService.editComment(request, webtoonId, commentId, 1L);
+		commentService.editComment(request, webtoonId, commentId, id);
 		return ResponseEntity.ok(
 			ApiResponse.success(ResponseCodeAndMessage.COMMEND_EDIT_SUCCESS, null)
 		);
@@ -94,11 +94,11 @@ public class CommentController {
 	public ResponseEntity<ApiResponse<CommentListResponse>> deleteComment(
 		@PathVariable Long webtoonId,
 		@PathVariable Long commentId,
-		@RequestHeader(value = "Authorization", required = false) String bearerToken
+		@RequestHeader(value = "Authorization") String bearerToken
 	) {
-		// Long id = validateTokenAndExtractPrincipal(bearerToken);
+		Long id = validateTokenAndExtractPrincipal(bearerToken);
 
-		commentService.deleteComment(webtoonId, commentId, 1L);
+		commentService.deleteComment(webtoonId, commentId, id);
 		return ResponseEntity.ok(
 			ApiResponse.success(ResponseCodeAndMessage.COMMENT_DELETE_SUCCESS, null)
 		);
