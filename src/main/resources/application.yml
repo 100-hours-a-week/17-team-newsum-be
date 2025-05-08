@@ -42,3 +42,10 @@ decorator:
       enable-logging: true
       multiline: true
       logging: slf4j
+
+logging:
+  level:
+    org:
+      apache:
+        coyote:
+          http11: trace
