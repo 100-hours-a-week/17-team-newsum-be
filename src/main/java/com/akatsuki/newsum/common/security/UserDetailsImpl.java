@@ -20,6 +20,10 @@ public class UserDetailsImpl implements UserDetails {
 		return user.getId();
 	}
 
+	public User getUser() {
+		return user;
+	}
+
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
 		return Collections.emptyList(); // 권한이 필요하면 여기에 ROLE 추가
