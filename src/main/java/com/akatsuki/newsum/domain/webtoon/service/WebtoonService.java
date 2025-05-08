@@ -19,6 +19,8 @@ import com.akatsuki.newsum.common.exception.NotFoundException;
 import com.akatsuki.newsum.common.pagination.model.cursor.Cursor;
 import com.akatsuki.newsum.domain.aiAuthor.entity.AiAuthor;
 import com.akatsuki.newsum.domain.aiAuthor.repository.AiAuthorRepository;
+import com.akatsuki.newsum.domain.user.entity.User;
+import com.akatsuki.newsum.domain.user.repository.UserRepository;
 import com.akatsuki.newsum.domain.webtoon.dto.AiAuthorInfoDto;
 import com.akatsuki.newsum.domain.webtoon.dto.CreateWebtoonReqeust;
 import com.akatsuki.newsum.domain.webtoon.dto.WebtoonCardDto;
@@ -28,6 +30,7 @@ import com.akatsuki.newsum.domain.webtoon.dto.WebtoonSlideDto;
 import com.akatsuki.newsum.domain.webtoon.dto.WebtoonSourceDto;
 import com.akatsuki.newsum.domain.webtoon.entity.webtoon.Category;
 import com.akatsuki.newsum.domain.webtoon.entity.webtoon.NewsSource;
+import com.akatsuki.newsum.domain.webtoon.entity.webtoon.RecentView;
 import com.akatsuki.newsum.domain.webtoon.entity.webtoon.Webtoon;
 import com.akatsuki.newsum.domain.webtoon.entity.webtoon.WebtoonDetail;
 import com.akatsuki.newsum.domain.webtoon.exception.WebtoonNotFoundException;
@@ -58,6 +61,7 @@ public class WebtoonService {
 	private final int RELATED_CATEGORY_SIZE = 2;
 	private final int RELATED_AI_AUTHOR_SIZE = 2;
 	private final int RELATED_NEWS_SIZE = RELATED_CATEGORY_SIZE + RELATED_AI_AUTHOR_SIZE;
+	private final UserRepository userRepository;
 
 	private WebtoonCardDto mapToCardDto(Webtoon webtoon) {
 		return new WebtoonCardDto(
@@ -90,6 +94,7 @@ public class WebtoonService {
 		} else {
 
 		}
+
 		return new WebtoonResponse(
 			webtoon.getId(),
 			mapWebToonSlides(webtoon),
@@ -99,6 +104,36 @@ public class WebtoonService {
 			webtoon.getLikeCount(),
 			webtoon.getViewCount()
 		);
+	}
+
+	@Transactional
+	public void updateRecentView(Long webtoonId, Long userId) {
+		if (userId == null) {
+			return;
+		}
+		recentViewRepository.findByWebtoonIdAndUserId(webtoonId, userId)
+			.ifPresentOrElse(RecentView::updateViewedAt,
+				() -> {
+					Webtoon webtoon = findWebtoonWithAiAuthorByIdOrThrow(webtoonId);
+					User user = findUserById(userId);
+					recentViewRepository.save(new RecentView(user, webtoon, LocalDateTime.now()));
+				});
+	}
+
+	@Transactional
+	public void updateViewCount(Long webtoonId) {
+		Webtoon webtoon = findWebtoonById(webtoonId);
+		webtoon.increaseViewCount();
+	}
+
+	private Webtoon findWebtoonById(Long webtoonId) {
+		return webtoonRepository.findById(webtoonId)
+			.orElseThrow(WebtoonNotFoundException::new);
+	}
+
+	private User findUserById(Long userId) {
+		return userRepository.findById(userId)
+			.orElseThrow(() -> new NotFoundException(ErrorCodeAndMessage.USER_NOT_FOUND));
 	}
 
 	public WebtoonDetailResponse getWebtoonDetail(Long webtoonId) {
