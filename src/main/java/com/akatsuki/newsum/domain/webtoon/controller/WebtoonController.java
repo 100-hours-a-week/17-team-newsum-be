@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -22,6 +23,7 @@ import com.akatsuki.newsum.common.pagination.model.cursor.Cursor;
 import com.akatsuki.newsum.common.pagination.model.page.CursorPage;
 import com.akatsuki.newsum.common.security.JwtTokenUtil;
 import com.akatsuki.newsum.common.security.TokenProvider;
+import com.akatsuki.newsum.common.security.UserDetailsImpl;
 import com.akatsuki.newsum.domain.webtoon.dto.CreateWebtoonReqeust;
 import com.akatsuki.newsum.domain.webtoon.dto.WebtoonCardDto;
 import com.akatsuki.newsum.domain.webtoon.dto.WebtoonDetailResponse;
@@ -141,20 +143,17 @@ public class WebtoonController {
 		);
 	}
 
-	//최근조회페이지
 	@GetMapping("/recent")
-	public ResponseEntity<ApiResponse<Map<String, List<WebtoonCardDto>>>> getRecentViewed(
-		@RequestHeader("Authorization") String bearerToken) {
+	public ResponseEntity<ApiResponse<Map<String, List<WebtoonCardDto>>>> getRecentWebtoons(
+		@AuthenticationPrincipal UserDetailsImpl userPrincipal) {
+		Long userId = userPrincipal.getUserId();
 
-		// Long userId = validateTokenAndExtractPrincipal(bearerToken);
-		// List<WebtoonCardDto> recentViewed = webtoonService.getRecentViewedWebtoons(userId);
-		//
-		// return ResponseEntity.ok(
-		// 	ApiResponse.success(ResponseCodeAndMessage.WEBTOON_RECENT_SUCCESS, Map.of(
-		// 		"recentWebtoons", recentViewed
-		// 	))
-		// );
-		return null;
+		List<WebtoonCardDto> recentWebtoons = webtoonService.getRecentWebtoons(userId);
+
+		return ResponseEntity.ok(ApiResponse.success(
+			ResponseCodeAndMessage.USER_RECENTLY_VIEWED_WEBTOON_LIST_SUCCESS,
+			Map.of("recentWebtoons", recentWebtoons)
+		));
 	}
 
 }

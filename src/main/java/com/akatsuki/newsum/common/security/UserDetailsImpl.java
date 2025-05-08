@@ -8,15 +8,20 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import com.akatsuki.newsum.domain.user.entity.User;
 
-import lombok.Getter;
-
-@Getter
 public class UserDetailsImpl implements UserDetails {
 
 	private final User user;
 
 	public UserDetailsImpl(User user) {
 		this.user = user;
+	}
+
+	public Long getUserId() {
+		return user.getId();
+	}
+
+	public User getUser() {
+		return user;
 	}
 
 	@Override

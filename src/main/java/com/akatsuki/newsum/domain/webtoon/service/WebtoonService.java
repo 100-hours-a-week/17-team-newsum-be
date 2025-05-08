@@ -32,6 +32,7 @@ import com.akatsuki.newsum.domain.webtoon.entity.webtoon.Webtoon;
 import com.akatsuki.newsum.domain.webtoon.entity.webtoon.WebtoonDetail;
 import com.akatsuki.newsum.domain.webtoon.exception.WebtoonNotFoundException;
 import com.akatsuki.newsum.domain.webtoon.repository.NewsSourceRepository;
+import com.akatsuki.newsum.domain.webtoon.repository.RecentViewRepository;
 import com.akatsuki.newsum.domain.webtoon.repository.WebtoonDetailRepository;
 import com.akatsuki.newsum.domain.webtoon.repository.WebtoonRepository;
 import com.akatsuki.newsum.extern.dto.CreateWebtoonApiRequest;
@@ -51,10 +52,21 @@ public class WebtoonService {
 	private final WebtoonDetailRepository webtoonDetailRepository;
 	private final NewsSourceRepository newsSourceRepository;
 	private final AiServerApiService aiServerApiService;
+	private final RecentViewRepository recentViewRepository;
 
+	private static final int RECENT_WEBTOON_LIMIT = 3;
 	private final int RELATED_CATEGORY_SIZE = 2;
 	private final int RELATED_AI_AUTHOR_SIZE = 2;
 	private final int RELATED_NEWS_SIZE = RELATED_CATEGORY_SIZE + RELATED_AI_AUTHOR_SIZE;
+
+	private WebtoonCardDto mapToCardDto(Webtoon webtoon) {
+		return new WebtoonCardDto(
+			webtoon.getId(),
+			webtoon.getTitle(),
+			webtoon.getThumbnailImageUrl(),
+			webtoon.getCreatedAt()
+		);
+	}
 
 	public List<WebtoonCardDto> findWebtoonsByCategory(String category, Cursor cursor, int size) {
 		List<Webtoon> webtoons = webtoonRepository.findWebtoonByCategoryWithCursor(Category.valueOf(category), cursor,
@@ -220,13 +232,13 @@ public class WebtoonService {
 
 	public List<WebtoonCardDto> getTop3TodayByViewCount() {
 		return webtoonRepository.findTop3TodayByViewCount().stream()
-			.map(WebtoonCardDto::toDto)
+			.map(this::mapToCardDto)
 			.toList();
 	}
 
 	public List<WebtoonCardDto> getTodayNewsCards() {
 		return webtoonRepository.findTodayNewsTop3().stream()
-			.map(WebtoonCardDto::toDto)
+			.map(this::mapToCardDto)
 			.toList();
 	}
 
@@ -235,11 +247,24 @@ public class WebtoonService {
 		for (Category category : Category.values()) {
 			List<WebtoonCardDto> dtoList = webtoonRepository.findTop3ByCategoryOrderByCreatedAtDesc(category)
 				.stream()
-				.map(WebtoonCardDto::toDto)
+				.map(this::mapToCardDto)
 				.toList();
 			result.put(category.name(), dtoList);
 		}
 		return result;
+	}
+
+	public List<WebtoonCardDto> getRecentWebtoons(Long userId) {
+		List<Webtoon> recentWebtoons = recentViewRepository.findRecentWebtoonsByUserId(userId, RECENT_WEBTOON_LIMIT);
+
+		if (recentWebtoons.isEmpty()) {
+			return List.of();
+		}
+
+		// 변환 중 오류 발생 시 명확하게 터뜨리는 것이 좋다.
+		return recentWebtoons.stream()
+			.map(this::mapToCardDto)
+			.toList();
 	}
 
 }
