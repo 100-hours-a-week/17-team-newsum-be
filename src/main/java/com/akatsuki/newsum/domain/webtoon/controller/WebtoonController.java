@@ -147,7 +147,7 @@ public class WebtoonController {
 	public ResponseEntity<ApiResponse<Map<String, List<WebtoonCardDto>>>> getRecentWebtoons(
 		@AuthenticationPrincipal UserDetailsImpl userPrincipal) {
 		Long userId = userPrincipal.getUserId();
-		
+
 		List<WebtoonCardDto> recentWebtoons = webtoonService.getRecentWebtoons(userId);
 
 		return ResponseEntity.ok(ApiResponse.success(

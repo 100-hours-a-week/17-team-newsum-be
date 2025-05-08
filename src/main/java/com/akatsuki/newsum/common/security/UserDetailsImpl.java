@@ -8,9 +8,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import com.akatsuki.newsum.domain.user.entity.User;
 
-import lombok.Getter;
-
-@Getter
 public class UserDetailsImpl implements UserDetails {
 
 	private final User user;
