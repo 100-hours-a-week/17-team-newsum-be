@@ -48,7 +48,7 @@ public class Webtoon extends BaseTimeEntity {
 	@Column(nullable = false, length = 20)
 	private Category category;
 
-	@Column(nullable = false, length = 20)
+	@Column(nullable = false, length = 100)
 	private String title;
 
 	@Column(nullable = false, length = 255)
