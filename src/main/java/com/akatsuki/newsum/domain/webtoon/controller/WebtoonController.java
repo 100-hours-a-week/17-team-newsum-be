@@ -66,7 +66,8 @@ public class WebtoonController {
 		Long id = validateTokenAndExtractPrincipal(bearerToken);
 
 		WebtoonResponse response = webtoonService.getWebtoon(webtoonId, id);
-
+		webtoonService.updateRecentView(webtoonId, id);
+		webtoonService.updateViewCount(webtoonId);
 		return ResponseEntity.ok(
 			ApiResponse.success(ResponseCodeAndMessage.WEBTOON_BASE_INFO_SUCCESS, response)
 		);
@@ -104,20 +105,7 @@ public class WebtoonController {
 		);
 	}
 
-	private Long validateTokenAndExtractPrincipal(String bearerToken) {
-
-		if (bearerToken == null) {
-			return null;
-		}
-		String accessToken = JwtTokenUtil.parseBearerToken(bearerToken);
-		if (tokenProvider.validateToken(accessToken)) {
-			return Long.parseLong(tokenProvider.getPrincipal(accessToken));
-		}
-		return null;
-	}
-
 	//메인페이지
-
 	@GetMapping("/top")
 	public ResponseEntity<ApiResponse<Map<String, List<WebtoonCardDto>>>> getTop() {
 		List<WebtoonCardDto> topToons = webtoonService.getTop3TodayByViewCount();
@@ -156,4 +144,15 @@ public class WebtoonController {
 		));
 	}
 
+	private Long validateTokenAndExtractPrincipal(String bearerToken) {
+
+		if (bearerToken == null) {
+			return null;
+		}
+		String accessToken = JwtTokenUtil.parseBearerToken(bearerToken);
+		if (tokenProvider.validateToken(accessToken)) {
+			return Long.parseLong(tokenProvider.getPrincipal(accessToken));
+		}
+		return null;
+	}
 }

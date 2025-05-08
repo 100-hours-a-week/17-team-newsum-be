@@ -103,4 +103,8 @@ public class Webtoon extends BaseTimeEntity {
 		this.viewCount = 0L;
 		this.likeCount = 0L;
 	}
+
+	public void increaseViewCount() {
+		this.viewCount++;
+	}
 }

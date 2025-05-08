@@ -37,4 +37,14 @@ public class RecentView {
 
 	@Column(name = "viewed_at", nullable = false)
 	private LocalDateTime viewedAt;
+
+	public RecentView(User user, Webtoon webtoon, LocalDateTime viewedAt) {
+		this.user = user;
+		this.webtoon = webtoon;
+		this.viewedAt = viewedAt;
+	}
+
+	public void updateViewedAt() {
+		this.viewedAt = LocalDateTime.now();
+	}
 }
