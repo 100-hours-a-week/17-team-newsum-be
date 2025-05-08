@@ -32,7 +32,19 @@ public class WebMvcConfig implements WebMvcConfigurer {
 
 	@Override
 	public void addViewControllers(ViewControllerRegistry registry) {
-		registry.addViewController("/oauth2/callback/**")
+		registry.addViewController("/article/**")
+			.setViewName("forward:/index.html");
+		registry.addViewController("/comment/**")
+			.setViewName("forward:/index.html");
+		registry.addViewController("/oauth2/**")
+			.setViewName("forward:/index.html");
+		registry.addViewController("/login/**")
+			.setViewName("forward:/index.html");
+		registry.addViewController("/recent/**")
+			.setViewName("forward:/index.html");
+		registry.addViewController("/category/**")
+			.setViewName("forward:/index.html");
+		registry.addViewController("/users/**")
 			.setViewName("forward:/index.html");
 	}
 }
