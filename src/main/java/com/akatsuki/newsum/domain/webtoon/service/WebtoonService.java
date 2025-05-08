@@ -258,11 +258,8 @@ public class WebtoonService {
 		List<Webtoon> recentWebtoons = recentViewRepository.findRecentWebtoonsByUserId(userId, RECENT_WEBTOON_LIMIT);
 
 		if (recentWebtoons.isEmpty()) {
-			log.warn("최근 웹툰 없음 userId={}", userId);
 			return List.of();
 		}
-
-		log.info("최근 본 웹툰 목록 userId={} : {}", userId, recentWebtoons);
 
 		// 변환 중 오류 발생 시 명확하게 터뜨리는 것이 좋다.
 		return recentWebtoons.stream()
