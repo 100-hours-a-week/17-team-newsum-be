@@ -23,7 +23,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Table(name = "users")
 @Getter
-@SQLDelete(sql = "UPDATE user SET deleted_at = now() WHERE id = ?")
+@SQLDelete(sql = "UPDATE users SET deleted_at = now() WHERE id = ?")
 @SQLRestriction(value = "deleted_at IS NULL")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User extends BaseTimeEntity {
@@ -60,11 +60,11 @@ public class User extends BaseTimeEntity {
 		this.status = status;
 	}
 
-	public void updateName(String name) {
+	public void updateNickname(String nickname) {
 		this.nickname = nickname;
 	}
 
-	public void updatePicture(String picture) {
+	public void profileImageUrl(String profileImageUrl) {
 		this.profileImageUrl = profileImageUrl;
 	}
 

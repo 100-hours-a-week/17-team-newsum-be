@@ -49,11 +49,11 @@ public class UserService {
 			.orElseThrow(() -> new IllegalArgumentException("해당 유저가 없습니다."));
 
 		if (dto.nickname() != null && !dto.nickname().isBlank()) {
-			user.updateName(dto.nickname());
+			user.updateNickname(dto.nickname());
 		}
 
 		if (dto.picture() != null && !dto.picture().isBlank()) {
-			user.updatePicture(dto.picture());
+			user.profileImageUrl(dto.picture());
 		}
 	}
 }
