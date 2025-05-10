@@ -54,8 +54,8 @@ public class UserService {
 			user.updateNickname(dto.nickname());
 		}
 
-		if (dto.profileimage() != null && !dto.profileimage().isBlank()) {
-			user.profileImageUrl(dto.profileimage());
+		if (dto.profileImage() != null && !dto.profileImage().isBlank()) {
+			user.profileImageUrl(dto.profileImage());
 		}
 
 		return new UserProfileDto(
