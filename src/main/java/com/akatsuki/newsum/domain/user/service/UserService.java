@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.akatsuki.newsum.converter.DateConverter;
 import com.akatsuki.newsum.domain.user.dto.UpdateUserRequestDto;
+import com.akatsuki.newsum.domain.user.dto.UserProfileDto;
 import com.akatsuki.newsum.domain.user.entity.User;
 import com.akatsuki.newsum.domain.user.repository.UserRepository;
 import com.akatsuki.newsum.domain.webtoon.dto.WebtoonCardDto;
@@ -44,7 +45,8 @@ public class UserService {
 			recentView.getWebtoon().getCreatedAt());
 	}
 
-	public void updateUser(Long userId, UpdateUserRequestDto dto) {
+	@Transactional
+	public UserProfileDto updateUser(Long userId, UpdateUserRequestDto dto) {
 		User user = userRepository.findById(userId)
 			.orElseThrow(() -> new IllegalArgumentException("해당 유저가 없습니다."));
 
@@ -52,8 +54,15 @@ public class UserService {
 			user.updateNickname(dto.nickname());
 		}
 
-		if (dto.picture() != null && !dto.picture().isBlank()) {
-			user.profileImageUrl(dto.picture());
+		if (dto.profileimage() != null && !dto.profileimage().isBlank()) {
+			user.profileImageUrl(dto.profileimage());
 		}
+
+		return new UserProfileDto(
+			user.getEmail(),
+			user.getNickname(),
+			user.getProfileImageUrl(),
+			String.valueOf(user.getId())
+		);
 	}
 }
