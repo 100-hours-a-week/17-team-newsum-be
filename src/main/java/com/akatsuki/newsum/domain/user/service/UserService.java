@@ -10,6 +10,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.akatsuki.newsum.converter.DateConverter;
+import com.akatsuki.newsum.domain.user.dto.UpdateUserRequestDto;
+import com.akatsuki.newsum.domain.user.dto.UserProfileDto;
+import com.akatsuki.newsum.domain.user.entity.User;
+import com.akatsuki.newsum.domain.user.repository.UserRepository;
 import com.akatsuki.newsum.domain.webtoon.dto.WebtoonCardDto;
 import com.akatsuki.newsum.domain.webtoon.entity.webtoon.RecentView;
 import com.akatsuki.newsum.domain.webtoon.repository.WebtoonRepository;
@@ -21,6 +25,7 @@ import lombok.RequiredArgsConstructor;
 @Transactional(readOnly = true)
 public class UserService {
 	private final WebtoonRepository webtoonRepository;
+	private final UserRepository userRepository;
 
 	public Map<String, List<WebtoonCardDto>> findRecentWebtoonList(Long id) {
 		List<RecentView> recentViews = webtoonRepository.findRecentWebtoons(id);
@@ -40,4 +45,24 @@ public class UserService {
 			recentView.getWebtoon().getCreatedAt());
 	}
 
+	@Transactional
+	public UserProfileDto updateUser(Long userId, UpdateUserRequestDto dto) {
+		User user = userRepository.findById(userId)
+			.orElseThrow(() -> new IllegalArgumentException("해당 유저가 없습니다."));
+
+		if (dto.nickname() != null && !dto.nickname().isBlank()) {
+			user.updateNickname(dto.nickname());
+		}
+
+		if (dto.profileImage() != null && !dto.profileImage().isBlank()) {
+			user.profileImageUrl(dto.profileImage());
+		}
+
+		return new UserProfileDto(
+			user.getEmail(),
+			user.getNickname(),
+			user.getProfileImageUrl(),
+			String.valueOf(user.getId())
+		);
+	}
 }

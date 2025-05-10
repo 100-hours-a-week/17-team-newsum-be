@@ -29,6 +29,7 @@ public enum ResponseCodeAndMessage {
 	USER_LOGIN_SUCCESS(HttpStatus.OK.value(), "로그인이 성공적으로 완료되었습니다."),
 	USER_INFO_SUCCESS(HttpStatus.OK.value(), "사용자 정보 조회에 성공했습니다."),
 	USER_RECENTLY_VIEWED_WEBTOON_LIST_SUCCESS(HttpStatus.OK.value(), "최근 본 웹툰 목록 조회에 성공했습니다."),
+	USER_INFO_UPDATE_SUCCESS(HttpStatus.OK.value(), "프로필 수정이 완료되었습니다."),
 
 	COMMENT_FIND_SUCCESS(HttpStatus.OK.value(), "댓글 목록 조회에 성공했습니다."),
 	COMMENT_DELETE_SUCCESS(HttpStatus.NO_CONTENT.value(), "댓글 삭제에 성공했습니다."),
