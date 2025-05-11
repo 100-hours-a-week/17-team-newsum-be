@@ -62,7 +62,7 @@ public class UserController {
 		@AuthenticationPrincipal UserDetailsImpl userDetails,
 		@Valid @RequestBody UpdateUserRequestDto dto
 	) {
-		Long userId = userDetails.getUser().getId();
+		Long userId = userDetails.getUserId();
 		UpdateUserResponseDto responseDto = userService.updateUser(userId, dto);
 
 		return ResponseEntity.ok(
