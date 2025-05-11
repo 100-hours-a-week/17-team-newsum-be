@@ -9,6 +9,8 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.akatsuki.newsum.common.dto.ErrorCodeAndMessage;
+import com.akatsuki.newsum.common.exception.NotFoundException;
 import com.akatsuki.newsum.converter.DateConverter;
 import com.akatsuki.newsum.domain.user.dto.UpdateUserRequestDto;
 import com.akatsuki.newsum.domain.user.dto.UserProfileDto;
@@ -45,10 +47,14 @@ public class UserService {
 			recentView.getWebtoon().getCreatedAt());
 	}
 
+	private User findUserById(Long userId) {
+		return userRepository.findById(userId)
+			.orElseThrow(() -> new NotFoundException(ErrorCodeAndMessage.USER_NOT_FOUND));
+	}
+
 	@Transactional
 	public UserProfileDto updateUser(Long userId, UpdateUserRequestDto dto) {
-		User user = userRepository.findById(userId)
-			.orElseThrow(() -> new IllegalArgumentException("해당 유저가 없습니다."));
+		User user = findUserById(userId);
 
 		if (dto.nickname() != null && !dto.nickname().isBlank()) {
 			user.updateNickname(dto.nickname());
@@ -65,4 +71,5 @@ public class UserService {
 			String.valueOf(user.getId())
 		);
 	}
+
 }
