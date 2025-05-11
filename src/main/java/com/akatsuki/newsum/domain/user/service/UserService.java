@@ -13,7 +13,7 @@ import com.akatsuki.newsum.common.dto.ErrorCodeAndMessage;
 import com.akatsuki.newsum.common.exception.NotFoundException;
 import com.akatsuki.newsum.converter.DateConverter;
 import com.akatsuki.newsum.domain.user.dto.UpdateUserRequestDto;
-import com.akatsuki.newsum.domain.user.dto.UserProfileDto;
+import com.akatsuki.newsum.domain.user.dto.UpdateUserResponseDto;
 import com.akatsuki.newsum.domain.user.entity.User;
 import com.akatsuki.newsum.domain.user.repository.UserRepository;
 import com.akatsuki.newsum.domain.webtoon.dto.WebtoonCardDto;
@@ -53,16 +53,14 @@ public class UserService {
 	}
 
 	@Transactional
-	public UserProfileDto updateUser(Long userId, UpdateUserRequestDto dto) {
+	public UpdateUserResponseDto updateUser(Long userId, UpdateUserRequestDto dto) {
 		User user = findUserById(userId);
 		user.updateNickname(dto.nickname());
 		user.profileImageUrl(dto.profileImage());
 
-		return new UserProfileDto(
-			user.getEmail(),
+		return new UpdateUserResponseDto(
 			user.getNickname(),
-			user.getProfileImageUrl(),
-			String.valueOf(user.getId())
+			user.getProfileImageUrl()
 		);
 	}
 
