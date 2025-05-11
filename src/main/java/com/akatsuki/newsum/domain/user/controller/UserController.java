@@ -16,6 +16,7 @@ import com.akatsuki.newsum.common.dto.ResponseCodeAndMessage;
 import com.akatsuki.newsum.common.security.UserDetailsImpl;
 import com.akatsuki.newsum.domain.user.dto.RecentViewWebtoonListResponse;
 import com.akatsuki.newsum.domain.user.dto.UpdateUserRequestDto;
+import com.akatsuki.newsum.domain.user.dto.UpdateUserResponseDto;
 import com.akatsuki.newsum.domain.user.dto.UserProfileDto;
 import com.akatsuki.newsum.domain.user.service.UserService;
 import com.akatsuki.newsum.domain.webtoon.dto.WebtoonCardDto;
@@ -57,12 +58,12 @@ public class UserController {
 	}
 
 	@PatchMapping("/me")
-	public ResponseEntity<ApiResponse<UserProfileDto>> updateMyProfile(
+	public ResponseEntity<ApiResponse<UpdateUserResponseDto>> updateMyProfile(
 		@AuthenticationPrincipal UserDetailsImpl userDetails,
 		@Valid @RequestBody UpdateUserRequestDto dto
 	) {
 		Long userId = userDetails.getUser().getId();
-		UserProfileDto responseDto = userService.updateUser(userId, dto);
+		UpdateUserResponseDto responseDto = userService.updateUser(userId, dto);
 
 		return ResponseEntity.ok(
 			ApiResponse.success(ResponseCodeAndMessage.USER_INFO_UPDATE_SUCCESS, responseDto)
