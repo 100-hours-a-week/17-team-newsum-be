@@ -55,14 +55,8 @@ public class UserService {
 	@Transactional
 	public UserProfileDto updateUser(Long userId, UpdateUserRequestDto dto) {
 		User user = findUserById(userId);
-
-		if (dto.nickname() != null && !dto.nickname().isBlank()) {
-			user.updateNickname(dto.nickname());
-		}
-
-		if (dto.profileImage() != null && !dto.profileImage().isBlank()) {
-			user.profileImageUrl(dto.profileImage());
-		}
+		user.updateNickname(dto.nickname());
+		user.profileImageUrl(dto.profileImage());
 
 		return new UserProfileDto(
 			user.getEmail(),

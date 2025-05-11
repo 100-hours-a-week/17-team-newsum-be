@@ -20,6 +20,7 @@ import com.akatsuki.newsum.domain.user.dto.UserProfileDto;
 import com.akatsuki.newsum.domain.user.service.UserService;
 import com.akatsuki.newsum.domain.webtoon.dto.WebtoonCardDto;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -58,7 +59,7 @@ public class UserController {
 	@PatchMapping("/me")
 	public ResponseEntity<ApiResponse<UserProfileDto>> updateMyProfile(
 		@AuthenticationPrincipal UserDetailsImpl userDetails,
-		@RequestBody UpdateUserRequestDto dto
+		@Valid @RequestBody UpdateUserRequestDto dto
 	) {
 		Long userId = userDetails.getUser().getId();
 		UserProfileDto responseDto = userService.updateUser(userId, dto);
