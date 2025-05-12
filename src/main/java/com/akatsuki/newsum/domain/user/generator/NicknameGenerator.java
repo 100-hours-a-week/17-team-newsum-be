@@ -20,9 +20,10 @@ public class NicknameGenerator {
 	public String generate() {
 		String base = BASE_NAMES.get(random.nextInt(BASE_NAMES.size()));
 		int suffix = random.nextInt(5000);
+
 		String nickname = base + suffix;
 		while (userRepository.existsByNickname(nickname)) {
-			suffix = random.nextInt(1000);
+			suffix = random.nextInt(5000);
 			nickname = base + suffix;
 		}
 		return nickname;
