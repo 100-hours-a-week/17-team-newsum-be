@@ -25,7 +25,7 @@ public class NicknameGenerator {
 			suffix = random.nextInt(1000);
 			nickname = base + suffix;
 		}
-
 		return nickname;
 	}
 }
+
