@@ -37,7 +37,9 @@ public class UserService {
 			recentView.getWebtoon().getId(),
 			recentView.getWebtoon().getTitle(),
 			recentView.getWebtoon().getThumbnailImageUrl(),
-			recentView.getWebtoon().getCreatedAt());
+			recentView.getWebtoon().getCreatedAt(),
+			recentView.getWebtoon().getViewCount()
+		);
 	}
 
 }

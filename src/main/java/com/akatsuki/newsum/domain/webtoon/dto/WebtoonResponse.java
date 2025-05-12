@@ -1,5 +1,6 @@
 package com.akatsuki.newsum.domain.webtoon.dto;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public record WebtoonResponse(
@@ -11,6 +12,7 @@ public record WebtoonResponse(
 	boolean isLiked,
 	boolean isBookmarked,
 	Long likeCount,
-	Long viewCount
+	Long viewCount,
+	LocalDateTime createdAt
 ) {
 }

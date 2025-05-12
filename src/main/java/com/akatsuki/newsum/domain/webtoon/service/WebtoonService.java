@@ -95,7 +95,8 @@ public class WebtoonService {
 			isLiked,
 			isBookmarked,
 			webtoon.getLikeCount(),
-			webtoon.getViewCount()
+			webtoon.getViewCount(),
+			webtoon.getCreatedAt()
 		);
 	}
 
@@ -246,7 +247,8 @@ public class WebtoonService {
 
 	private WebtoonCardDto mapWebToonCardDto(Webtoon webtoon) {
 		return new WebtoonCardDto(webtoon.getId(), webtoon.getTitle(), webtoon.getThumbnailImageUrl(),
-			webtoon.getCreatedAt());
+			webtoon.getCreatedAt(),
+			webtoon.getViewCount());
 	}
 
 	private AiAuthorInfoDto mapAiAuthorToAiAuthorInfoDto(AiAuthor aiAuthor) {
@@ -300,7 +302,8 @@ public class WebtoonService {
 			webtoon.getId(),
 			webtoon.getTitle(),
 			webtoon.getThumbnailImageUrl(),
-			webtoon.getCreatedAt()
+			webtoon.getCreatedAt(),
+			webtoon.getViewCount()
 		);
 	}
 }
