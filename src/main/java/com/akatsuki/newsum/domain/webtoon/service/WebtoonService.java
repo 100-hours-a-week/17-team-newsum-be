@@ -97,6 +97,8 @@ public class WebtoonService {
 
 		return new WebtoonResponse(
 			webtoon.getId(),
+			webtoon.getThumbnailImageUrl(),
+			webtoon.getTitle(),
 			mapWebToonSlides(webtoon),
 			mapAiAuthorToAiAuthorInfoDto(webtoon.getAiAuthor()),
 			isLiked,

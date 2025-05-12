@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -21,7 +20,6 @@ import com.akatsuki.newsum.common.pagination.annotation.CursorParam;
 import com.akatsuki.newsum.common.pagination.model.cursor.CreatedAtIdCursor;
 import com.akatsuki.newsum.common.pagination.model.cursor.Cursor;
 import com.akatsuki.newsum.common.pagination.model.page.CursorPage;
-import com.akatsuki.newsum.common.security.JwtTokenUtil;
 import com.akatsuki.newsum.common.security.TokenProvider;
 import com.akatsuki.newsum.common.security.UserDetailsImpl;
 import com.akatsuki.newsum.domain.webtoon.dto.CreateWebtoonReqeust;
@@ -61,9 +59,9 @@ public class WebtoonController {
 	@GetMapping("/{webtoonId}")
 	public ResponseEntity<ApiResponse<WebtoonResponse>> getWebtoon(
 		@PathVariable Long webtoonId,
-		@RequestHeader(value = "Authorization", required = false) String bearerToken) {
+		@AuthenticationPrincipal UserDetailsImpl userDetails) {
 
-		Long id = validateTokenAndExtractPrincipal(bearerToken);
+		Long id = userDetails.getUserId();
 
 		WebtoonResponse response = webtoonService.getWebtoon(webtoonId, id);
 		webtoonService.updateRecentView(webtoonId, id);
@@ -142,17 +140,5 @@ public class WebtoonController {
 			ResponseCodeAndMessage.USER_RECENTLY_VIEWED_WEBTOON_LIST_SUCCESS,
 			Map.of("recentWebtoons", recentWebtoons)
 		));
-	}
-
-	private Long validateTokenAndExtractPrincipal(String bearerToken) {
-
-		if (bearerToken == null) {
-			return null;
-		}
-		String accessToken = JwtTokenUtil.parseBearerToken(bearerToken);
-		if (tokenProvider.validateToken(accessToken)) {
-			return Long.parseLong(tokenProvider.getPrincipal(accessToken));
-		}
-		return null;
 	}
 }
