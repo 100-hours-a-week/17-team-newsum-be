@@ -46,6 +46,7 @@ public class CommentController {
 		@AuthenticationPrincipal UserDetailsImpl userDetails
 	) {
 		Long id = getUserId(userDetails);
+
 		List<CommentAndSubComments> commentsByWebtoon = commentService.findCommentsByWebtoon(webtoonId, cursor, size,
 			id);
 		CursorPage<CommentAndSubComments> cursorPage = cursorPaginationService.create(

@@ -60,7 +60,6 @@ public class WebtoonController {
 	public ResponseEntity<ApiResponse<WebtoonResponse>> getWebtoon(
 		@PathVariable Long webtoonId,
 		@AuthenticationPrincipal UserDetailsImpl userDetails) {
-
 		Long id = getUserId(userDetails);
 
 		WebtoonResponse response = webtoonService.getWebtoon(webtoonId, id);
