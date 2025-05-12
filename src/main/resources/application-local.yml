@@ -62,3 +62,7 @@ jwt:
 
 ai-server:
   base-url: ${AI_SERVER_BASE_URL}
+
+user:
+  default-profile-image-url: ${default-profile-image-url}
+
