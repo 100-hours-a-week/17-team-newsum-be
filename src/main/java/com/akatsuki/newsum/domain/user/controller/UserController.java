@@ -45,10 +45,18 @@ public class UserController {
 	public ResponseEntity<ApiResponse<RecentViewWebtoonListResponse>> getRecentWebtoonList(
 		@AuthenticationPrincipal UserDetailsImpl userDetails
 	) {
-		Long id = userDetails.getUser().getId();
+		Long id = getUserId(userDetails);
 		Map<String, List<WebtoonCardDto>> result = userService.findRecentWebtoonList(id);
 		RecentViewWebtoonListResponse response = new RecentViewWebtoonListResponse(result);
 		return ResponseEntity.ok(
 			ApiResponse.success(ResponseCodeAndMessage.USER_RECENTLY_VIEWED_WEBTOON_LIST_SUCCESS, response));
+	}
+
+	private Long getUserId(
+		UserDetailsImpl userDetails) {
+		if (userDetails == null) {
+			return null;
+		}
+		return userDetails.getUserId();
 	}
 }

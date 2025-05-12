@@ -61,7 +61,7 @@ public class WebtoonController {
 		@PathVariable Long webtoonId,
 		@AuthenticationPrincipal UserDetailsImpl userDetails) {
 
-		Long id = userDetails.getUserId();
+		Long id = getUserId(userDetails);
 
 		WebtoonResponse response = webtoonService.getWebtoon(webtoonId, id);
 		webtoonService.updateRecentView(webtoonId, id);
@@ -73,8 +73,8 @@ public class WebtoonController {
 
 	@GetMapping("/{webtoonId}/details")
 	public ResponseEntity<ApiResponse<WebtoonDetailResponse>> getWebtoonDetails(
-		@PathVariable Long webtoonId) {
-
+		@PathVariable Long webtoonId
+	) {
 		WebtoonDetailResponse response = webtoonService.getWebtoonDetail(webtoonId);
 
 		return ResponseEntity.ok(
@@ -131,8 +131,8 @@ public class WebtoonController {
 
 	@GetMapping("/recent")
 	public ResponseEntity<ApiResponse<Map<String, List<WebtoonCardDto>>>> getRecentWebtoons(
-		@AuthenticationPrincipal UserDetailsImpl userPrincipal) {
-		Long userId = userPrincipal.getUserId();
+		@AuthenticationPrincipal UserDetailsImpl userDetails) {
+		Long userId = getUserId(userDetails);
 
 		List<WebtoonCardDto> recentWebtoons = webtoonService.getRecentWebtoons(userId);
 
@@ -140,5 +140,13 @@ public class WebtoonController {
 			ResponseCodeAndMessage.USER_RECENTLY_VIEWED_WEBTOON_LIST_SUCCESS,
 			Map.of("recentWebtoons", recentWebtoons)
 		));
+	}
+
+	private Long getUserId(
+		UserDetailsImpl userDetails) {
+		if (userDetails == null) {
+			return null;
+		}
+		return userDetails.getUserId();
 	}
 }
