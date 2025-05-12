@@ -21,7 +21,6 @@ import com.akatsuki.newsum.common.pagination.annotation.CursorParam;
 import com.akatsuki.newsum.common.pagination.model.cursor.CreatedAtIdCursor;
 import com.akatsuki.newsum.common.pagination.model.cursor.Cursor;
 import com.akatsuki.newsum.common.pagination.model.page.CursorPage;
-import com.akatsuki.newsum.common.security.TokenProvider;
 import com.akatsuki.newsum.common.security.UserDetailsImpl;
 import com.akatsuki.newsum.domain.webtoon.dto.CommentAndSubComments;
 import com.akatsuki.newsum.domain.webtoon.dto.CommentCreateRequest;
@@ -37,7 +36,6 @@ import lombok.RequiredArgsConstructor;
 public class CommentController {
 
 	private final CommentService commentService;
-	private final TokenProvider tokenProvider;
 	private final CursorPaginationService cursorPaginationService;
 
 	@GetMapping("/{webtoonId}/comments")
@@ -47,7 +45,8 @@ public class CommentController {
 		@RequestParam(defaultValue = "10", required = false) Integer size,
 		@AuthenticationPrincipal UserDetailsImpl userDetails
 	) {
-		Long id = userDetails.getUserId();
+		Long id = getUserId(userDetails);
+
 		List<CommentAndSubComments> commentsByWebtoon = commentService.findCommentsByWebtoon(webtoonId, cursor, size,
 			id);
 		CursorPage<CommentAndSubComments> cursorPage = cursorPaginationService.create(
@@ -67,7 +66,7 @@ public class CommentController {
 		@RequestBody CommentCreateRequest request,
 		@AuthenticationPrincipal UserDetailsImpl userDetails
 	) {
-		Long id = userDetails.getUserId();
+		Long id = getUserId(userDetails);
 
 		commentService.addComment(request, webtoonId, id);
 		return ResponseEntity.ok(
@@ -82,7 +81,7 @@ public class CommentController {
 		@RequestBody CommentEditRequest request,
 		@AuthenticationPrincipal UserDetailsImpl userDetails
 	) {
-		Long id = userDetails.getUserId();
+		Long id = getUserId(userDetails);
 
 		commentService.editComment(request, webtoonId, commentId, id);
 		return ResponseEntity.ok(
@@ -96,11 +95,19 @@ public class CommentController {
 		@PathVariable Long commentId,
 		@AuthenticationPrincipal UserDetailsImpl userDetails
 	) {
-		Long id = userDetails.getUserId();
+		Long id = getUserId(userDetails);
 
 		commentService.deleteComment(webtoonId, commentId, id);
 		return ResponseEntity.ok(
 			ApiResponse.success(ResponseCodeAndMessage.COMMENT_DELETE_SUCCESS, null)
 		);
+	}
+
+	private Long getUserId(
+		UserDetailsImpl userDetails) {
+		if (userDetails == null) {
+			return null;
+		}
+		return userDetails.getUserId();
 	}
 }
