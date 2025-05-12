@@ -3,13 +3,13 @@ package com.akatsuki.newsum.domain.webtoon.controller;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -21,8 +21,8 @@ import com.akatsuki.newsum.common.pagination.annotation.CursorParam;
 import com.akatsuki.newsum.common.pagination.model.cursor.CreatedAtIdCursor;
 import com.akatsuki.newsum.common.pagination.model.cursor.Cursor;
 import com.akatsuki.newsum.common.pagination.model.page.CursorPage;
-import com.akatsuki.newsum.common.security.JwtTokenUtil;
 import com.akatsuki.newsum.common.security.TokenProvider;
+import com.akatsuki.newsum.common.security.UserDetailsImpl;
 import com.akatsuki.newsum.domain.webtoon.dto.CommentAndSubComments;
 import com.akatsuki.newsum.domain.webtoon.dto.CommentCreateRequest;
 import com.akatsuki.newsum.domain.webtoon.dto.CommentEditRequest;
@@ -45,9 +45,9 @@ public class CommentController {
 		@PathVariable Long webtoonId,
 		@CursorParam(cursorType = CreatedAtIdCursor.class) Cursor cursor,
 		@RequestParam(defaultValue = "10", required = false) Integer size,
-		@RequestHeader(value = "Authorization", required = false) String bearerToken
+		@AuthenticationPrincipal UserDetailsImpl userDetails
 	) {
-		Long id = validateTokenAndExtractPrincipal(bearerToken);
+		Long id = userDetails.getUserId();
 		List<CommentAndSubComments> commentsByWebtoon = commentService.findCommentsByWebtoon(webtoonId, cursor, size,
 			id);
 		CursorPage<CommentAndSubComments> cursorPage = cursorPaginationService.create(
@@ -65,9 +65,9 @@ public class CommentController {
 	public ResponseEntity<ApiResponse<CommentListResponse>> createComment(
 		@PathVariable Long webtoonId,
 		@RequestBody CommentCreateRequest request,
-		@RequestHeader(value = "Authorization") String bearerToken
+		@AuthenticationPrincipal UserDetailsImpl userDetails
 	) {
-		Long id = validateTokenAndExtractPrincipal(bearerToken);
+		Long id = userDetails.getUserId();
 
 		commentService.addComment(request, webtoonId, id);
 		return ResponseEntity.ok(
@@ -80,9 +80,9 @@ public class CommentController {
 		@PathVariable Long webtoonId,
 		@PathVariable Long commentId,
 		@RequestBody CommentEditRequest request,
-		@RequestHeader(value = "Authorization") String bearerToken
+		@AuthenticationPrincipal UserDetailsImpl userDetails
 	) {
-		Long id = validateTokenAndExtractPrincipal(bearerToken);
+		Long id = userDetails.getUserId();
 
 		commentService.editComment(request, webtoonId, commentId, id);
 		return ResponseEntity.ok(
@@ -94,24 +94,13 @@ public class CommentController {
 	public ResponseEntity<ApiResponse<CommentListResponse>> deleteComment(
 		@PathVariable Long webtoonId,
 		@PathVariable Long commentId,
-		@RequestHeader(value = "Authorization") String bearerToken
+		@AuthenticationPrincipal UserDetailsImpl userDetails
 	) {
-		Long id = validateTokenAndExtractPrincipal(bearerToken);
+		Long id = userDetails.getUserId();
 
 		commentService.deleteComment(webtoonId, commentId, id);
 		return ResponseEntity.ok(
 			ApiResponse.success(ResponseCodeAndMessage.COMMENT_DELETE_SUCCESS, null)
 		);
-	}
-
-	private Long validateTokenAndExtractPrincipal(String bearerToken) {
-		if (bearerToken == null) {
-			return null;
-		}
-		String accessToken = JwtTokenUtil.parseBearerToken(bearerToken);
-		if (tokenProvider.validateToken(accessToken)) {
-			return tokenProvider.getUserIdFromToken(accessToken);
-		}
-		return null;
 	}
 }
