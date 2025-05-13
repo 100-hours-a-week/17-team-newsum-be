@@ -22,6 +22,7 @@ import com.akatsuki.newsum.domain.user.entity.SocialLogin;
 import com.akatsuki.newsum.domain.user.entity.Status;
 import com.akatsuki.newsum.domain.user.entity.User;
 import com.akatsuki.newsum.domain.user.entity.UserRole;
+import com.akatsuki.newsum.domain.user.generator.NicknameGenerator;
 import com.akatsuki.newsum.domain.user.repository.SocialLoginRepository;
 import com.akatsuki.newsum.domain.user.repository.UserRepository;
 
@@ -34,6 +35,7 @@ public class KakaoOAuthService {
 	private final SocialLoginRepository socialLoginRepository;
 	private final TokenProvider tokenProvider;
 	private final RestTemplate restTemplate = new RestTemplate();
+	private final NicknameGenerator nicknameGenerator;
 
 	@Value("${KAKAO_CLIENT_ID}")
 	private String clientId;
@@ -43,6 +45,9 @@ public class KakaoOAuthService {
 
 	@Value("${KAKAO_REDIRECT_URI}")
 	private String redirectUri;
+
+	@Value("${user.default-profile-image-url}")
+	private String defaultProfileImageUrl;
 
 	public TokenResponse loginWithCode(String code) {
 		String accessToken = getAccessToken(code);
@@ -98,10 +103,11 @@ public class KakaoOAuthService {
 	}
 
 	private User saveNewUser(OAuthUserInfo userInfo) {
+		String nickname = nicknameGenerator.generate();
 		return userRepository.save(User.builder()
 			.email(userInfo.getEmail())
-			.nickname(userInfo.getName())
-			.profileImageUrl(userInfo.getPicture())
+			.nickname(nickname)
+			.profileImageUrl(defaultProfileImageUrl)
 			.role(UserRole.USER_BASIC)
 			.status(Status.ACTIVATE)
 			.build());

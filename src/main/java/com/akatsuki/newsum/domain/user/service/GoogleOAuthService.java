@@ -21,6 +21,7 @@ import com.akatsuki.newsum.domain.user.entity.SocialLogin;
 import com.akatsuki.newsum.domain.user.entity.Status;
 import com.akatsuki.newsum.domain.user.entity.User;
 import com.akatsuki.newsum.domain.user.entity.UserRole;
+import com.akatsuki.newsum.domain.user.generator.NicknameGenerator;
 import com.akatsuki.newsum.domain.user.repository.SocialLoginRepository;
 import com.akatsuki.newsum.domain.user.repository.UserRepository;
 
@@ -33,6 +34,7 @@ public class GoogleOAuthService {
 	private final UserRepository userRepository;
 	private final SocialLoginRepository socialLoginRepository;
 	private final TokenProvider tokenProvider;
+	private final NicknameGenerator nicknameGenerator;
 
 	@Value("${GOOGLE_CLIENT_ID}")
 	private String clientId;
@@ -42,6 +44,9 @@ public class GoogleOAuthService {
 
 	@Value("${GOOGLE_REDIRECT_URI}")
 	private String redirectUri;
+
+	@Value("${user.default-profile-image-url}")
+	private String defaultProfileImageUrl;
 
 	private final RestTemplate restTemplate = new RestTemplate();
 
@@ -115,10 +120,11 @@ public class GoogleOAuthService {
 	}
 
 	private User saveNewUser(GoogleUserInfo userInfo) {
+		String nickname = nicknameGenerator.generate();
 		return userRepository.save(User.builder()
 			.email(userInfo.getEmail())
-			.nickname(userInfo.getName())
-			.profileImageUrl(userInfo.getPicture())
+			.nickname(nickname)
+			.profileImageUrl(defaultProfileImageUrl)
 			.role(UserRole.USER_BASIC)
 			.status(Status.ACTIVATE)
 			.build());
