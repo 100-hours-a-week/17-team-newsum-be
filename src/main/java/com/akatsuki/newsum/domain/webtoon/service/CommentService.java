@@ -12,6 +12,7 @@ import com.akatsuki.newsum.common.pagination.model.cursor.Cursor;
 import com.akatsuki.newsum.domain.webtoon.dto.CommentAndSubComments;
 import com.akatsuki.newsum.domain.webtoon.dto.CommentCreateRequest;
 import com.akatsuki.newsum.domain.webtoon.dto.CommentEditRequest;
+import com.akatsuki.newsum.domain.webtoon.dto.CommentListResult;
 import com.akatsuki.newsum.domain.webtoon.dto.CommentReadDto;
 import com.akatsuki.newsum.domain.webtoon.dto.CommentResult;
 import com.akatsuki.newsum.domain.webtoon.entity.comment.entity.Comment;
@@ -31,7 +32,7 @@ public class CommentService {
 	private final CommentRepository commentRepository;
 	private final WebtoonRepository webtoonRepository;
 
-	public List<CommentAndSubComments> findCommentsByWebtoon(Long webtoonId, Cursor cursor, Integer size,
+	public CommentListResult findCommentsByWebtoon(Long webtoonId, Cursor cursor, Integer size,
 		Long id) {
 		//2. Cursor 기반 부모 댓글 조회
 		List<CommentReadDto> allParentComments = commentRepository.findParentCommentsByCursorAndSize(webtoonId, cursor,
@@ -54,7 +55,10 @@ public class CommentService {
 		List<CommentAndSubComments> commentAndSubComments = mergeParentAndSubComments(parentCommentResult,
 			subCommentsGroupByParentId);
 
-		return commentAndSubComments;
+		//7. 댓글 총 개수 조회
+		Long commentCount = commentRepository.countCommentsByWebtoonId(webtoonId);
+
+		return new CommentListResult(commentAndSubComments, commentCount);
 	}
 
 	@Transactional

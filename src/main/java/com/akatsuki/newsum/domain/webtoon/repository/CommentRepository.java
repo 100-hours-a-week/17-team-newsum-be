@@ -9,4 +9,6 @@ import com.akatsuki.newsum.domain.webtoon.entity.comment.entity.Comment;
 public interface CommentRepository extends JpaRepository<Comment, Long>, CommentQueryRepository {
 
 	List<Comment> findByWebtoonId(Long webtoonId);
+
+	Long countCommentsByWebtoonId(Long webtoonId);
 }
