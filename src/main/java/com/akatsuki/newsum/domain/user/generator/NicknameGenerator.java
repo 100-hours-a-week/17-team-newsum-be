@@ -18,13 +18,20 @@ public class NicknameGenerator {
 
 	public String generate() {
 		Random random = new Random(System.nanoTime());
-		String nickname;
-		do {
+
+		int attempts = 0;
+		int maxAttempts = 20;
+
+		while (attempts++ < maxAttempts) {
 			String base = BASE_NAMES.get(random.nextInt(BASE_NAMES.size()));
 			int suffix = random.nextInt(5000);
-			nickname = base + suffix;
+			String nickname = base + suffix;
 
-		} while (userRepository.existsByNickname(nickname));
-		return nickname;
+			if (!userRepository.existsByNickname(nickname)) {
+				return nickname;
+			}
+		}
+		throw new IllegalStateException("중복되지 않는 닉네임을 찾을 수 없습니다.");
 	}
+
 }
