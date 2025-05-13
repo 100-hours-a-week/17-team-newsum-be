@@ -1,15 +1,17 @@
 package com.akatsuki.newsum.domain.webtoon.dto;
 
+import java.util.List;
+
 import com.akatsuki.newsum.common.pagination.model.page.CursorPage;
 import com.akatsuki.newsum.common.pagination.model.page.PageInfo;
-import com.akatsuki.newsum.common.pagination.model.page.PageItemList;
 
 public record CommentListResponse(
-	PageItemList<CommentAndSubComments> comments,
+	List<CommentAndSubComments> comments,
+	Long commentCount,
 	PageInfo pageInfo
 ) {
 
-	public static CommentListResponse of(CursorPage<CommentAndSubComments> results) {
-		return new CommentListResponse(results.getItems(), results.getPageInfo());
+	public static CommentListResponse of(CursorPage<CommentAndSubComments> results, Long commentCount) {
+		return new CommentListResponse(results.getItems(), commentCount, results.getPageInfo());
 	}
 }

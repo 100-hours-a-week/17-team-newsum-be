@@ -1,7 +1,5 @@
 package com.akatsuki.newsum.domain.webtoon.controller;
 
-import java.util.List;
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -26,6 +24,7 @@ import com.akatsuki.newsum.domain.webtoon.dto.CommentAndSubComments;
 import com.akatsuki.newsum.domain.webtoon.dto.CommentCreateRequest;
 import com.akatsuki.newsum.domain.webtoon.dto.CommentEditRequest;
 import com.akatsuki.newsum.domain.webtoon.dto.CommentListResponse;
+import com.akatsuki.newsum.domain.webtoon.dto.CommentListResult;
 import com.akatsuki.newsum.domain.webtoon.service.CommentService;
 
 import lombok.RequiredArgsConstructor;
@@ -47,14 +46,14 @@ public class CommentController {
 	) {
 		Long id = getUserId(userDetails);
 
-		List<CommentAndSubComments> commentsByWebtoon = commentService.findCommentsByWebtoon(webtoonId, cursor, size,
+		CommentListResult result = commentService.findCommentsByWebtoon(webtoonId, cursor, size,
 			id);
 		CursorPage<CommentAndSubComments> cursorPage = cursorPaginationService.create(
-			commentsByWebtoon,
+			result.comments(),
 			size,
 			cursor);
 
-		CommentListResponse response = CommentListResponse.of(cursorPage);
+		CommentListResponse response = CommentListResponse.of(cursorPage, result.commentCount());
 		return ResponseEntity.ok(
 			ApiResponse.success(ResponseCodeAndMessage.COMMENT_FIND_SUCCESS, response)
 		);
