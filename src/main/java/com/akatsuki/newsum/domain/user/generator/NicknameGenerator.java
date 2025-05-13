@@ -13,7 +13,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class NicknameGenerator {
 
-	private static final List<String> BASE_NAMES = List.of("춘식이", "라이언", "무지", "어피치");
+	private final List<String> BASE_NAMES = List.of("춘식이", "라이언", "무지", "어피치");
 	private final UserRepository userRepository;
 	private final Random random = new Random();
 
