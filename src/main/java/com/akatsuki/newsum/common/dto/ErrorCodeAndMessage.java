@@ -37,6 +37,7 @@ public enum ErrorCodeAndMessage {
 	// 사용자 관련 클라이언트 오류
 	USER_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "존재하지 않는 사용자입니다."),
 	INVALID_USER_CREDENTIALS(HttpStatus.UNAUTHORIZED.value(), "유효하지 않은 사용자 인증정보입니다."),
+	DUPLICATE_NICKNAME_GENERATION_FAILED(409, "중복되지 않는 닉네임을 찾을 수 없습니다."),
 
 	// 서버 오류 (5xx)
 	INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR.value(), "서버 내부 오류가 발생했습니다."),

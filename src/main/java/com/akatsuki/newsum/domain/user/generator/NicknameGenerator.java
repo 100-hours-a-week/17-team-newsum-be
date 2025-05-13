@@ -5,6 +5,8 @@ import java.util.Random;
 
 import org.springframework.stereotype.Component;
 
+import com.akatsuki.newsum.common.dto.ErrorCodeAndMessage;
+import com.akatsuki.newsum.common.exception.BusinessException;
 import com.akatsuki.newsum.domain.user.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -31,7 +33,7 @@ public class NicknameGenerator {
 				return nickname;
 			}
 		}
-		throw new IllegalStateException("중복되지 않는 닉네임을 찾을 수 없습니다.");
+		throw new BusinessException(ErrorCodeAndMessage.DUPLICATE_NICKNAME_GENERATION_FAILED);
 	}
 
 }
