@@ -15,7 +15,6 @@ public class NicknameGenerator {
 
 	private final List<String> BASE_NAMES = List.of("춘식이", "라이언", "무지", "어피치");
 	private final UserRepository userRepository;
-	private final Random random = new Random();
 
 	public String generate() {
 		Random random = new Random(System.nanoTime());
