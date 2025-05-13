@@ -18,15 +18,14 @@ public class NicknameGenerator {
 	private final Random random = new Random();
 
 	public String generate() {
-		String base = BASE_NAMES.get(random.nextInt(BASE_NAMES.size()));
-		int suffix = random.nextInt(5000);
-
-		String nickname = base + suffix;
-		while (userRepository.existsByNickname(nickname)) {
-			suffix = random.nextInt(5000);
+		Random random = new Random(System.nanoTime());
+		String nickname;
+		do {
+			String base = BASE_NAMES.get(random.nextInt(BASE_NAMES.size()));
+			int suffix = random.nextInt(5000);
 			nickname = base + suffix;
-		}
+
+		} while (userRepository.existsByNickname(nickname));
 		return nickname;
 	}
 }
-
