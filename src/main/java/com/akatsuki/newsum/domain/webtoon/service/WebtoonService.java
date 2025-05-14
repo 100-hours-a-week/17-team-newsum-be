@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.akatsuki.newsum.cache.RedisService;
 import com.akatsuki.newsum.common.dto.ErrorCodeAndMessage;
 import com.akatsuki.newsum.common.exception.NotFoundException;
 import com.akatsuki.newsum.common.pagination.model.cursor.Cursor;
@@ -57,6 +58,7 @@ public class WebtoonService {
 	private final AiServerApiService aiServerApiService;
 	private final RecentViewRepository recentViewRepository;
 	private final UserRepository userRepository;
+	private final RedisService redisService;
 
 	private final int RECENT_WEBTOON_LIMIT = 3;
 	private final int RELATED_CATEGORY_SIZE = 2;
@@ -306,4 +308,17 @@ public class WebtoonService {
 			webtoon.getViewCount()
 		);
 	}
+
+	@Transactional
+	public void toggleWebtoonLike(Long webtoonId, Long userId) {
+		String key = "webtoon:likes:" + webtoonId;
+		Set<Object> userIds = redisService.getSetMembers(key);
+
+		if (userIds.contains(userId)) {
+			redisService.removeSetValue(key, userId);
+		} else {
+			redisService.addSetValue(key, userId);
+		}
+	}
+
 }

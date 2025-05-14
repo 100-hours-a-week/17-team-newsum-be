@@ -1,5 +1,7 @@
 package com.akatsuki.newsum.cache;
 
+import java.util.Set;
+
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -22,4 +24,17 @@ public class RedisService {
 	public void delete(String key) {
 		redisTemplate.delete(key);
 	}
+
+	public void addSetValue(String key, Object value) {
+		redisTemplate.opsForSet().add(key, value);
+	}
+
+	public void removeSetValue(String key, Object value) {
+		redisTemplate.opsForSet().remove(key, value);
+	}
+
+	public Set<Object> getSetMembers(String key) {
+		return redisTemplate.opsForSet().members(key);
+	}
+
 }
