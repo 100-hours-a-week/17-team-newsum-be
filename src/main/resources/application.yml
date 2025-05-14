@@ -49,3 +49,6 @@ logging:
       apache:
         coyote:
           http11: trace
+
+user:
+  default-profile-image-url: ${USER_DEFAULT_PROFILE_IMAGE_URL}
