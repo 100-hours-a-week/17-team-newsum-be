@@ -151,7 +151,7 @@ public class WebtoonController {
 	}
 
 	@GetMapping("/{webtoonId}/likes")
-	public ResponseEntity<ApiResponse<List<WebtoonLikeStatusDto>>> getWebtoonLikesStatus(
+	public ResponseEntity<ApiResponse<WebtoonLikeStatusDto>> getWebtoonLikesStatus(
 		@PathVariable Long webtoonId,
 		@AuthenticationPrincipal UserDetailsImpl userDetails
 	) {
@@ -159,7 +159,8 @@ public class WebtoonController {
 		WebtoonLikeStatusDto dto = webtoonService.getWebtoonLikeStatus(webtoonId, userId);
 
 		return ResponseEntity.ok(
-			ApiResponse.success(ResponseCodeAndMessage.)
-		)
+			ApiResponse.success(ResponseCodeAndMessage.ARTICLE_LIKE_CHECK_SUCCESS, dto)
+		);
+	}
 	}
 }
