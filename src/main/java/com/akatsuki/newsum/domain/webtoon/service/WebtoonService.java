@@ -26,6 +26,7 @@ import com.akatsuki.newsum.domain.webtoon.dto.AiAuthorInfoDto;
 import com.akatsuki.newsum.domain.webtoon.dto.CreateWebtoonReqeust;
 import com.akatsuki.newsum.domain.webtoon.dto.WebtoonCardDto;
 import com.akatsuki.newsum.domain.webtoon.dto.WebtoonDetailResponse;
+import com.akatsuki.newsum.domain.webtoon.dto.WebtoonLikeStatusDto;
 import com.akatsuki.newsum.domain.webtoon.dto.WebtoonResponse;
 import com.akatsuki.newsum.domain.webtoon.dto.WebtoonSlideDto;
 import com.akatsuki.newsum.domain.webtoon.dto.WebtoonSourceDto;
@@ -333,6 +334,13 @@ public class WebtoonService {
 	public long getWebtoonLikeCount(Long webtoonId) {
 		String key = "webtoon:likes:" + webtoonId;
 		return redisService.getSetMembers(key).size();
+	}
+
+	@Transactional(readOnly = true)
+	public WebtoonLikeStatusDto getWebtoonLikeStatus(Long webtoonId, Long userId) {
+		boolean liked = hasUserLikedWebtoon(webtoonId, userId);
+		long count = getWebtoonLikeCount(webtoonId);
+		return new WebtoonLikeStatusDto(liked, count);
 	}
 
 }

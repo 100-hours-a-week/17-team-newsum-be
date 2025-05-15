@@ -25,6 +25,7 @@ import com.akatsuki.newsum.common.security.UserDetailsImpl;
 import com.akatsuki.newsum.domain.webtoon.dto.CreateWebtoonReqeust;
 import com.akatsuki.newsum.domain.webtoon.dto.WebtoonCardDto;
 import com.akatsuki.newsum.domain.webtoon.dto.WebtoonDetailResponse;
+import com.akatsuki.newsum.domain.webtoon.dto.WebtoonLikeStatusDto;
 import com.akatsuki.newsum.domain.webtoon.dto.WebtoonListResponse;
 import com.akatsuki.newsum.domain.webtoon.dto.WebtoonResponse;
 import com.akatsuki.newsum.domain.webtoon.service.WebtoonService;
@@ -147,5 +148,18 @@ public class WebtoonController {
 			return null;
 		}
 		return userDetails.getUserId();
+	}
+
+	@GetMapping("/{webtoonId}/likes")
+	public ResponseEntity<ApiResponse<List<WebtoonLikeStatusDto>>> getWebtoonLikesStatus(
+		@PathVariable Long webtoonId,
+		@AuthenticationPrincipal UserDetailsImpl userDetails
+	) {
+		Long userId = getUserId(userDetails);
+		WebtoonLikeStatusDto dto = webtoonService.getWebtoonLikeStatus(webtoonId, userId);
+
+		return ResponseEntity.ok(
+			ApiResponse.success(ResponseCodeAndMessage.)
+		)
 	}
 }
