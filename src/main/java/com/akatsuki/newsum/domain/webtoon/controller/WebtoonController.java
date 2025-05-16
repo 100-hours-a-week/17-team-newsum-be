@@ -162,5 +162,5 @@ public class WebtoonController {
 			ApiResponse.success(ResponseCodeAndMessage.ARTICLE_LIKE_CHECK_SUCCESS, dto)
 		);
 	}
-	}
 }
+
