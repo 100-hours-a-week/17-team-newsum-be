@@ -6,6 +6,7 @@ import static com.akatsuki.newsum.domain.webtoon.entity.webtoon.QRecentView.*;
 import static com.akatsuki.newsum.domain.webtoon.entity.webtoon.QWebtoon.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -81,23 +82,32 @@ public class WebtoonQueryRepositoryImpl implements WebtoonQueryRepository {
 	@Override
 	public List<Webtoon> findTop3TodayByViewCount() {
 		LocalDateTime startOfToday = LocalDateTime.now().toLocalDate().atStartOfDay();
-		List<Webtoon> todayTop3Webtoons = queryFactory
-			.selectFrom(webtoon)
-			.where(webtoon.createdAt.goe(startOfToday))
-			.orderBy(webtoon.viewCount.desc())
-			.limit(3)
-			.fetch();
 
-		if (todayTop3Webtoons.size() < 3) {
-			LocalDateTime startOfYesterday = startOfToday.minusDays(1);
-			return queryFactory
+		List<Webtoon> result = new ArrayList<>();
+		int maxDaysToLookBack = 10;
+		int dayoffset = 0;
+
+		while (result.size() < 3 && dayoffset < maxDaysToLookBack) {
+			LocalDateTime start = startOfToday.minusDays(dayoffset);
+			LocalDateTime end = start.plusDays(1);
+
+			List<Webtoon> dailywebtoons = queryFactory
 				.selectFrom(webtoon)
-				.where(webtoon.createdAt.goe(startOfYesterday))
+				.where(webtoon.createdAt.goe(start)
+					.and(webtoon.createdAt.lt(end))
+				)
 				.orderBy(webtoon.viewCount.desc())
-				.limit(3)
 				.fetch();
+
+			for (Webtoon webtoon : dailywebtoons) {
+				if (result.size() >= 3)
+					break;
+				result.add(webtoon);
+			}
+			dayoffset++;
+
 		}
-		return todayTop3Webtoons;
+		return result;
 	}
 
 	@Override
@@ -127,3 +137,4 @@ public class WebtoonQueryRepositoryImpl implements WebtoonQueryRepository {
 	}
 
 }
+
