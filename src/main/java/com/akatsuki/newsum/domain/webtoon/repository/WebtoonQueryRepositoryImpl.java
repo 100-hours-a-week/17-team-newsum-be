@@ -68,7 +68,7 @@ public class WebtoonQueryRepositoryImpl implements WebtoonQueryRepository {
 			.join(webtoon).fetchJoin()
 			.on(webtoon.id.eq(recentView.webtoon.id))
 			.where(recentView.user.id.eq(id))
-			.orderBy(recentView.viewedAt.asc())
+			.orderBy(recentView.viewedAt.desc())
 			.fetch();
 	}
 
@@ -81,24 +81,49 @@ public class WebtoonQueryRepositoryImpl implements WebtoonQueryRepository {
 	@Override
 	public List<Webtoon> findTop3TodayByViewCount() {
 		LocalDateTime startOfToday = LocalDateTime.now().toLocalDate().atStartOfDay();
-
-		return queryFactory
+		List<Webtoon> todayTop3Webtoons = queryFactory
 			.selectFrom(webtoon)
 			.where(webtoon.createdAt.goe(startOfToday))
 			.orderBy(webtoon.viewCount.desc())
 			.limit(3)
 			.fetch();
+
+		if (todayTop3Webtoons.size() < 3) {
+			LocalDateTime startOfYesterday = startOfToday.minusDays(1);
+			return queryFactory
+				.selectFrom(webtoon)
+				.where(webtoon.createdAt.goe(startOfYesterday))
+				.orderBy(webtoon.viewCount.desc())
+				.limit(3)
+				.fetch();
+		}
+		return todayTop3Webtoons;
 	}
 
 	@Override
 	public List<Webtoon> findTodayNewsTop3() {
 		LocalDateTime startOfToday = LocalDateTime.now().toLocalDate().atStartOfDay();
 
-		return queryFactory
+		List<Webtoon> todayWebtoons = queryFactory
 			.selectFrom(webtoon)
 			.where(webtoon.createdAt.goe(startOfToday))
 			.orderBy(webtoon.createdAt.desc())
 			.limit(3)
 			.fetch();
+
+		if (todayWebtoons.size() < 3) {
+			LocalDateTime startOfYesterday = startOfToday.minusDays(1);
+
+			return queryFactory
+				.selectFrom(webtoon)
+				.where(webtoon.createdAt.goe(startOfYesterday))
+				.orderBy(webtoon.createdAt.desc())
+				.limit(3)
+				.fetch();
+		}
+
+		return todayWebtoons;
+
 	}
+
 }
