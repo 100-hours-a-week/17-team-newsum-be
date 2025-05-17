@@ -114,26 +114,12 @@ public class WebtoonQueryRepositoryImpl implements WebtoonQueryRepository {
 	public List<Webtoon> findTodayNewsTop3() {
 		LocalDateTime startOfToday = LocalDateTime.now().toLocalDate().atStartOfDay();
 
-		List<Webtoon> todayWebtoons = queryFactory
+		return queryFactory
 			.selectFrom(webtoon)
 			.where(webtoon.createdAt.goe(startOfToday))
 			.orderBy(webtoon.createdAt.desc())
 			.limit(3)
 			.fetch();
-
-		if (todayWebtoons.size() < 3) {
-			LocalDateTime startOfYesterday = startOfToday.minusDays(1);
-
-			return queryFactory
-				.selectFrom(webtoon)
-				.where(webtoon.createdAt.goe(startOfYesterday))
-				.orderBy(webtoon.createdAt.desc())
-				.limit(3)
-				.fetch();
-		}
-
-		return todayWebtoons;
-
 	}
 
 }
