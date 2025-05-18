@@ -29,8 +29,6 @@ public class WebtoonLikeSyncJob {
 
 	@Scheduled(cron = "0 */10 * * * *") // 1분마다 실행
 	public void syncLikesFromRedisToDB() {
-		log.info("🔄 [Batch] Redis 좋아요 → RDB 반영 시작");
-
 		Set<String> keys = redisService.getKeys("webtoon:likes:*");
 
 		for (String key : keys) {
