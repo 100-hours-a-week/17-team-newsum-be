@@ -159,7 +159,6 @@ public class WebtoonController {
 		@AuthenticationPrincipal UserDetailsImpl userDetails
 	) {
 		Long userId = getUserId(userDetails);
-		log.info("💬 좋아요 요청: webtoonId={}, userId={}", webtoonId, userId);
 		if (userId != null) {
 			webtoonService.toggleWebtoonLike(webtoonId, userId);
 		}

@@ -38,15 +38,12 @@ public class WebtoonLikeSyncJob {
 				Long webtoonId = Long.parseLong(key.split(":")[2]);
 				Set<Object> userIds = redisService.getSetMembers(key);
 
-				// 웹툰 조회
 				Webtoon webtoon = webtoonRepository.findById(webtoonId)
 					.orElseThrow(() -> new WebtoonNotFoundException());
 
-				// likeCount 업데이트
 				webtoon.updateLikeCount(userIds.size());
 				webtoonRepository.save(webtoon);
 
-				// 좋아요 이력 테이블에 insert (❗ 삭제 없이)
 				for (Object userIdObj : userIds) {
 					try {
 						Long userId = Long.valueOf(userIdObj.toString());
@@ -58,8 +55,6 @@ public class WebtoonLikeSyncJob {
 						log.warn("⚠️ userId={} insert 실패: {}", userIdObj, e.getMessage());
 					}
 				}
-
-				log.info("✅ 웹툰 ID={} → 좋아요 수={} / 이력 {}건 저장 완료", webtoonId, userIds.size(), userIds.size());
 
 			} catch (Exception e) {
 				log.error("❌ 좋아요 반영 실패 - key={}, reason={}", key, e.getMessage(), e);

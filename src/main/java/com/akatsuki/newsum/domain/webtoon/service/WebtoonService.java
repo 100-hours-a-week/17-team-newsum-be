@@ -312,7 +312,6 @@ public class WebtoonService {
 
 	@Transactional
 	public WebtoonLikeStatusDto toggleWebtoonLike(Long webtoonId, Long userId) {
-		log.info(">>> 좋아요 토글 호출됨: webtoonId={}, userId={}", webtoonId, userId);
 		String key = "webtoon:likes:" + webtoonId;
 		Set<Object> userIds = redisService.getSetMembers(key);
 
