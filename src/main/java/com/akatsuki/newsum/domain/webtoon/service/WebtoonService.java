@@ -340,6 +340,7 @@ public class WebtoonService {
 		String key = "webtoon:likes:" + webtoonId;
 
 		return redisService.getSetMembers(key).stream()
+			.map(Object::toString)
 			.anyMatch(id -> id.toString().equals(userId.toString()));
 	}
 
