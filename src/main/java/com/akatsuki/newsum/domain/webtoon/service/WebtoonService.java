@@ -316,9 +316,13 @@ public class WebtoonService {
 		String key = "webtoon:likes:" + webtoonId;
 		Set<Object> userIds = redisService.getSetMembers(key);
 
+		boolean alreadyLiked = userIds.stream()
+			.map(Object::toString)
+			.anyMatch(id -> id.equals(userId.toString()));
+
 		boolean liked;
 
-		if (userIds.contains(userId)) {
+		if (alreadyLiked) {
 			redisService.removeSetValue(key, userId);
 			liked = false;
 		} else {
