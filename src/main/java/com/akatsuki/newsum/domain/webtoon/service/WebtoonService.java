@@ -311,16 +311,23 @@ public class WebtoonService {
 	}
 
 	@Transactional
-	public void toggleWebtoonLike(Long webtoonId, Long userId) {
+	public WebtoonLikeStatusDto toggleWebtoonLike(Long webtoonId, Long userId) {
 		log.info(">>> 좋아요 토글 호출됨: webtoonId={}, userId={}", webtoonId, userId);
 		String key = "webtoon:likes:" + webtoonId;
 		Set<Object> userIds = redisService.getSetMembers(key);
 
+		boolean liked;
+
 		if (userIds.contains(userId)) {
 			redisService.removeSetValue(key, userId);
+			liked = false;
 		} else {
 			redisService.addSetValue(key, userId);
+			liked = true;
 		}
+		long count = redisService.getSetMembers(key).size();
+		return new WebtoonLikeStatusDto(liked, count);
+
 	}
 
 	@Transactional(readOnly = true)
@@ -328,7 +335,9 @@ public class WebtoonService {
 		if (userId == null)
 			return false;
 		String key = "webtoon:likes:" + webtoonId;
-		return redisService.getSetMembers(key).contains(userId);
+
+		return redisService.getSetMembers(key).stream()
+			.anyMatch(id -> id.toString().equals(userId.toString()));
 	}
 
 	@Transactional(readOnly = true)

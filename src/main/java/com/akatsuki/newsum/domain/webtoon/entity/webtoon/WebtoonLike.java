@@ -33,4 +33,10 @@ public class WebtoonLike {
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)
 	@JoinColumn(name = "webtoon_id", nullable = false)
 	private Webtoon webtoon;
+
+	public WebtoonLike(User user, Webtoon webtoon) {
+		this.user = user;
+		this.webtoon = webtoon;
+	}
+
 }
