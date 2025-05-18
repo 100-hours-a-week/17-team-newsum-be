@@ -340,6 +340,7 @@ public class WebtoonService {
 	public WebtoonLikeStatusDto getWebtoonLikeStatus(Long webtoonId, Long userId) {
 		boolean liked = hasUserLikedWebtoon(webtoonId, userId);
 		long count = getWebtoonLikeCount(webtoonId);
+
 		return new WebtoonLikeStatusDto(liked, count);
 	}
 

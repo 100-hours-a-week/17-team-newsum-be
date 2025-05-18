@@ -150,17 +150,25 @@ public class WebtoonController {
 		return userDetails.getUserId();
 	}
 
-	@GetMapping("/{webtoonId}/likes")
-	public ResponseEntity<ApiResponse<WebtoonLikeStatusDto>> getWebtoonLikesStatus(
+	//웹툰 좋아요
+	@PostMapping("/{webtoonId}/likes")
+	public ResponseEntity<ApiResponse<WebtoonLikeStatusDto>> like(
 		@PathVariable Long webtoonId,
 		@AuthenticationPrincipal UserDetailsImpl userDetails
 	) {
 		Long userId = getUserId(userDetails);
+
+		if (userId != null) {
+			webtoonService.toggleWebtoonLike(webtoonId, userId);
+		}
+
 		WebtoonLikeStatusDto dto = webtoonService.getWebtoonLikeStatus(webtoonId, userId);
 
 		return ResponseEntity.ok(
-			ApiResponse.success(ResponseCodeAndMessage.ARTICLE_LIKE_CHECK_SUCCESS, dto)
+			ApiResponse.success(ResponseCodeAndMessage.WEBTOON_LIKE_SUCCESS, dto)
 		);
+
 	}
+
 }
 
