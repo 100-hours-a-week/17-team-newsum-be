@@ -37,4 +37,9 @@ public class RedisService {
 		return redisTemplate.opsForSet().members(key);
 	}
 
+	//keys * 로 가져오기 때문에 최적화 필요함
+	public Set<String> getKeys(String pattern) {
+		return redisTemplate.keys(pattern);
+	}
+
 }

@@ -5,13 +5,6 @@ spring:
   profiles:
     active: ${SPRING_PROFILES_ACTIVE:test}
 
-  # 데이터베이스 설정 (H2 인메모리)
-  datasource:
-    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
-    driverClassName: org.h2.Driver
-    username: sa
-    password: password
-
   # JPA 설정
   jpa:
     database-platform: org.hibernate.dialect.H2Dialect
@@ -21,12 +14,6 @@ spring:
     properties:
       hibernate:
         format_sql: true
-
-  # H2 콘솔 설정
-  h2:
-    console:
-      enabled: true
-      path: /h2-console
 
   # Flyway 비활성화
   flyway:

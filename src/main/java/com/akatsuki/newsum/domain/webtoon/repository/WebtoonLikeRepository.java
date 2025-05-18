@@ -9,5 +9,5 @@ import com.akatsuki.newsum.domain.webtoon.entity.webtoon.Webtoon;
 import com.akatsuki.newsum.domain.webtoon.entity.webtoon.WebtoonLike;
 
 public interface WebtoonLikeRepository extends JpaRepository<WebtoonLike, Long> {
-	Optional<WebtoonLike> findByWebtoonandUser(Webtoon webtoon, User user);
+	Optional<WebtoonLike> findByWebtoonAndUser(Webtoon webtoon, User user);
 }
