@@ -149,7 +149,7 @@ public class WebtoonController {
 		return userDetails.getUserId();
 	}
 
-	@PostMapping("/favorites")
+	@PostMapping("/{webtoonId}/favorites")
 	public ResponseEntity<ApiResponse<Boolean>> toggleFavorites(
 		@PathVariable Long webtoonId,
 		@AuthenticationPrincipal UserDetailsImpl userDetails
