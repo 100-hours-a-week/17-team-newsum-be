@@ -68,7 +68,7 @@ public class WebtoonQueryRepositoryImpl implements WebtoonQueryRepository {
 			.join(webtoon).fetchJoin()
 			.on(webtoon.id.eq(recentView.webtoon.id))
 			.where(recentView.user.id.eq(id))
-			.orderBy(recentView.viewedAt.asc())
+			.orderBy(recentView.viewedAt.desc())
 			.fetch();
 	}
 
@@ -80,11 +80,8 @@ public class WebtoonQueryRepositoryImpl implements WebtoonQueryRepository {
 
 	@Override
 	public List<Webtoon> findTop3TodayByViewCount() {
-		LocalDateTime startOfToday = LocalDateTime.now().toLocalDate().atStartOfDay();
-
 		return queryFactory
 			.selectFrom(webtoon)
-			.where(webtoon.createdAt.goe(startOfToday))
 			.orderBy(webtoon.viewCount.desc())
 			.limit(3)
 			.fetch();
@@ -101,4 +98,6 @@ public class WebtoonQueryRepositoryImpl implements WebtoonQueryRepository {
 			.limit(3)
 			.fetch();
 	}
+
 }
+
