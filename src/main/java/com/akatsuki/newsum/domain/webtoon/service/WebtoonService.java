@@ -1,5 +1,7 @@
 package com.akatsuki.newsum.domain.webtoon.service;
 
+import static com.akatsuki.newsum.common.dto.ErrorCodeAndMessage.*;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -15,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.akatsuki.newsum.common.dto.ErrorCodeAndMessage;
+import com.akatsuki.newsum.common.exception.BusinessException;
 import com.akatsuki.newsum.common.exception.NotFoundException;
 import com.akatsuki.newsum.common.pagination.model.cursor.Cursor;
 import com.akatsuki.newsum.domain.aiAuthor.entity.AiAuthor;
@@ -33,10 +36,12 @@ import com.akatsuki.newsum.domain.webtoon.entity.webtoon.NewsSource;
 import com.akatsuki.newsum.domain.webtoon.entity.webtoon.RecentView;
 import com.akatsuki.newsum.domain.webtoon.entity.webtoon.Webtoon;
 import com.akatsuki.newsum.domain.webtoon.entity.webtoon.WebtoonDetail;
+import com.akatsuki.newsum.domain.webtoon.entity.webtoon.WebtoonFavorite;
 import com.akatsuki.newsum.domain.webtoon.exception.WebtoonNotFoundException;
 import com.akatsuki.newsum.domain.webtoon.repository.NewsSourceRepository;
 import com.akatsuki.newsum.domain.webtoon.repository.RecentViewRepository;
 import com.akatsuki.newsum.domain.webtoon.repository.WebtoonDetailRepository;
+import com.akatsuki.newsum.domain.webtoon.repository.WebtoonFavoriteRepository;
 import com.akatsuki.newsum.domain.webtoon.repository.WebtoonRepository;
 import com.akatsuki.newsum.extern.dto.CreateWebtoonApiRequest;
 import com.akatsuki.newsum.extern.service.AiServerApiService;
@@ -57,6 +62,7 @@ public class WebtoonService {
 	private final AiServerApiService aiServerApiService;
 	private final RecentViewRepository recentViewRepository;
 	private final UserRepository userRepository;
+	private final WebtoonFavoriteRepository webtoonFavoriteRepository;
 
 	private final int RECENT_WEBTOON_LIMIT = 3;
 	private final int RELATED_CATEGORY_SIZE = 2;
@@ -305,5 +311,23 @@ public class WebtoonService {
 			webtoon.getCreatedAt(),
 			webtoon.getViewCount()
 		);
+	}
+
+	//북마크구현
+
+	@Transactional
+	public boolean toggleBookmark(Long webtoonId, Long userId) {
+		if (webtoonFavoriteRepository.existsByWebtoonIdAndUserId(webtoonId, userId)) {
+			webtoonFavoriteRepository.deleteByUserIdAndWebtoonId(userId, webtoonId);
+
+			return false;
+		} else {
+			User user = userRepository.findById(userId)
+				.orElseThrow(() -> new BusinessException(USER_NOT_FOUND));
+			Webtoon webtoon = webtoonRepository.findById(webtoonId)
+				.orElseThrow(() -> new BusinessException(WEBTOON_NOT_FOUND));
+			webtoonFavoriteRepository.save(new WebtoonFavorite(user, webtoon));
+			return true;
+		}
 	}
 }

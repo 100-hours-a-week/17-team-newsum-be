@@ -148,4 +148,15 @@ public class WebtoonController {
 		}
 		return userDetails.getUserId();
 	}
+
+	@PostMapping("/favorites")
+	public ResponseEntity<ApiResponse<Boolean>> toggleFavorites(
+		@PathVariable Long webtoonId,
+		@AuthenticationPrincipal UserDetailsImpl userDetails
+	) {
+		Long userId = getUserId(userDetails);
+		boolean bookmarked = webtoonService.toggleBookmark(userId, webtoonId);
+		return ResponseEntity.ok(ApiResponse.success(ResponseCodeAndMessage.WEBTOON_BOOKMARK_SUCCESS, bookmarked)
+		);
+	}
 }
