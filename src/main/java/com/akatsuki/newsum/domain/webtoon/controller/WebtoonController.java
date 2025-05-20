@@ -155,7 +155,6 @@ public class WebtoonController {
 		@AuthenticationPrincipal UserDetailsImpl userDetails
 	) {
 		Long userId = getUserId(userDetails);
-		System.out.print("유저아이디" + userId);
 		boolean bookmarked = webtoonService.toggleBookmark(webtoonId, userId);
 		return ResponseEntity.ok(ApiResponse.success(ResponseCodeAndMessage.WEBTOON_BOOKMARK_SUCCESS, bookmarked)
 		);

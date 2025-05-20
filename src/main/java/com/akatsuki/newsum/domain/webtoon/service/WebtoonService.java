@@ -314,7 +314,6 @@ public class WebtoonService {
 	}
 
 	//북마크구현
-
 	@Transactional
 	public boolean toggleBookmark(Long webtoonId, Long userId) {
 		if (webtoonFavoriteRepository.existsByWebtoonIdAndUserId(webtoonId, userId)) {
