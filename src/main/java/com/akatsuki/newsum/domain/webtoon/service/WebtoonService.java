@@ -81,12 +81,12 @@ public class WebtoonService {
 	public WebtoonResponse getWebtoon(Long webtoonId, Long userId) {
 		Webtoon webtoon = findWebtoonWithAiAuthorByIdOrThrow(webtoonId);
 
-		// 좋아요, 북마크 여부 확인
 		boolean isLiked = false;
 		boolean isBookmarked = false;
 
-		//TODO : 좋아요 테이블, 즐겨찾기 테이블 연결 필요
-		if (userId == null) {
+		//TODO : 좋아요 테이블
+		if (userId != null) {
+			isBookmarked = webtoonFavoriteRepository.existsByWebtoonIdAndUserId(webtoonId, userId);
 
 		} else {
 
