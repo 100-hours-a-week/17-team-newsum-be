@@ -320,8 +320,7 @@ public class WebtoonService {
 			webtoonFavoriteRepository.deleteByUserIdAndWebtoonId(userId, webtoonId);
 			return false;
 		} else {
-			User user = userRepository.findById(userId)
-				.orElseThrow(() -> new BusinessException(USER_NOT_FOUND));
+			User user = new User(userId);
 			Webtoon webtoon = webtoonRepository.findById(webtoonId)
 				.orElseThrow(() -> new BusinessException(WEBTOON_NOT_FOUND));
 			webtoonFavoriteRepository.save(new WebtoonFavorite(user, webtoon));
