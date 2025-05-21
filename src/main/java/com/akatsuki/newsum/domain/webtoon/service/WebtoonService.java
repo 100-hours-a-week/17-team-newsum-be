@@ -318,7 +318,6 @@ public class WebtoonService {
 	public boolean toggleBookmark(Long webtoonId, Long userId) {
 		if (webtoonFavoriteRepository.existsByWebtoonIdAndUserId(webtoonId, userId)) {
 			webtoonFavoriteRepository.deleteByUserIdAndWebtoonId(userId, webtoonId);
-
 			return false;
 		} else {
 			User user = userRepository.findById(userId)
