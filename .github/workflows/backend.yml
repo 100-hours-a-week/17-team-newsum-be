@@ -1,0 +1,89 @@
+name: Backend CI/CD
+
+on:
+  push:
+    branches: [ dev ]
+  pull_request:
+    branches: [ dev ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up JDK 17
+      uses: actions/setup-java@v3
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        cache: 'gradle'
+    
+    - name: Grant execute permission for gradlew
+      run: chmod +x gradlew
+      
+    - name: Build with Gradle
+      run: ./gradlew build -x test
+      
+    - name: Upload JAR
+      uses: actions/upload-artifact@v4
+      with:
+        name: backend-jar
+        path: build/libs/*.jar
+
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up JDK 17
+      uses: actions/setup-java@v3
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        
+    - name: Grant execute permission for gradlew
+      run: chmod +x gradlew
+      
+    - name: Run tests
+      run: ./gradlew test
+
+  deploy:
+    needs: [build, test]
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Download JAR
+      uses: actions/download-artifact@v4
+      with:
+        name: backend-jar
+        path: build/libs/
+        
+    - name: Setup SSH
+      run: |
+        mkdir -p ~/.ssh
+        echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+        ssh-keyscan -H ${{ secrets.GCP_VM_IP }} >> ~/.ssh/known_hosts
+        
+    - name: Deploy to GCP VM
+      run: |
+        # Copy JAR to VM
+        scp build/libs/*.jar ${{ secrets.GCP_VM_USER }}@${{ secrets.GCP_VM_IP }}:/home/${{ secrets.GCP_VM_USER }}/be/
+        
+        # SSH into VM and restart the service
+        ssh ${{ secrets.GCP_VM_USER }}@${{ secrets.GCP_VM_IP }} '\
+          cd /home/${{ secrets.GCP_VM_USER }}/be && \
+          # Stop existing service if running
+          if [ -f backend.pid ]; then
+            kill $(cat backend.pid) || true
+            rm -f backend.pid
+          fi && \
+          # Start new service
+          nohup java -jar *.jar > backend.log 2>&1 & echo $! > backend.pid && \
+          # Wait for service to start
+          sleep 10'
