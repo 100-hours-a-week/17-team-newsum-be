@@ -1,9 +1,6 @@
-#1
 name: Backend CI/CD
 
 on:
-  push:
-    branches: [ dev ]
   pull_request:
     branches: [ dev ]
 
@@ -79,12 +76,17 @@ jobs:
         # SSH into VM and restart the service
         ssh ${{ secrets.GCP_VM_USER }}@${{ secrets.GCP_VM_IP }} '\
           cd /home/${{ secrets.GCP_VM_USER }}/be && \
-          # Stop existing service if running
-          if [ -f backend.pid ]; then
-            kill $(cat backend.pid) || true
-            rm -f backend.pid
-          fi && \
-          # Start new service
-          nohup java -jar newsum-0.0.1-SNAPSHOT.jar > backend.log 2>&1 & echo $! > backend.pid && \
-          # Wait for service to start
-          sleep 10'
+        
+        # Stop previous
+        if [ -f backend.pid ]; then
+        kill $(cat backend.pid) || true
+        rm -f backend.pid
+        fi
+
+        # Start new
+        echo "Starting app..."
+        nohup java -jar newsum-0.0.1-SNAPSHOT.jar > backend.log 2>&1 &
+        echo $! > backend.pid
+        
+        # Wait for service to start
+        sleep 10'
