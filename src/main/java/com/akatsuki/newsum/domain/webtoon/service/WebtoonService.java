@@ -10,6 +10,7 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -305,18 +306,28 @@ public class WebtoonService {
 		);
 	}
 
-	//북마크구현
 	@Transactional
 	public boolean toggleBookmark(Long webtoonId, Long userId) {
-		if (webtoonFavoriteRepository.existsByWebtoonIdAndUserId(webtoonId, userId)) {
-			webtoonFavoriteRepository.deleteByUserIdAndWebtoonId(userId, webtoonId);
-			return false;
-		} else {
-			User user = new User(userId);
-			Webtoon webtoon = webtoonRepository.findById(webtoonId)
-				.orElseThrow(() -> new BusinessException(WEBTOON_NOT_FOUND));
-			webtoonFavoriteRepository.save(new WebtoonFavorite(user, webtoon));
-			return true;
-		}
+		Optional<WebtoonFavorite> favoriteOpt = webtoonFavoriteRepository
+			.findByWebtoonIdAndUserId(webtoonId, userId);
+
+		final boolean[] isAdded = new boolean[1];
+
+		favoriteOpt.ifPresentOrElse(
+			favorite -> {
+				webtoonFavoriteRepository.delete(favorite);
+				isAdded[0] = false;
+			},
+			() -> {
+				User user = new User(userId);
+				Webtoon webtoon = webtoonRepository.findById(webtoonId)
+					.orElseThrow(() -> new BusinessException(WEBTOON_NOT_FOUND));
+				webtoonFavoriteRepository.save(new WebtoonFavorite(user, webtoon));
+				isAdded[0] = true;
+			}
+		);
+
+		return isAdded[0];
 	}
+
 }

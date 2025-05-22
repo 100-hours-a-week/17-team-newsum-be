@@ -1,6 +1,7 @@
 package com.akatsuki.newsum.domain.webtoon.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -15,5 +16,7 @@ public interface WebtoonFavoriteRepository extends JpaRepository<WebtoonFavorite
 	List<WebtoonFavorite> findByUserId(Long userId);
 
 	void deleteByUserIdAndWebtoonId(Long userId, Long webtoonId);
+
+	Optional<WebtoonFavorite> findByWebtoonIdAndUserId(Long webtoonId, Long userId);
 
 }
