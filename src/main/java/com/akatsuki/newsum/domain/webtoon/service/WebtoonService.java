@@ -84,14 +84,6 @@ public class WebtoonService {
 		boolean isLiked = false;
 		boolean isBookmarked = false;
 
-		//TODO : 좋아요 테이블
-		if (userId != null) {
-			isBookmarked = webtoonFavoriteRepository.existsByWebtoonIdAndUserId(webtoonId, userId);
-
-		} else {
-
-		}
-
 		return new WebtoonResponse(
 			webtoon.getId(),
 			webtoon.getThumbnailImageUrl(),
