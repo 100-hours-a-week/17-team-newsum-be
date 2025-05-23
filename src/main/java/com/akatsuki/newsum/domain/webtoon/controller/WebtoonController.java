@@ -25,12 +25,15 @@ import com.akatsuki.newsum.common.security.UserDetailsImpl;
 import com.akatsuki.newsum.domain.webtoon.dto.CreateWebtoonReqeust;
 import com.akatsuki.newsum.domain.webtoon.dto.WebtoonCardDto;
 import com.akatsuki.newsum.domain.webtoon.dto.WebtoonDetailResponse;
+import com.akatsuki.newsum.domain.webtoon.dto.WebtoonLikeStatusDto;
 import com.akatsuki.newsum.domain.webtoon.dto.WebtoonListResponse;
 import com.akatsuki.newsum.domain.webtoon.dto.WebtoonResponse;
 import com.akatsuki.newsum.domain.webtoon.service.WebtoonService;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/v1/webtoons")
 @RequiredArgsConstructor
@@ -148,4 +151,25 @@ public class WebtoonController {
 		}
 		return userDetails.getUserId();
 	}
+
+	//웹툰 좋아요
+	@PostMapping("/{webtoonId}/likes")
+	public ResponseEntity<ApiResponse<WebtoonLikeStatusDto>> like(
+		@PathVariable Long webtoonId,
+		@AuthenticationPrincipal UserDetailsImpl userDetails
+	) {
+		Long userId = getUserId(userDetails);
+		if (userId != null) {
+			webtoonService.toggleWebtoonLike(webtoonId, userId);
+		}
+
+		WebtoonLikeStatusDto dto = webtoonService.getWebtoonLikeStatus(webtoonId, userId);
+
+		return ResponseEntity.ok(
+			ApiResponse.success(ResponseCodeAndMessage.WEBTOON_LIKE_SUCCESS, dto)
+		);
+
+	}
+
 }
+

@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.akatsuki.newsum.cache.RedisService;
 import com.akatsuki.newsum.common.dto.ErrorCodeAndMessage;
 import com.akatsuki.newsum.common.exception.NotFoundException;
 import com.akatsuki.newsum.common.pagination.model.cursor.Cursor;
@@ -25,6 +26,7 @@ import com.akatsuki.newsum.domain.webtoon.dto.AiAuthorInfoDto;
 import com.akatsuki.newsum.domain.webtoon.dto.CreateWebtoonReqeust;
 import com.akatsuki.newsum.domain.webtoon.dto.WebtoonCardDto;
 import com.akatsuki.newsum.domain.webtoon.dto.WebtoonDetailResponse;
+import com.akatsuki.newsum.domain.webtoon.dto.WebtoonLikeStatusDto;
 import com.akatsuki.newsum.domain.webtoon.dto.WebtoonResponse;
 import com.akatsuki.newsum.domain.webtoon.dto.WebtoonSlideDto;
 import com.akatsuki.newsum.domain.webtoon.dto.WebtoonSourceDto;
@@ -57,6 +59,7 @@ public class WebtoonService {
 	private final AiServerApiService aiServerApiService;
 	private final RecentViewRepository recentViewRepository;
 	private final UserRepository userRepository;
+	private final RedisService redisService;
 
 	private final int RECENT_WEBTOON_LIMIT = 3;
 	private final int RELATED_CATEGORY_SIZE = 2;
@@ -306,4 +309,53 @@ public class WebtoonService {
 			webtoon.getViewCount()
 		);
 	}
+
+	@Transactional
+	public WebtoonLikeStatusDto toggleWebtoonLike(Long webtoonId, Long userId) {
+		String key = "webtoon:likes:" + webtoonId;
+		Set<Object> userIds = redisService.getSetMembers(key);
+
+		boolean alreadyLiked = userIds.stream()
+			.map(Object::toString)
+			.anyMatch(id -> id.equals(userId.toString()));
+
+		boolean liked;
+
+		if (alreadyLiked) {
+			redisService.removeSetValue(key, userId);
+			liked = false;
+		} else {
+			redisService.addSetValue(key, userId);
+			liked = true;
+		}
+		long count = redisService.getSetMembers(key).size();
+		return new WebtoonLikeStatusDto(liked, count);
+
+	}
+
+	@Transactional(readOnly = true)
+	public boolean hasUserLikedWebtoon(Long webtoonId, Long userId) {
+		if (userId == null)
+			return false;
+		String key = "webtoon:likes:" + webtoonId;
+
+		return redisService.getSetMembers(key).stream()
+			.map(Object::toString)
+			.anyMatch(id -> id.toString().equals(userId.toString()));
+	}
+
+	@Transactional(readOnly = true)
+	public long getWebtoonLikeCount(Long webtoonId) {
+		String key = "webtoon:likes:" + webtoonId;
+		return redisService.getSetMembers(key).size();
+	}
+
+	@Transactional(readOnly = true)
+	public WebtoonLikeStatusDto getWebtoonLikeStatus(Long webtoonId, Long userId) {
+		boolean liked = hasUserLikedWebtoon(webtoonId, userId);
+		long count = getWebtoonLikeCount(webtoonId);
+
+		return new WebtoonLikeStatusDto(liked, count);
+	}
+
 }
