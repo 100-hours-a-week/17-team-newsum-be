@@ -7,13 +7,11 @@ CREATE TABLE webtoon_favorite
 
     CONSTRAINT fk_webtoon_favorite_user
         FOREIGN KEY (user_id)
-            REFERENCES users (id)
-            ON DELETE CASCADE,
+            REFERENCES users (id),
 
     CONSTRAINT fk_webtoon_favorite_webtoon
         FOREIGN KEY (webtoon_id)
-            REFERENCES webtoon (id)
-            ON DELETE CASCADE,
+            REFERENCES webtoon (id),
 
     CONSTRAINT uq_webtoon_favorite_user_webtoon
         UNIQUE (user_id, webtoon_id)
