@@ -134,7 +134,7 @@ jobs:
             --projectId=$INFISICAL_PROJECT_ID \
             --token=$INFISICAL_TOKEN \
             --format=dotenv \
-            --domain=$INFISICAL_API_URL > env.list
+            --domain=$INFISICAL_API_URL > .env
       
           # Copy .env file to VM
           scp env.list ${{ secrets.GCP_VM_USER }}@${{ secrets.GCP_VM_IP }}:/home/${{ secrets.GCP_VM_USER }}/be/env.list
@@ -151,7 +151,7 @@ jobs:
   
           # Set environment variables and start the application
           set -a && \
-          source env.list && \
+          source .env && \
           set +a && \
 
           # Start the application
