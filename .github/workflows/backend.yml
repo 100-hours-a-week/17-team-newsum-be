@@ -80,7 +80,6 @@ jobs:
 
   # Deployment job (only runs on push to dev)
   deploy:
-    needs: build
     if: github.event_name == 'push' && github.ref == 'refs/heads/dev'
     runs-on: ubuntu-latest
     
