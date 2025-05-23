@@ -19,6 +19,7 @@ env:
   CACHE: 'gradle'
 
 jobs:
+  if: github.event_name == 'pull_request'
   setup-java:
     name: Setup Java Environment
     runs-on: ubuntu-latest
@@ -80,6 +81,7 @@ jobs:
 
   # Deployment job (only runs on push to dev)
   deploy:
+    needs: build
     if: github.event_name == 'push' && github.ref == 'refs/heads/dev'
     runs-on: ubuntu-latest
     
