@@ -112,13 +112,18 @@ jobs:
         echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
         chmod 600 ~/.ssh/id_rsa
         ssh-keyscan -H ${{ secrets.GCP_VM_IP }} >> ~/.ssh/known_hosts
-        
+
+    - name: Install Infisical CLI
+      run: |
+        curl -1sLf 'https://artifacts-cli.infisical.com/setup.deb.sh' | sudo -E bash
+        sudo apt-get update && sudo apt-get install -y infisical
+
     - name: Deploy to GCP VM
       env:
         # Fetch environment variables from Infisical
-        INFISICAL_ENV: ${{ secrets.INFISICAL_ENV }}
+        INFISICAL_ENV: ${{ secrets.INFISICAL_ENV_DEV }}
         INFISICAL_PROJECT_ID: ${{ secrets.INFISICAL_PROJECT_ID }}
-        INFISICAL_TOKEN: ${{ secrets.INFISICAL_TOKEN }}
+        INFISICAL_TOKEN: ${{ secrets.INFISICAL_TOKEN_DEV }}
         INFISICAL_API_URL: ${{ secrets.INFISICAL_API_URL }}
       run: |
         # Copy JAR to VM
