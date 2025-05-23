@@ -140,7 +140,7 @@ jobs:
           scp .env ${{ secrets.GCP_VM_USER }}@${{ secrets.GCP_VM_IP }}:/home/${{ secrets.GCP_VM_USER }}/be/.env
       
           # SSH into the VM and start application using the environment variables
-          ssh ${{ secrets.GCP_VM_USER }}@${{ secrets.GCP_VM_IP }} "\
+          ssh ${{ secrets.GCP_VM_USER }}@${{ secrets.GCP_VM_IP }} \
             cd /home/${{ secrets.GCP_VM_USER }}/be && \
 
           # Stop the application if it's running
@@ -160,4 +160,4 @@ jobs:
           echo \$! > backend.pid && \
           echo 'Application started with PID: ' \$(cat backend.pid) && \
 
-          sleep 10"
+          sleep 10
