@@ -38,7 +38,7 @@ jobs:
   build:
     needs: setup-java
     runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request' || github.event_name == 'push'
+    if: github.event_name == 'pull_request'
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-java@v3
@@ -55,10 +55,29 @@ jobs:
         with:
           name: backend-jar
           path: build/libs/*.jar
-          retention-days: 1
 
-  # This job is no longer needed as we reuse the JAR from the build job
-  # build-for-deploy job has been removed to avoid duplicate builds
+  build-for-deploy:
+    needs: setup-java
+    if: github.event_name == 'push' && github.ref == 'refs/heads/dev'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-java@v3
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: ${{ env.DISTRIBUTION }}
+          cache: ${{ env.CACHE }}
+      - name: Build and package for deployment
+        run: |
+          ./gradlew clean build -x test
+          mkdir -p deploy
+          cp build/libs/*.jar deploy/
+      - name: Upload deployment artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: deploy-jar
+          path: deploy/*.jar
+          retention-days: 1
 
   test:
     needs: setup-java
@@ -80,7 +99,7 @@ jobs:
 
   # Deployment job (only runs on push to dev)
   deploy:
-    needs: build
+    needs: build-for-deploy
     if: github.event_name == 'push' && github.ref == 'refs/heads/dev'
     runs-on: ubuntu-latest
     
