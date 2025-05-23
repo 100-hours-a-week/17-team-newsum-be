@@ -140,17 +140,18 @@ jobs:
           scp .env ${{ secrets.GCP_VM_USER }}@${{ secrets.GCP_VM_IP }}:/home/${{ secrets.GCP_VM_USER }}/be/.env
       
           # SSH into the VM and start application using the environment variables
-          ssh ${{ secrets.GCP_VM_USER }}@${{ secrets.GCP_VM_IP }} "cd /home/${{ secrets.GCP_VM_USER }}/be &&\
-          if [ -f backend.pid ]; then &&\
-            kill $(cat backend.pid) || true &&\
-            rm -f backend.pid &&\
-          fi &&\
-          set -a &&\
-          source .env &&\
-          set +a &&\
-          echo 'Setting environment variables and starting application...' &&\
-          nohup java -jar newsum-0.0.1-SNAPSHOT.jar > backend.log 2>&1 & &&\
-          echo $! > backend.pid &&\
-          echo 'Application started with PID: ' $(cat backend.pid) &&\
+          ssh ${{ secrets.GCP_VM_USER }}@${{ secrets.GCP_VM_IP }}
+          cd /home/${{ secrets.GCP_VM_USER }}/be
+          if [ -f backend.pid ]; then
+            kill $(cat backend.pid) || true
+            rm -f backend.pid
+          fi
+          set -a
+          source .env
+          set +a
+          echo 'Setting environment variables and starting application...'
+          nohup java -jar newsum-0.0.1-SNAPSHOT.jar > backend.log 2>&1 &
+          echo $! > backend.pid
+          echo 'Application started with PID: ' $(cat backend.pid)
 
-          sleep 10"
+          sleep 10
