@@ -136,8 +136,8 @@ jobs:
             --format=dotenv \
             --domain=$INFISICAL_API_URL > .env
       
-          # Copy .env file to VM
-          scp env.list ${{ secrets.GCP_VM_USER }}@${{ secrets.GCP_VM_IP }}:/home/${{ secrets.GCP_VM_USER }}/be/env.list
+          # Copy .env to VM
+          scp .env ${{ secrets.GCP_VM_USER }}@${{ secrets.GCP_VM_IP }}:/home/${{ secrets.GCP_VM_USER }}/be/.env
       
           # SSH into the VM and start application using the environment variables
           ssh ${{ secrets.GCP_VM_USER }}@${{ secrets.GCP_VM_IP }} "\
