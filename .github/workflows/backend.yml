@@ -146,7 +146,7 @@ jobs:
           
           # Stop previous instance if running
           if [ -f backend.pid ]; then
-            kill \$(cat backend.pid) || true
+            kill $(cat backend.pid) || true
             rm -f backend.pid
           fi && \
           
@@ -155,7 +155,7 @@ jobs:
           $ENV_VARS && \
           nohup java -jar newsum-0.0.1-SNAPSHOT.jar > backend.log 2>&1 & \
           echo \$! > backend.pid && \
-          echo 'Application started with PID: '\$(cat backend.pid)"
-          
+          echo "Application started with PID: $(cat backend.pid)"
+
           # Wait for service to start
           sleep 10'
