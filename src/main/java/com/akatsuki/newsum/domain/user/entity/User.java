@@ -68,4 +68,7 @@ public class User extends BaseTimeEntity {
 		this.profileImageUrl = profileImageUrl;
 	}
 
+	public User(Long id) {
+		this.id = id;
+	}
 }
