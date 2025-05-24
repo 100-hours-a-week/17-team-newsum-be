@@ -140,8 +140,8 @@ jobs:
         scp .env ${{ secrets.GCP_VM_USER }}@${{ secrets.GCP_VM_IP }}:/home/${{ secrets.GCP_VM_USER }}/be/.env
       
         # Stop existing application if running and start new one
-        ssh -o ConnectTimeout=10 ${{ secrets.GCP_VM_USER }}@${{ secrets.GCP_VM_IP }} '
-          cd /home/${{ secrets.GCP_VM_USER }}/be
+        ssh -o ConnectTimeout=10 ${{ secrets.GCP_VM_USER }}@${{ secrets.GCP_VM_IP }} 
+          'cd /home/${{ secrets.GCP_VM_USER }}/be
             
           # Stop existing process if running
           if [ -f backend.pid ]; then
@@ -168,5 +168,4 @@ jobs:
             else
               echo "Failed to start application"
               exit 1
-          fi'
-         || { echo "Deployment failed"; exit 1; }
+          fi' || { echo "Deployment failed"; exit 1; }
