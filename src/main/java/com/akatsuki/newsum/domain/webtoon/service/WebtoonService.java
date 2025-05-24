@@ -88,12 +88,13 @@ public class WebtoonService {
 	public WebtoonResponse getWebtoon(Long webtoonId, Long userId) {
 		Webtoon webtoon = findWebtoonWithAiAuthorByIdOrThrow(webtoonId);
 
-		// 좋아요, 북마크 여부 확인
-		boolean isLiked = false;
-		boolean isBookmarked = false;
-
 		//TODO : 좋아요 테이블, 즐겨찾기 테이블 연결 필요
-		if (userId == null) {
+		boolean isBookmarked;
+		boolean isLiked;
+
+		if (userId != null) {
+			isLiked = webtoonLikeRepository.existsByWebtoonIdAndUserId(webtoonId, userId);
+			isBookmarked = webtoonFavoriteRepository.existsByWebtoonIdAndUserId(webtoonId, userId);
 
 		} else {
 
@@ -373,19 +374,9 @@ public class WebtoonService {
 	}
 
 	@Transactional(readOnly = true)
-	public boolean hasUserLikedWebtoon(Long webtoonId, Long userId) {
-		return webtoonLikeRepository.findByWebtoonIdAndUserId(webtoonId, userId).isPresent();
-	}
-
-	@Transactional(readOnly = true)
-	public long getWebtoonLikeCount(Long webtoonId) {
-		return webtoonLikeRepository.countByWebtoonId(webtoonId);
-	}
-
-	@Transactional(readOnly = true)
 	public WebtoonLikeStatusDto getWebtoonLikeStatus(Long webtoonId, Long userId) {
-		boolean liked = hasUserLikedWebtoon(webtoonId, userId);
-		long count = getWebtoonLikeCount(webtoonId);
+		boolean liked = webtoonLikeRepository.existsByWebtoonIdAndUserId(webtoonId, userId);
+		long count = webtoonLikeRepository.countByWebtoonId(webtoonId);
 
 		return new WebtoonLikeStatusDto(liked, count);
 	}
