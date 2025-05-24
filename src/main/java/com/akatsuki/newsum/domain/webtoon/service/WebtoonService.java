@@ -40,11 +40,13 @@ import com.akatsuki.newsum.domain.webtoon.entity.webtoon.RecentView;
 import com.akatsuki.newsum.domain.webtoon.entity.webtoon.Webtoon;
 import com.akatsuki.newsum.domain.webtoon.entity.webtoon.WebtoonDetail;
 import com.akatsuki.newsum.domain.webtoon.entity.webtoon.WebtoonFavorite;
+import com.akatsuki.newsum.domain.webtoon.entity.webtoon.WebtoonLike;
 import com.akatsuki.newsum.domain.webtoon.exception.WebtoonNotFoundException;
 import com.akatsuki.newsum.domain.webtoon.repository.NewsSourceRepository;
 import com.akatsuki.newsum.domain.webtoon.repository.RecentViewRepository;
 import com.akatsuki.newsum.domain.webtoon.repository.WebtoonDetailRepository;
 import com.akatsuki.newsum.domain.webtoon.repository.WebtoonFavoriteRepository;
+import com.akatsuki.newsum.domain.webtoon.repository.WebtoonLikeRepository;
 import com.akatsuki.newsum.domain.webtoon.repository.WebtoonRepository;
 import com.akatsuki.newsum.extern.dto.CreateWebtoonApiRequest;
 import com.akatsuki.newsum.extern.service.AiServerApiService;
@@ -67,6 +69,7 @@ public class WebtoonService {
 	private final UserRepository userRepository;
 	private final RedisService redisService;
 	private final WebtoonFavoriteRepository webtoonFavoriteRepository;
+	private final WebtoonLikeRepository webtoonLikeRepository;
 
 	private final int RECENT_WEBTOON_LIMIT = 3;
 	private final int RELATED_CATEGORY_SIZE = 2;
@@ -341,28 +344,32 @@ public class WebtoonService {
 		return isAdded[0];
 	}
 
+	//좋아요 기능
 
 	@Transactional
-	public WebtoonLikeStatusDto toggleWebtoonLike(Long webtoonId, Long userId) {
-		String key = "webtoon:likes:" + webtoonId;
-		Set<Object> userIds = redisService.getSetMembers(key);
+	public boolean toggleWebtoonLike(Long webtoonId, Long userId) {
+		Optional<WebtoonLike> likeOPt = webtoonLikeRepository
+			.findByWebtoonAndUser(webtoonId, userId);
 
-		boolean alreadyLiked = userIds.stream()
-			.map(Object::toString)
-			.anyMatch(id -> id.equals(userId.toString()));
+		final boolean[] isAdded = new boolean[1];
 
-		boolean liked;
+		likeOPt.ifPresentOrElse(
+			webtoonLike -> {
+				webtoonLikeRepository.delete(webtoonLike);
+				isAdded[0] = false;
+			},
 
-		if (alreadyLiked) {
-			redisService.removeSetValue(key, userId);
-			liked = false;
-		} else {
-			redisService.addSetValue(key, userId);
-			liked = true;
-		}
-		long count = redisService.getSetMembers(key).size();
-		return new WebtoonLikeStatusDto(liked, count);
+			() -> {
+				User user = new User(userId);
+				Webtoon webtoon = webtoonRepository.findById(webtoonId)
+					.orElseThrow(() -> new BusinessException(WEBTOON_NOT_FOUND));
+				webtoonLikeRepository.save(new WebtoonLike(user, webtoon));
+				isAdded[0] = true;
+			}
 
+		);
+
+		return isAdded[0];
 	}
 
 	@Transactional(readOnly = true)
