@@ -349,7 +349,7 @@ public class WebtoonService {
 	@Transactional
 	public boolean toggleWebtoonLike(Long webtoonId, Long userId) {
 		Optional<WebtoonLike> likeOPt = webtoonLikeRepository
-			.findByWebtoonAndUser(webtoonId, userId);
+			.findByWebtoonIdAndUserId(webtoonId, userId);
 
 		final boolean[] isAdded = new boolean[1];
 
@@ -374,12 +374,12 @@ public class WebtoonService {
 
 	@Transactional(readOnly = true)
 	public boolean hasUserLikedWebtoon(Long webtoonId, Long userId) {
-		return webtoonLikeRepository.findByWebtoonAndUser(webtoonId, userId).isPresent();
+		return webtoonLikeRepository.findByWebtoonIdAndUserId(webtoonId, userId).isPresent();
 	}
 
 	@Transactional(readOnly = true)
 	public long getWebtoonLikeCount(Long webtoonId) {
-		return webtoonLikeRepository.countByWebtoon(webtoonId);
+		return webtoonLikeRepository.countByWebtoonId(webtoonId);
 	}
 
 	@Transactional(readOnly = true)
