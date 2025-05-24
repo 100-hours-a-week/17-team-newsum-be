@@ -12,4 +12,8 @@ public interface WebtoonLikeRepository extends JpaRepository<WebtoonLike, Long> 
 
 	// 들어갔을때 좋아요했는지 아닌지 확인, 좋아요할 용도
 	boolean existsByWebtoonIdAndUserId(Long webtoonId, Long userId);
+
+	long countByWebtoon(Long webtoonId);
+
 }
+

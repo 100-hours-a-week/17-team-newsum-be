@@ -374,19 +374,12 @@ public class WebtoonService {
 
 	@Transactional(readOnly = true)
 	public boolean hasUserLikedWebtoon(Long webtoonId, Long userId) {
-		if (userId == null)
-			return false;
-		String key = "webtoon:likes:" + webtoonId;
-
-		return redisService.getSetMembers(key).stream()
-			.map(Object::toString)
-			.anyMatch(id -> id.toString().equals(userId.toString()));
+		return webtoonLikeRepository.findByWebtoonAndUser(webtoonId, userId).isPresent();
 	}
 
 	@Transactional(readOnly = true)
 	public long getWebtoonLikeCount(Long webtoonId) {
-		String key = "webtoon:likes:" + webtoonId;
-		return redisService.getSetMembers(key).size();
+		return webtoonLikeRepository.countByWebtoon(webtoonId);
 	}
 
 	@Transactional(readOnly = true)
