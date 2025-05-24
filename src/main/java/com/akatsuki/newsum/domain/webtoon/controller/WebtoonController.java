@@ -152,6 +152,17 @@ public class WebtoonController {
 		return userDetails.getUserId();
 	}
 
+	@PostMapping("/{webtoonId}/favorites")
+	public ResponseEntity<ApiResponse<Boolean>> toggleFavorites(
+		@PathVariable Long webtoonId,
+		@AuthenticationPrincipal UserDetailsImpl userDetails
+	) {
+		Long userId = getUserId(userDetails);
+		boolean bookmarked = webtoonService.toggleBookmark(webtoonId, userId);
+		return ResponseEntity.ok(ApiResponse.success(ResponseCodeAndMessage.WEBTOON_BOOKMARK_SUCCESS, bookmarked)
+		);
+	}
+
 	//웹툰 좋아요
 	@PostMapping("/{webtoonId}/likes")
 	public ResponseEntity<ApiResponse<WebtoonLikeStatusDto>> like(
@@ -172,4 +183,3 @@ public class WebtoonController {
 	}
 
 }
-

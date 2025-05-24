@@ -1,0 +1,171 @@
+name: Backend CI/CD
+
+on:
+  pull_request:
+    branches: [ dev ]
+    types: [opened, synchronize, reopened]
+  push:
+    branches:
+      - dev
+    paths-ignore:
+      - '**/README.md'
+      - '**/.gitignore'
+
+# Save build artifacts between jobs
+env:
+  ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up JDK 17
+      uses: actions/setup-java@v3
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        cache: 'gradle'
+    
+    - name: Grant execute permission for gradlew
+      run: chmod +x gradlew
+      
+    - name: Build with Gradle
+      run: ./gradlew build -x test
+      
+    - name: Upload JAR
+      uses: actions/upload-artifact@v4
+      with:
+        name: backend-jar
+        path: build/libs/*.jar
+
+  build-for-deploy:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/dev'
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up JDK 17
+      uses: actions/setup-java@v3
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        cache: 'gradle'
+    
+    - name: Build with Gradle
+      run: |
+        ./gradlew clean build -x test
+        mkdir -p deploy
+        cp build/libs/*.jar deploy/
+    
+    - name: Upload deployment artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: deploy-jar
+        path: deploy/*.jar
+        retention-days: 1
+
+  test:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up JDK 17
+      uses: actions/setup-java@v3
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        
+    - name: Grant execute permission for gradlew
+      run: chmod +x gradlew
+      
+    - name: Run tests if tests exist
+      run: |
+        if [ -d "src/test" ]; then
+          ./gradlew test
+        else
+          echo "No test directory found, skipping tests"
+        fi
+
+  # Deployment job (only runs on push to dev)
+  deploy:
+    needs: build-for-deploy
+    if: github.event_name == 'push' && github.ref == 'refs/heads/dev'
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Download deployment artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: deploy-jar
+        path: build/libs/
+        
+    - name: Setup SSH
+      run: |
+        mkdir -p ~/.ssh
+        echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+        ssh-keyscan -H ${{ secrets.GCP_VM_IP }} >> ~/.ssh/known_hosts
+
+    - name: Install Infisical CLI
+      run: |
+        curl -1sLf 'https://artifacts-cli.infisical.com/setup.deb.sh' | sudo -E bash
+        sudo apt-get update && sudo apt-get install -y infisical
+
+    - name: Deploy to GCP VM
+      env:
+        INFISICAL_ENV: ${{ secrets.INFISICAL_ENV_DEV }}
+        INFISICAL_PROJECT_ID: ${{ secrets.INFISICAL_PROJECT_ID }}
+        INFISICAL_TOKEN: ${{ secrets.INFISICAL_TOKEN_DEV }}
+        INFISICAL_API_URL: ${{ secrets.INFISICAL_API_URL }}
+      run: |
+        # Copy JAR to GCP VM
+        scp build/libs/*.jar ${{ secrets.GCP_VM_USER }}@${{ secrets.GCP_VM_IP }}:/home/${{ secrets.GCP_VM_USER }}/be/
+      
+        # Export Infisical environment variables to .env file
+        infisical export \
+          --env=$INFISICAL_ENV \
+          --projectId=$INFISICAL_PROJECT_ID \
+          --token=$INFISICAL_TOKEN \
+          --format=dotenv \
+          --domain=$INFISICAL_API_URL > .env
+      
+        # Copy .env to GCP VM
+        scp .env ${{ secrets.GCP_VM_USER }}@${{ secrets.GCP_VM_IP }}:/home/${{ secrets.GCP_VM_USER }}/be/.env
+      
+        # Stop existing application if running and start new one
+        ssh -o ConnectTimeout=10 ${{ secrets.GCP_VM_USER }}@${{ secrets.GCP_VM_IP }} '
+          cd /home/${{ secrets.GCP_VM_USER }}/be
+            
+          # Stop existing process if running
+          if [ -f backend.pid ]; then
+            echo "Stopping existing application..."
+            kill $(cat backend.pid) 2>/dev/null || true
+            rm -f backend.pid
+            sleep 3  # Give some time for the process to terminate
+          fi
+            
+          # Load environment variables and start application
+          echo "Starting application..."
+          set -a
+          source .env
+          set +a
+            
+          nohup java -jar newsum-0.0.1-SNAPSHOT.jar > backend.log 2>&1 &
+          echo $! > backend.pid
+            
+          # Verify application started
+          sleep 5
+          if ps -p $(cat backend.pid) > /dev/null; then
+              echo "Application started successfully with PID: $(cat backend.pid)"
+              exit 0
+            else
+              echo "Failed to start application"
+              exit 1
+          fi'
