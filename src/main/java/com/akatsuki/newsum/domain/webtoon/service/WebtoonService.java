@@ -88,18 +88,16 @@ public class WebtoonService {
 	public WebtoonResponse getWebtoon(Long webtoonId, Long userId) {
 		Webtoon webtoon = findWebtoonWithAiAuthorByIdOrThrow(webtoonId);
 
-		//TODO : 좋아요 테이블, 즐겨찾기 테이블 연결 필요
-		boolean isBookmarked;
-		boolean isLiked;
+		WebtoonLikeStatusDto likeStatus = getWebtoonLikeStatus(webtoonId, userId);
+		boolean isLiked = likeStatus.liked();
+		long likeCount = likeStatus.likeCount();
+
+		boolean isBookmarked = false;
 
 		if (userId != null) {
-			isLiked = webtoonLikeRepository.existsByWebtoonIdAndUserId(webtoonId, userId);
 			isBookmarked = webtoonFavoriteRepository.existsByWebtoonIdAndUserId(webtoonId, userId);
 
-		} else {
-
 		}
-
 		return new WebtoonResponse(
 			webtoon.getId(),
 			webtoon.getThumbnailImageUrl(),
@@ -108,7 +106,7 @@ public class WebtoonService {
 			mapAiAuthorToAiAuthorInfoDto(webtoon.getAiAuthor()),
 			isLiked,
 			isBookmarked,
-			webtoon.getLikeCount(),
+			likeCount,
 			webtoon.getViewCount(),
 			webtoon.getCreatedAt()
 		);
