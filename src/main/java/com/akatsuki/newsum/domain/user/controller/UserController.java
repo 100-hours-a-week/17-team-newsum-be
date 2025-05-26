@@ -9,10 +9,16 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.akatsuki.newsum.common.dto.ApiResponse;
 import com.akatsuki.newsum.common.dto.ResponseCodeAndMessage;
+import com.akatsuki.newsum.common.pagination.CursorPaginationService;
+import com.akatsuki.newsum.common.pagination.annotation.CursorParam;
+import com.akatsuki.newsum.common.pagination.model.cursor.CreatedAtIdCursor;
+import com.akatsuki.newsum.common.pagination.model.cursor.Cursor;
+import com.akatsuki.newsum.common.pagination.model.page.CursorPage;
 import com.akatsuki.newsum.common.security.UserDetailsImpl;
 import com.akatsuki.newsum.domain.user.dto.RecentViewWebtoonListResponse;
 import com.akatsuki.newsum.domain.user.dto.UpdateUserRequestDto;
@@ -20,6 +26,7 @@ import com.akatsuki.newsum.domain.user.dto.UpdateUserResponseDto;
 import com.akatsuki.newsum.domain.user.dto.UserProfileDto;
 import com.akatsuki.newsum.domain.user.service.UserService;
 import com.akatsuki.newsum.domain.webtoon.dto.WebtoonCardDto;
+import com.akatsuki.newsum.domain.webtoon.service.WebtoonService;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +37,8 @@ import lombok.RequiredArgsConstructor;
 public class UserController {
 
 	private final UserService userService;
+	private final WebtoonService webtoonService;
+	private final CursorPaginationService cursorPaginationService;
 
 	@GetMapping("/profile")
 	public ResponseEntity<ApiResponse<UserProfileDto>> getProfile(
@@ -77,4 +86,29 @@ public class UserController {
 		}
 		return userDetails.getUserId();
 	}
+
+	@GetMapping("/favorites/webtoons")
+	public ResponseEntity<ApiResponse<Map<String, Object>>> getBookmarkedWebtoons(
+		@AuthenticationPrincipal UserDetailsImpl userDetails,
+		@CursorParam(cursorType = CreatedAtIdCursor.class) Cursor cursor,
+		@RequestParam(defaultValue = "10") int size
+	) {
+		Long userId = getUserId(userDetails);
+
+		CursorPage<WebtoonCardDto> page = webtoonService.getBookmarkedWebtoonCards(userId, (CreatedAtIdCursor)cursor,
+			size);
+
+		Map<String, Object> response = Map.of(
+			"webtoons", page.getItems(),
+			"pageInfo", Map.of(
+				"nextCursor", page.getPageInfo().nextCursor(),
+				"hasNext", page.getPageInfo().hasNext()
+			)
+		);
+
+		return ResponseEntity.ok(
+			ApiResponse.success(ResponseCodeAndMessage.WEBTOON_BOOKMARK_SUCCESS, response)
+		);
+	}
+
 }

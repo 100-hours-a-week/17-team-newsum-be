@@ -34,7 +34,6 @@ public enum ResponseCodeAndMessage {
 	COMMENT_DELETE_SUCCESS(HttpStatus.NO_CONTENT.value(), "댓글 삭제에 성공했습니다."),
 	COMMEND_EDIT_SUCCESS(HttpStatus.OK.value(), "댓글 수정에 성공했습니다."),
 	COMMENT_ADD_SUCCESS(HttpStatus.CREATED.value(), "댓글 생성에 성공했습니다.");
-
 	private final int code;
 	private final String message;
 

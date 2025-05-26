@@ -20,7 +20,10 @@ import org.springframework.transaction.annotation.Transactional;
 import com.akatsuki.newsum.common.dto.ErrorCodeAndMessage;
 import com.akatsuki.newsum.common.exception.BusinessException;
 import com.akatsuki.newsum.common.exception.NotFoundException;
+import com.akatsuki.newsum.common.pagination.CursorPaginationService;
+import com.akatsuki.newsum.common.pagination.model.cursor.CreatedAtIdCursor;
 import com.akatsuki.newsum.common.pagination.model.cursor.Cursor;
+import com.akatsuki.newsum.common.pagination.model.page.CursorPage;
 import com.akatsuki.newsum.domain.aiAuthor.entity.AiAuthor;
 import com.akatsuki.newsum.domain.aiAuthor.repository.AiAuthorRepository;
 import com.akatsuki.newsum.domain.user.entity.User;
@@ -64,6 +67,7 @@ public class WebtoonService {
 	private final RecentViewRepository recentViewRepository;
 	private final UserRepository userRepository;
 	private final WebtoonFavoriteRepository webtoonFavoriteRepository;
+	private final CursorPaginationService cursorPaginationService;
 
 	private final int RECENT_WEBTOON_LIMIT = 3;
 	private final int RELATED_CATEGORY_SIZE = 2;
@@ -328,6 +332,11 @@ public class WebtoonService {
 		);
 
 		return isAdded[0];
+
+	}
+
+	public CursorPage<WebtoonCardDto> getBookmarkedWebtoonCards(Long userId, CreatedAtIdCursor cursor, int size) {
+
 	}
 
 }
