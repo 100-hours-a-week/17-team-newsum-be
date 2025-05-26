@@ -105,7 +105,6 @@ public class UserController {
 				"hasNext", page.getPageInfo().hasNext()
 			)
 		);
-
 		return ResponseEntity.ok(
 			ApiResponse.success(ResponseCodeAndMessage.WEBTOON_BOOKMARK_SUCCESS, response)
 		);
