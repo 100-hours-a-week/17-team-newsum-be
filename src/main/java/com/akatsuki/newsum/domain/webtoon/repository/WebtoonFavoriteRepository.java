@@ -7,7 +7,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.akatsuki.newsum.domain.webtoon.entity.webtoon.WebtoonFavorite;
 
-public interface WebtoonFavoriteRepository extends JpaRepository<WebtoonFavorite, Long> {
+public interface WebtoonFavoriteRepository
+	extends JpaRepository<WebtoonFavorite, Long>, WebtoonFavoriteRepositoryCustom {
 
 	//상세페이지 들어갔을때 북마크했는지 아닌지 확인및 북마크 할 용도
 	boolean existsByWebtoonIdAndUserId(Long webtoonId, Long userId);
