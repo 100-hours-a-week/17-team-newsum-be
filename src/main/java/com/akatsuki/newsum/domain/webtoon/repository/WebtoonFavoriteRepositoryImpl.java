@@ -25,17 +25,17 @@ public class WebtoonFavoriteRepositoryImpl implements WebtoonFavoriteRepositoryC
 
 		if (cursor.getCreatedAt() != null && cursor.getId() != null) {
 			builder.and(
-				webtoon.createdAt.lt(
+				qWebtoonFavorite.createdAt.lt(
 					cursor.getCreatedAt()
-				).or(webtoon.createdAt.eq(cursor.getCreatedAt()))
-			).and(webtoon.id.lt(cursor.getId()));
+				).or(qWebtoonFavorite.createdAt.eq(cursor.getCreatedAt()))
+			).and(qWebtoonFavorite.id.lt(cursor.getId()));
 		}
 
 		return queryFactory
 			.selectFrom(qWebtoonFavorite)
 			.join(qWebtoonFavorite.webtoon, webtoon).fetchJoin()
 			.where(builder)
-			.orderBy(webtoon.createdAt.desc(), webtoon.id.desc())
+			.orderBy(qWebtoonFavorite.createdAt.desc(), qWebtoonFavorite.id.desc())
 			.limit(size + 1)
 			.fetch();
 	}
