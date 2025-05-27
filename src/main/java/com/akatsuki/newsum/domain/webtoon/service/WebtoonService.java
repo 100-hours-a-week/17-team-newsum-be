@@ -17,6 +17,7 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.akatsuki.newsum.cache.RedisService;
 import com.akatsuki.newsum.common.dto.ErrorCodeAndMessage;
 import com.akatsuki.newsum.common.exception.BusinessException;
 import com.akatsuki.newsum.common.exception.NotFoundException;
@@ -32,6 +33,7 @@ import com.akatsuki.newsum.domain.webtoon.dto.AiAuthorInfoDto;
 import com.akatsuki.newsum.domain.webtoon.dto.CreateWebtoonReqeust;
 import com.akatsuki.newsum.domain.webtoon.dto.WebtoonCardDto;
 import com.akatsuki.newsum.domain.webtoon.dto.WebtoonDetailResponse;
+import com.akatsuki.newsum.domain.webtoon.dto.WebtoonLikeStatusDto;
 import com.akatsuki.newsum.domain.webtoon.dto.WebtoonResponse;
 import com.akatsuki.newsum.domain.webtoon.dto.WebtoonSlideDto;
 import com.akatsuki.newsum.domain.webtoon.dto.WebtoonSourceDto;
@@ -41,11 +43,13 @@ import com.akatsuki.newsum.domain.webtoon.entity.webtoon.RecentView;
 import com.akatsuki.newsum.domain.webtoon.entity.webtoon.Webtoon;
 import com.akatsuki.newsum.domain.webtoon.entity.webtoon.WebtoonDetail;
 import com.akatsuki.newsum.domain.webtoon.entity.webtoon.WebtoonFavorite;
+import com.akatsuki.newsum.domain.webtoon.entity.webtoon.WebtoonLike;
 import com.akatsuki.newsum.domain.webtoon.exception.WebtoonNotFoundException;
 import com.akatsuki.newsum.domain.webtoon.repository.NewsSourceRepository;
 import com.akatsuki.newsum.domain.webtoon.repository.RecentViewRepository;
 import com.akatsuki.newsum.domain.webtoon.repository.WebtoonDetailRepository;
 import com.akatsuki.newsum.domain.webtoon.repository.WebtoonFavoriteRepository;
+import com.akatsuki.newsum.domain.webtoon.repository.WebtoonLikeRepository;
 import com.akatsuki.newsum.domain.webtoon.repository.WebtoonRepository;
 import com.akatsuki.newsum.extern.dto.CreateWebtoonApiRequest;
 import com.akatsuki.newsum.extern.service.AiServerApiService;
@@ -66,7 +70,9 @@ public class WebtoonService {
 	private final AiServerApiService aiServerApiService;
 	private final RecentViewRepository recentViewRepository;
 	private final UserRepository userRepository;
+	private final RedisService redisService;
 	private final WebtoonFavoriteRepository webtoonFavoriteRepository;
+	private final WebtoonLikeRepository webtoonLikeRepository;
 	private final CursorPaginationService cursorPaginationService;
 
 	private final int RECENT_WEBTOON_LIMIT = 4;
@@ -86,14 +92,16 @@ public class WebtoonService {
 	public WebtoonResponse getWebtoon(Long webtoonId, Long userId) {
 		Webtoon webtoon = findWebtoonWithAiAuthorByIdOrThrow(webtoonId);
 
-		boolean isLiked = false;
+		WebtoonLikeStatusDto likeStatus = getWebtoonLikeStatus(webtoonId, userId);
+		boolean isLiked = likeStatus.liked();
+		long likeCount = likeStatus.likeCount();
+
 		boolean isBookmarked = false;
 
 		if (userId != null) {
 			isBookmarked = webtoonFavoriteRepository.existsByWebtoonIdAndUserId(webtoonId, userId);
 
 		}
-
 		return new WebtoonResponse(
 			webtoon.getId(),
 			webtoon.getThumbnailImageUrl(),
@@ -102,7 +110,7 @@ public class WebtoonService {
 			mapAiAuthorToAiAuthorInfoDto(webtoon.getAiAuthor()),
 			isLiked,
 			isBookmarked,
-			webtoon.getLikeCount(),
+			likeCount,
 			webtoon.getViewCount(),
 			webtoon.getCreatedAt()
 		);
@@ -368,6 +376,42 @@ public class WebtoonService {
 			})
 			.toList();
 		return cursorPaginationService.create(result, size, cursor);
+	}
+
+	//좋아요 기능
+
+	@Transactional
+	public boolean toggleWebtoonLike(Long webtoonId, Long userId) {
+		Optional<WebtoonLike> likeOPt = webtoonLikeRepository
+			.findByWebtoonIdAndUserId(webtoonId, userId);
+
+		final boolean[] isAdded = new boolean[1];
+
+		likeOPt.ifPresentOrElse(
+			webtoonLike -> {
+				webtoonLikeRepository.delete(webtoonLike);
+				isAdded[0] = false;
+			},
+
+			() -> {
+				User user = new User(userId);
+				Webtoon webtoon = webtoonRepository.findById(webtoonId)
+					.orElseThrow(() -> new BusinessException(WEBTOON_NOT_FOUND));
+				webtoonLikeRepository.save(new WebtoonLike(user, webtoon));
+				isAdded[0] = true;
+			}
+
+		);
+
+		return isAdded[0];
+	}
+
+	@Transactional(readOnly = true)
+	public WebtoonLikeStatusDto getWebtoonLikeStatus(Long webtoonId, Long userId) {
+		boolean liked = webtoonLikeRepository.existsByWebtoonIdAndUserId(webtoonId, userId);
+		long count = webtoonLikeRepository.countByWebtoonId(webtoonId);
+
+		return new WebtoonLikeStatusDto(liked, count);
 	}
 
 }
