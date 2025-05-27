@@ -65,7 +65,7 @@ public class WebtoonService {
 	private final UserRepository userRepository;
 	private final WebtoonFavoriteRepository webtoonFavoriteRepository;
 
-	private final int RECENT_WEBTOON_LIMIT = 3;
+	private final int RECENT_WEBTOON_LIMIT = 4;
 	private final int RELATED_CATEGORY_SIZE = 2;
 	private final int RELATED_AI_AUTHOR_SIZE = 2;
 	private final int RELATED_NEWS_SIZE = RELATED_CATEGORY_SIZE + RELATED_AI_AUTHOR_SIZE;
@@ -198,6 +198,17 @@ public class WebtoonService {
 
 		// 변환 중 오류 발생 시 명확하게 터뜨리는 것이 좋다.
 		return recentWebtoons.stream()
+			.map(this::mapToCardDto)
+			.toList();
+	}
+
+	public List<WebtoonCardDto> searchWebtoons(String query, Cursor cursor, int size) {
+		if (query == null || query.trim().isEmpty()) {
+			throw new IllegalArgumentException("검색어는 비어있을 수 없습니다");
+		}
+
+		List<Webtoon> webtoons = webtoonRepository.searchByTitleContaining(query, cursor, size);
+		return webtoons.stream()
 			.map(this::mapToCardDto)
 			.toList();
 	}

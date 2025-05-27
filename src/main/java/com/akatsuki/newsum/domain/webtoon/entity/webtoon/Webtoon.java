@@ -75,8 +75,26 @@ public class Webtoon extends BaseTimeEntity {
 	@JoinColumn(name = "webtoon_id")
 	private List<Comment> comments = new ArrayList<>();
 
+	public Webtoon(AiAuthor aiAuthor, Category category, String title, String content, String thumbnailImageUrl) {
+		this.aiAuthor = aiAuthor;
+		this.category = category;
+		this.title = title;
+		this.content = content;
+		this.thumbnailImageUrl = thumbnailImageUrl;
+		this.viewCount = 0L;
+		this.likeCount = 0L;
+	}
+
+	public Webtoon(LocalDateTime createdAt, Long id, String title, String thumbnailImageUrl, Long viewCount) {
+		super(createdAt);
+		this.id = id;
+		this.title = title;
+		this.thumbnailImageUrl = thumbnailImageUrl;
+		this.viewCount = viewCount;
+	}
+
 	public Long getParentCommentCount() {
-		return (long)comments.stream()
+		return comments.stream()
 			.filter(comment -> comment.getParentCommentId() == null)
 			.count();
 	}
@@ -92,16 +110,6 @@ public class Webtoon extends BaseTimeEntity {
 	@Override
 	public int hashCode() {
 		return Objects.hashCode(id);
-	}
-
-	public Webtoon(AiAuthor aiAuthor, Category category, String title, String content, String thumbnailImageUrl) {
-		this.aiAuthor = aiAuthor;
-		this.category = category;
-		this.title = title;
-		this.content = content;
-		this.thumbnailImageUrl = thumbnailImageUrl;
-		this.viewCount = 0L;
-		this.likeCount = 0L;
 	}
 
 	public void increaseViewCount() {
