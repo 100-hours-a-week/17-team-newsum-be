@@ -344,10 +344,7 @@ public class WebtoonService {
 		List<WebtoonFavorite> favorites = webtoonFavoriteRepository
 			.findFavoritesByUserIdWithCursor(userId, cursor, size);
 
-		boolean hasNext = favorites.size() > size;
-
 		List<WebtoonCardDto> result = favorites.stream()
-			.limit(size)
 			.map(fav -> {
 				Webtoon webtoon = fav.getWebtoon();
 				return new WebtoonCardDto(
@@ -359,7 +356,6 @@ public class WebtoonService {
 				);
 			})
 			.toList();
-
 		return cursorPaginationService.create(result, size, cursor);
 	}
 
