@@ -89,6 +89,11 @@ public class WebtoonService {
 		boolean isLiked = false;
 		boolean isBookmarked = false;
 
+		if (userId != null) {
+			isBookmarked = webtoonFavoriteRepository.existsByWebtoonIdAndUserId(webtoonId, userId);
+
+		}
+
 		return new WebtoonResponse(
 			webtoon.getId(),
 			webtoon.getThumbnailImageUrl(),
