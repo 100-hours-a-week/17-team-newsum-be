@@ -20,7 +20,6 @@ import com.akatsuki.newsum.common.pagination.annotation.CursorParam;
 import com.akatsuki.newsum.common.pagination.model.cursor.CreatedAtIdCursor;
 import com.akatsuki.newsum.common.pagination.model.cursor.Cursor;
 import com.akatsuki.newsum.common.pagination.model.page.CursorPage;
-import com.akatsuki.newsum.common.security.TokenProvider;
 import com.akatsuki.newsum.common.security.UserDetailsImpl;
 import com.akatsuki.newsum.domain.webtoon.dto.CreateWebtoonReqeust;
 import com.akatsuki.newsum.domain.webtoon.dto.WebtoonCardDto;
@@ -28,6 +27,7 @@ import com.akatsuki.newsum.domain.webtoon.dto.WebtoonDetailResponse;
 import com.akatsuki.newsum.domain.webtoon.dto.WebtoonLikeStatusDto;
 import com.akatsuki.newsum.domain.webtoon.dto.WebtoonListResponse;
 import com.akatsuki.newsum.domain.webtoon.dto.WebtoonResponse;
+import com.akatsuki.newsum.domain.webtoon.dto.WebtoonSearchResponse;
 import com.akatsuki.newsum.domain.webtoon.service.WebtoonService;
 
 import lombok.RequiredArgsConstructor;
@@ -41,7 +41,6 @@ public class WebtoonController {
 
 	private final WebtoonService webtoonService;
 	private final CursorPaginationService cursorPaginationService;
-	private final TokenProvider tokenProvider;
 
 	@GetMapping
 	public ResponseEntity<ApiResponse<WebtoonListResponse>> getWebtoons(
@@ -142,6 +141,21 @@ public class WebtoonController {
 			ResponseCodeAndMessage.USER_RECENTLY_VIEWED_WEBTOON_LIST_SUCCESS,
 			Map.of("recentWebtoons", recentWebtoons)
 		));
+	}
+
+	@GetMapping("/search")
+	public ResponseEntity<ApiResponse<WebtoonSearchResponse>> searchWebtoons(
+		@RequestParam(name = "q") String query,
+		@CursorParam(cursorType = CreatedAtIdCursor.class) Cursor cursor,
+		@RequestParam(defaultValue = "10") int size
+	) {
+		List<WebtoonCardDto> result = webtoonService.searchWebtoons(query, cursor, size);
+
+		CursorPage<WebtoonCardDto> page = cursorPaginationService.create(result, size, cursor);
+		WebtoonSearchResponse response = WebtoonSearchResponse.of(page);
+		return ResponseEntity.ok(
+			ApiResponse.success(ResponseCodeAndMessage.WEBTOON_SEARCH_SUCCESS, response)
+		);
 	}
 
 	private Long getUserId(
