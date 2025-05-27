@@ -9,6 +9,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.jdbc.core.JdbcTemplate;
+
 import com.akatsuki.newsum.common.pagination.model.cursor.CreatedAtIdCursor;
 import com.akatsuki.newsum.common.pagination.model.cursor.Cursor;
 import com.akatsuki.newsum.common.pagination.querybuilder.CursorQueryBuilder;
@@ -26,6 +28,7 @@ public class WebtoonQueryRepositoryImpl implements WebtoonQueryRepository {
 
 	private final JPAQueryFactory queryFactory;
 	private final CursorQueryRegistry cursorQueryRegistry;
+	private final JdbcTemplate jdbcTemplate;
 
 	@Override
 	public List<Webtoon> findWebtoonByCategoryWithCursor(Category category, Cursor cursor, int size) {
@@ -72,10 +75,46 @@ public class WebtoonQueryRepositoryImpl implements WebtoonQueryRepository {
 			.fetch();
 	}
 
-	private BooleanExpression buildBooleanExpression(Cursor cursor) {
+	@Override
+	public List<Webtoon> searchByTitleContaining(String query, Cursor cursor, int size) {
 		CreatedAtIdCursor createdAtIdCursor = (CreatedAtIdCursor)cursor;
-		return webtoon.createdAt.gt(createdAtIdCursor.getCreatedAt())
-			.or(webtoon.createdAt.eq(createdAtIdCursor.getCreatedAt()).and(webtoon.id.goe(createdAtIdCursor.getId())));
+
+		final String sql = """
+			   SELECT DISTINCT w.id,
+					  w.title,
+					  w.content,
+					  w.created_at,
+					  w.thumbnail_image_url,
+					  w.view_count
+			   FROM webtoon w
+			   LEFT JOIN webtoon_detail d ON w.id = d.webtoon_id
+			   WHERE
+			       to_tsvector('simple', coalesce(w.title, '') || ' ' || coalesce(w.content, '')) @@ plainto_tsquery('simple', ?)
+			   OR
+			       to_tsvector('simple', coalesce(d.content, '')) @@ plainto_tsquery('simple', ?)
+				 AND (w.created_at < ? OR (w.created_at = ? AND w.id < ?))
+			   ORDER BY w.created_at DESC, w.id DESC
+			   LIMIT ?
+			""";
+
+		return jdbcTemplate.query(sql,
+			new Object[] {
+				query,
+				query,
+				createdAtIdCursor.getCreatedAt(),
+				createdAtIdCursor.getCreatedAt(),
+				createdAtIdCursor.getId(),
+				size + 1
+			},
+			(rs, rowNum) ->
+				new Webtoon(
+					rs.getTimestamp("created_at").toLocalDateTime(),
+					rs.getLong("id"),
+					rs.getString("title"),
+					rs.getString("thumbnail_image_url"),
+					rs.getLong("view_count")
+				)
+		);
 	}
 
 	@Override
@@ -99,5 +138,10 @@ public class WebtoonQueryRepositoryImpl implements WebtoonQueryRepository {
 			.fetch();
 	}
 
+	private BooleanExpression buildBooleanExpression(Cursor cursor) {
+		CreatedAtIdCursor createdAtIdCursor = (CreatedAtIdCursor)cursor;
+		return webtoon.createdAt.gt(createdAtIdCursor.getCreatedAt())
+			.or(webtoon.createdAt.eq(createdAtIdCursor.getCreatedAt()).and(webtoon.id.goe(createdAtIdCursor.getId())));
+	}
 }
 

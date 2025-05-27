@@ -21,4 +21,6 @@ public interface WebtoonQueryRepository {
 	List<Webtoon> findTodayNewsTop3();
 
 	List<RecentView> findRecentWebtoons(Long id);
+
+	List<Webtoon> searchByTitleContaining(String query, Cursor cursor, int size);
 }
