@@ -14,7 +14,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -43,7 +42,6 @@ public class AiAuthor {
 	@OneToMany(mappedBy = "aiAuthor", cascade = CascadeType.ALL)
 	private List<Webtoon> webtoons = new ArrayList<>();
 
-	@Builder
 	public AiAuthor(String name, String style, String introduction, String profileImageUrl) {
 		this.name = name;
 		this.style = style;
