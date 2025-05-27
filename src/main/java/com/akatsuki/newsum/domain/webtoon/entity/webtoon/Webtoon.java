@@ -115,4 +115,8 @@ public class Webtoon extends BaseTimeEntity {
 	public void increaseViewCount() {
 		this.viewCount++;
 	}
+
+	public Webtoon(Long id) {
+		this.id = id;
+	}
 }
