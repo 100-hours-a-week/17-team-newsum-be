@@ -23,6 +23,7 @@ import com.akatsuki.newsum.common.security.UserDetailsImpl;
 import com.akatsuki.newsum.domain.user.dto.RecentViewWebtoonListResponse;
 import com.akatsuki.newsum.domain.user.dto.UpdateUserRequestDto;
 import com.akatsuki.newsum.domain.user.dto.UpdateUserResponseDto;
+import com.akatsuki.newsum.domain.user.dto.UserFavoriteWebtoonsResponse;
 import com.akatsuki.newsum.domain.user.dto.UserProfileDto;
 import com.akatsuki.newsum.domain.user.service.UserService;
 import com.akatsuki.newsum.domain.webtoon.dto.WebtoonCardDto;
@@ -88,7 +89,7 @@ public class UserController {
 	}
 
 	@GetMapping("/favorites/webtoons")
-	public ResponseEntity<ApiResponse<Map<String, Object>>> getBookmarkedWebtoons(
+	public ResponseEntity<ApiResponse<UserFavoriteWebtoonsResponse>> getBookmarkedWebtoons(
 		@AuthenticationPrincipal UserDetailsImpl userDetails,
 		@CursorParam(cursorType = CreatedAtIdCursor.class) Cursor cursor,
 		@RequestParam(defaultValue = "10") int size
@@ -98,16 +99,14 @@ public class UserController {
 		CursorPage<WebtoonCardDto> page = webtoonService.getBookmarkedWebtoonCards(userId, (CreatedAtIdCursor)cursor,
 			size);
 
-		Map<String, Object> response = Map.of(
-			"webtoons", page.getItems(),
-			"pageInfo", Map.of(
-				"nextCursor", page.getPageInfo().nextCursor(),
-				"hasNext", page.getPageInfo().hasNext()
-			)
+		UserFavoriteWebtoonsResponse response = new UserFavoriteWebtoonsResponse(
+			page.getItems(),
+			page.getPageInfo()
 		);
+
 		return ResponseEntity.ok(
 			ApiResponse.success(ResponseCodeAndMessage.WEBTOON_BOOKMARK_SUCCESS, response)
 		);
-	}
 
+	}
 }
