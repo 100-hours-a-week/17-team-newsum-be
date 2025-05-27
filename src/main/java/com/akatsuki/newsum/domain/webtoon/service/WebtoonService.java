@@ -21,7 +21,10 @@ import com.akatsuki.newsum.cache.RedisService;
 import com.akatsuki.newsum.common.dto.ErrorCodeAndMessage;
 import com.akatsuki.newsum.common.exception.BusinessException;
 import com.akatsuki.newsum.common.exception.NotFoundException;
+import com.akatsuki.newsum.common.pagination.CursorPaginationService;
+import com.akatsuki.newsum.common.pagination.model.cursor.CreatedAtIdCursor;
 import com.akatsuki.newsum.common.pagination.model.cursor.Cursor;
+import com.akatsuki.newsum.common.pagination.model.page.CursorPage;
 import com.akatsuki.newsum.domain.aiAuthor.entity.AiAuthor;
 import com.akatsuki.newsum.domain.aiAuthor.repository.AiAuthorRepository;
 import com.akatsuki.newsum.domain.user.entity.User;
@@ -70,6 +73,7 @@ public class WebtoonService {
 	private final RedisService redisService;
 	private final WebtoonFavoriteRepository webtoonFavoriteRepository;
 	private final WebtoonLikeRepository webtoonLikeRepository;
+	private final CursorPaginationService cursorPaginationService;
 
 	private final int RECENT_WEBTOON_LIMIT = 4;
 	private final int RELATED_CATEGORY_SIZE = 2;
@@ -352,6 +356,26 @@ public class WebtoonService {
 		);
 
 		return isAdded[0];
+
+	}
+
+	public CursorPage<WebtoonCardDto> getBookmarkedWebtoonCards(Long userId, CreatedAtIdCursor cursor, int size) {
+		List<WebtoonFavorite> favorites = webtoonFavoriteRepository
+			.findFavoritesByUserIdWithCursor(userId, cursor, size);
+
+		List<WebtoonCardDto> result = favorites.stream()
+			.map(fav -> {
+				Webtoon webtoon = fav.getWebtoon();
+				return new WebtoonCardDto(
+					webtoon.getId(),
+					webtoon.getTitle(),
+					webtoon.getThumbnailImageUrl(),
+					fav.getCreatedAt(),
+					webtoon.getViewCount()
+				);
+			})
+			.toList();
+		return cursorPaginationService.create(result, size, cursor);
 	}
 
 	//좋아요 기능
