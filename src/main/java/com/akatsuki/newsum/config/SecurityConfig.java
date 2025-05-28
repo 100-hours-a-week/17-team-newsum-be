@@ -11,15 +11,11 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import com.akatsuki.newsum.common.security.OAuth2LoginSuccessHandler;
-
 import lombok.RequiredArgsConstructor;
 
 @Configuration
 @RequiredArgsConstructor
 public class SecurityConfig {
-
-	private final OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
 
 	//TODO: 설정 필요
 	private final String[] excludePaths = {
