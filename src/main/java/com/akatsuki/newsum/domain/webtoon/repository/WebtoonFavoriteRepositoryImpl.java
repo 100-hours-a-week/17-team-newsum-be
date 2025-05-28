@@ -23,7 +23,7 @@ public class WebtoonFavoriteRepositoryImpl implements WebtoonFavoriteRepositoryC
 			.and(webtoonFavorite.user.id.eq(userId));
 
 		if (cursor.getCreatedAt() != null && cursor.getId() != null) {
-			builder.and(webtoonFavorite.createdAt.lt(cursor.getCreatedAt()))
+			builder.and(webtoonFavorite.createdAt.gt(cursor.getCreatedAt()))
 				.or(
 					webtoonFavorite.createdAt.eq(cursor.getCreatedAt())
 						.and(webtoonFavorite.id.loe(cursor.getId()))
