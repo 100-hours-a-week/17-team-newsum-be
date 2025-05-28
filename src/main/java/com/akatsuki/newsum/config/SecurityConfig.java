@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -12,7 +13,6 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import com.akatsuki.newsum.common.security.OAuth2LoginSuccessHandler;
 
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 
 @Configuration
@@ -36,25 +36,10 @@ public class SecurityConfig {
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 		http
 			.cors(cors -> cors.configurationSource(corsConfigurationSource()))
-			.csrf(csrf -> csrf.disable())
+			.csrf(AbstractHttpConfigurer::disable)
 			.authorizeHttpRequests(auth -> auth
 				.requestMatchers(excludePaths).permitAll()
 				.anyRequest().authenticated()
-			)
-			.oauth2Login(oauth2 -> oauth2
-				.successHandler(oAuth2LoginSuccessHandler)
-			)
-			.exceptionHandling(exception -> exception
-				.authenticationEntryPoint((request, response, authException) -> {
-					response.setContentType("application/json");
-					response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-					response.getWriter().write("""
-							{
-							  "code": 401,
-							  "message": "인증되지 않은 요청입니다"
-							}
-						""");
-				})
 			);
 
 		return http.build();
