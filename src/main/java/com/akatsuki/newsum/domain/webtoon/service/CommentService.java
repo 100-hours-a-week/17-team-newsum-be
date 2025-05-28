@@ -156,4 +156,9 @@ public class CommentService {
 		return webtoonRepository.findById(webtoonId)
 			.orElseThrow(WebtoonNotFoundException::new);
 	}
+
+	@Transactional
+	public boolean togglecommentLike(Long webtoonId, Long commentId, Long id) {
+
+	}
 }

@@ -64,4 +64,5 @@ public class CommentQueryRepositoryImpl implements CommentQueryRepository {
 				.and(comment.parentCommentId.in(parentCommentIds)))
 			.fetch();
 	}
+	
 }

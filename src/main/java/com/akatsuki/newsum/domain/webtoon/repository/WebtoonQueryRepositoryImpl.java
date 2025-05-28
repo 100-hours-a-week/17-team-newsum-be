@@ -144,4 +144,3 @@ public class WebtoonQueryRepositoryImpl implements WebtoonQueryRepository {
 			.or(webtoon.createdAt.eq(createdAtIdCursor.getCreatedAt()).and(webtoon.id.goe(createdAtIdCursor.getId())));
 	}
 }
-

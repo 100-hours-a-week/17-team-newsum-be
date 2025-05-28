@@ -109,4 +109,20 @@ public class CommentController {
 		}
 		return userDetails.getUserId();
 	}
+
+	@PostMapping{"/{webtoonId}/comments/{commentId}/likes"}
+	public ResponseEntity<ApiResponse<CommentListResponse>> likeComment(
+		@PathVariable Long webtoonId,
+		@PathVariable Long commentId,
+		@AuthenticationPrincipal UserDetailsImpl userDetails
+	) {
+		Long id = getUserId(userDetails);
+
+		commentService.togglecommentLike(webtoonId,commentId, id);
+		return ResponseEntity.ok(
+			ApiResponse.success(ResponseCodeAndMessage.ARTICLE_LIKE_TOGGLE_SUCCESS,null));
+
+	}
+
+	)
 }
