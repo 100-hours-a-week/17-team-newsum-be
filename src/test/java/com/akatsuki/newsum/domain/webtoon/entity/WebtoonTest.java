@@ -15,7 +15,7 @@ import com.akatsuki.newsum.domain.webtoon.entity.comment.entity.Comment;
 import com.akatsuki.newsum.domain.webtoon.entity.webtoon.Category;
 import com.akatsuki.newsum.domain.webtoon.entity.webtoon.Webtoon;
 
-@DisplayName("도메인 : 웹툰")
+@DisplayName("도메인 : Webtoon")
 class WebtoonTest {
 
 	private AiAuthor aiAuthor;

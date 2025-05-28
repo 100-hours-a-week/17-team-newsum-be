@@ -35,7 +35,7 @@ import com.akatsuki.newsum.domain.webtoon.repository.WebtoonFavoriteRepository;
 import com.akatsuki.newsum.domain.webtoon.repository.WebtoonRepository;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("WebtoonService 테스트")
+@DisplayName("서비스: WebtoonService")
 class WebtoonServiceTest {
 
 	@Mock

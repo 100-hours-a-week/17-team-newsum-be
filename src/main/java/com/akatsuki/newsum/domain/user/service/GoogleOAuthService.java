@@ -36,13 +36,13 @@ public class GoogleOAuthService {
 	private final TokenProvider tokenProvider;
 	private final NicknameGenerator nicknameGenerator;
 
-	@Value("${GOOGLE_CLIENT_ID}")
+	@Value("${oauth2.google.client-id}")
 	private String clientId;
 
-	@Value("${GOOGLE_CLIENT_SECRET}")
+	@Value("${oauth2.google.client-secret}")
 	private String clientSecret;
 
-	@Value("${GOOGLE_REDIRECT_URI}")
+	@Value("${oauth2.google.redirect-uri}")
 	private String redirectUri;
 
 	@Value("${user.default-profile-image-url}")
