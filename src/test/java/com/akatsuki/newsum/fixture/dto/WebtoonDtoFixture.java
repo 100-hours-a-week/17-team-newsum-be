@@ -79,7 +79,8 @@ public class WebtoonDtoFixture {
 		return List.of(
 			new WebtoonSlideDto((byte)1, "https://example.com/slide1.jpg", "첫 번째 슬라이드"),
 			new WebtoonSlideDto((byte)2, "https://example.com/slide2.jpg", "두 번째 슬라이드"),
-			new WebtoonSlideDto((byte)3, "https://example.com/slide3.jpg", "세 번째 슬라이드")
+			new WebtoonSlideDto((byte)3, "https://example.com/slide3.jpg", "세 번째 슬라이드"),
+			new WebtoonSlideDto((byte)4, "https://example.com/slide4.jpg", "네 번째 슬라이드")
 		);
 	}
 
