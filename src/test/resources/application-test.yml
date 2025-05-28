@@ -27,36 +27,14 @@ spring:
       port: 6379
       password:
 
-  # Security 설정
-  security:
-    oauth2:
-      client:
-        registration:
-          kakao:
-            client-id: test-kakao-client-id
-            client-secret: test-kakao-client-secret
-            redirect-uri: http://localhost:8080/login/oauth2/code/kakao
-            authorization-grant-type: authorization_code
-            scope:
-              - profile_nickname
-              - profile_image
-              - account_email
-            client-name: Kakao
-          google:
-            client-id: test-google-client-id
-            client-secret: test-google-client-secret
-            redirect-uri: http://localhost:8080/login/oauth2/code/google
-            authorization-grant-type: authorization_code
-            scope:
-              - profile
-              - email
-            client-name: Google
-        provider:
-          kakao:
-            authorization-uri: https://kauth.kakao.com/oauth/authorize
-            token-uri: https://kauth.kakao.com/oauth/token
-            user-info-uri: https://kapi.kakao.com/v2/user/me
-            user-name-attribute: id
+oauth2:
+  kakao:
+    client-id: test-kakao-client-id
+    redirect-uri: http://localhost:8080/login/oauth2/code/kakao
+  google:
+    client-id: test-google-client-id
+    client-secret: test-google-client-secret
+    redirect-uri: http://localhost:8080/login/oauth2/code/google
 
 jwt:
   secret: test-secret-key
@@ -83,3 +61,10 @@ decorator:
       enable-logging: true
       multiline: true
       logging: slf4j
+
+logging:
+  level:
+    org:
+      apache:
+        coyote:
+          http11: trace
