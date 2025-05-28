@@ -36,13 +36,13 @@ public class GoogleOAuthService {
 	private final TokenProvider tokenProvider;
 	private final NicknameGenerator nicknameGenerator;
 
-	@Value("${spring.security.oauth2.client.registration.google.client-id}")
+	@Value("${oauth2.google.client-id}")
 	private String clientId;
 
-	@Value("${spring.security.oauth2.client.registration.google.client-secret}")
+	@Value("${oauth2.google.client-secret}")
 	private String clientSecret;
 
-	@Value("${spring.security.oauth2.client.registration.google.redirect-uri}")
+	@Value("${oauth2.google.redirect-uri}")
 	private String redirectUri;
 
 	@Value("${user.default-profile-image-url}")

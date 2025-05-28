@@ -37,13 +37,10 @@ public class KakaoOAuthService {
 	private final RestTemplate restTemplate = new RestTemplate();
 	private final NicknameGenerator nicknameGenerator;
 
-	@Value("${spring.security.oauth2.client.registration.kakao.client-id}")
+	@Value("${oauth2.kakao.client-id}")
 	private String clientId;
 
-	@Value("${spring.security.oauth2.client.registration.kakao.client-secret}")
-	private String clientSecret;
-
-	@Value("${spring.security.oauth2.client.registration.kakao.redirect-uri}")
+	@Value("${oauth2.kakao.redirect-uri}")
 	private String redirectUri;
 
 	@Value("${user.default-profile-image-url}")
@@ -76,7 +73,6 @@ public class KakaoOAuthService {
 		params.add("client_id", clientId);
 		params.add("redirect_uri", redirectUri);
 		params.add("code", code);
-		params.add("client_secret", clientSecret);
 
 		ResponseEntity<Map> response = restTemplate.exchange(
 			"https://kauth.kakao.com/oauth/token",
