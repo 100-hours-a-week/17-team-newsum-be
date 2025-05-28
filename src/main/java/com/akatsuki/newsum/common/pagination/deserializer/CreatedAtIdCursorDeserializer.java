@@ -10,7 +10,8 @@ import com.akatsuki.newsum.common.pagination.model.cursor.Cursor;
 @Component
 public class CreatedAtIdCursorDeserializer implements CursorDeserializer<CreatedAtIdCursor> {
 
-	private final CreatedAtIdCursor defaultCursor = new CreatedAtIdCursor(LocalDateTime.of(2000, 1, 1, 0, 0, 0), 0L);
+	private final CreatedAtIdCursor defaultCursor = new CreatedAtIdCursor(LocalDateTime.of(2000, 1, 1, 0, 0, 0),
+		Long.MAX_VALUE);
 
 	@Override
 	public boolean supports(Class<? extends Cursor> cursorType) {

@@ -45,6 +45,14 @@ decorator:
       multiline: true
       logging: slf4j
 
+logging:
+  level:
+    org:
+      apache:
+        coyote:
+          http11: trace
+    root: info
+
 user:
   default-profile-image-url: ${USER_DEFAULT_PROFILE_IMAGE_URL}
 

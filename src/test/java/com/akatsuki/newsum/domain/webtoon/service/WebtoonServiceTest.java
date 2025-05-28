@@ -3,7 +3,6 @@ package com.akatsuki.newsum.domain.webtoon.service;
 import static com.akatsuki.newsum.fixture.entity.AiAuthorFixture.*;
 import static com.akatsuki.newsum.fixture.entity.WebtoonDomainFixture.*;
 import static org.assertj.core.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.*;
 
 import java.time.LocalDateTime;
