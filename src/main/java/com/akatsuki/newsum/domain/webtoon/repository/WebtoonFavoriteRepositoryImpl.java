@@ -5,9 +5,15 @@ import static com.akatsuki.newsum.domain.webtoon.entity.webtoon.QWebtoonFavorite
 
 import java.util.List;
 
-import com.akatsuki.newsum.common.pagination.model.cursor.CreatedAtIdCursor;
+import com.akatsuki.newsum.common.pagination.model.cursor.Cursor;
+import com.akatsuki.newsum.common.pagination.model.query.QueryEngineType;
+import com.akatsuki.newsum.common.pagination.model.query.QueryFragment;
+import com.akatsuki.newsum.common.pagination.querybuilder.CursorPageQueryBuilder;
+import com.akatsuki.newsum.common.pagination.querybuilder.registry.CursorPageQueryRegistry;
+import com.akatsuki.newsum.domain.webtoon.entity.webtoon.QWebtoon;
 import com.akatsuki.newsum.domain.webtoon.entity.webtoon.WebtoonFavorite;
-import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.OrderSpecifier;
+import com.querydsl.core.types.Predicate;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import lombok.RequiredArgsConstructor;
@@ -15,27 +21,26 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class WebtoonFavoriteRepositoryImpl implements WebtoonFavoriteRepositoryCustom {
 	private final JPAQueryFactory queryFactory;
+	private final CursorPageQueryRegistry cursorQueryRegistry;
 
 	@Override
-	public List<WebtoonFavorite> findFavoritesByUserIdWithCursor(Long userId, CreatedAtIdCursor cursor, int size) {
-
-		BooleanBuilder builder = new BooleanBuilder()
-			.and(webtoonFavorite.user.id.eq(userId));
-
-		if (cursor.getCreatedAt() != null && cursor.getId() != null) {
-			builder.and(webtoonFavorite.createdAt.gt(cursor.getCreatedAt()))
-				.or(
-					webtoonFavorite.createdAt.eq(cursor.getCreatedAt())
-						.and(webtoonFavorite.id.loe(cursor.getId()))
-				);
-		}
+	public List<WebtoonFavorite> findFavoritesByUserIdWithCursor(Long userId, Cursor cursor, int size) {
+		QueryFragment queryFragment = buildQueryFragment(cursor);
 
 		return queryFactory
 			.selectFrom(webtoonFavorite)
 			.join(webtoonFavorite.webtoon, webtoon).fetchJoin()
-			.where(builder)
-			.orderBy(webtoonFavorite.createdAt.desc(), webtoonFavorite.id.desc())
+			.where(webtoonFavorite.user.id.eq(userId)
+				.and((Predicate)queryFragment.whereClause()))
+			.orderBy((OrderSpecifier<?>[])queryFragment.orderByClause())
 			.limit(size + 1)
 			.fetch();
+	}
+
+	private QueryFragment buildQueryFragment(Cursor cursor) {
+		CursorPageQueryBuilder<Cursor> queryBuilder = cursorQueryRegistry.resolve(QWebtoon.class, cursor,
+			QueryEngineType.QUERYDSL);
+		QueryFragment queryFragment = queryBuilder.buildQueryFragment(cursor);
+		return queryFragment;
 	}
 }
