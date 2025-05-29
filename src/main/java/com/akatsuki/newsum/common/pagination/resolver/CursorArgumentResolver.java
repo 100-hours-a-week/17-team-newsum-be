@@ -11,6 +11,7 @@ import com.akatsuki.newsum.common.pagination.annotation.CursorParam;
 import com.akatsuki.newsum.common.pagination.deserializer.CursorDeserializer;
 import com.akatsuki.newsum.common.pagination.deserializer.registry.CursorDeserializerRegistry;
 import com.akatsuki.newsum.common.pagination.model.cursor.Cursor;
+import com.akatsuki.newsum.common.pagination.model.cursor.strategy.OrderStrategy;
 
 import lombok.RequiredArgsConstructor;
 
@@ -32,14 +33,17 @@ public class CursorArgumentResolver implements HandlerMethodArgumentResolver {
 		WebDataBinderFactory binderFactory) {
 
 		CursorParam annotation = parameter.getParameterAnnotation(CursorParam.class);
-		Class<? extends Cursor> cursorType = annotation.cursorType();
-		String rawCursor = webRequest.getParameter("cursor");
-		CursorDeserializer<? extends Cursor> parser = deserializerRegistry.resolve(cursorType);
 
+		Class<? extends Cursor> cursorType = annotation.cursorType();
+		OrderStrategy strategy = annotation.strategy();
+
+		CursorDeserializer<? extends Cursor> deserializer = deserializerRegistry.resolve(cursorType);
+
+		String rawCursor = webRequest.getParameter("cursor");
 		if (rawCursor == null || rawCursor.isBlank()) {
-			return parser.defaultCursor();
+			return deserializer.defaultCursor();
 		}
 
-		return parser.deserialize(rawCursor);
+		return deserializer.deserialize(rawCursor, strategy);
 	}
 }
