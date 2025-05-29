@@ -2,6 +2,7 @@ package com.akatsuki.newsum.domain.webtoon.service;
 
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
@@ -16,10 +17,12 @@ import com.akatsuki.newsum.domain.webtoon.dto.CommentListResult;
 import com.akatsuki.newsum.domain.webtoon.dto.CommentReadDto;
 import com.akatsuki.newsum.domain.webtoon.dto.CommentResult;
 import com.akatsuki.newsum.domain.webtoon.entity.comment.entity.Comment;
+import com.akatsuki.newsum.domain.webtoon.entity.comment.entity.CommentLike;
 import com.akatsuki.newsum.domain.webtoon.entity.webtoon.Webtoon;
 import com.akatsuki.newsum.domain.webtoon.exception.CommentForbiddenException;
 import com.akatsuki.newsum.domain.webtoon.exception.CommentNotFoundException;
 import com.akatsuki.newsum.domain.webtoon.exception.WebtoonNotFoundException;
+import com.akatsuki.newsum.domain.webtoon.repository.CommentLikeRepository;
 import com.akatsuki.newsum.domain.webtoon.repository.CommentRepository;
 import com.akatsuki.newsum.domain.webtoon.repository.WebtoonRepository;
 
@@ -31,6 +34,7 @@ import lombok.RequiredArgsConstructor;
 public class CommentService {
 	private final CommentRepository commentRepository;
 	private final WebtoonRepository webtoonRepository;
+	private final CommentLikeRepository commentLikeRepository;
 
 	public CommentListResult findCommentsByWebtoon(Long webtoonId, Cursor cursor, Integer size,
 		Long id) {
@@ -156,4 +160,20 @@ public class CommentService {
 		return webtoonRepository.findById(webtoonId)
 			.orElseThrow(WebtoonNotFoundException::new);
 	}
+
+	public boolean toggleCommentLike(Long commentId, Long userId) {
+		AtomicBoolean liked = new AtomicBoolean(false);
+
+		commentLikeRepository.findByUserIdAndCommentId(userId, commentId)
+			.ifPresentOrElse(
+				commentLikeRepository::delete,
+				() -> {
+					commentLikeRepository.save(new CommentLike(userId, commentId));
+					liked.set(true);
+				}
+			);
+
+		return liked.get();
+	}
+
 }
