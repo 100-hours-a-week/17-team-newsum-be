@@ -23,6 +23,7 @@ import com.akatsuki.newsum.common.security.UserDetailsImpl;
 import com.akatsuki.newsum.domain.webtoon.dto.CommentAndSubComments;
 import com.akatsuki.newsum.domain.webtoon.dto.CommentCreateRequest;
 import com.akatsuki.newsum.domain.webtoon.dto.CommentEditRequest;
+import com.akatsuki.newsum.domain.webtoon.dto.CommentLikeStatusDto;
 import com.akatsuki.newsum.domain.webtoon.dto.CommentListResponse;
 import com.akatsuki.newsum.domain.webtoon.dto.CommentListResult;
 import com.akatsuki.newsum.domain.webtoon.service.CommentService;
@@ -117,9 +118,23 @@ public class CommentController {
 		@AuthenticationPrincipal UserDetailsImpl userDetails
 	) {
 		Long id = getUserId(userDetails);
-
 		boolean result = commentService.toggleCommentLike(commentId, id);
 		return ResponseEntity.ok(
 			ApiResponse.success(ResponseCodeAndMessage.ARTICLE_LIKE_TOGGLE_SUCCESS, null));
 	}
+
+	@GetMapping("/{webtoonId}/comments/{commentId}/likes")
+	public ResponseEntity<ApiResponse<CommentLikeStatusDto>> getCommentLikeStatus(
+		@PathVariable Long webtoonId,
+		@PathVariable Long commentId,
+		@AuthenticationPrincipal UserDetailsImpl userDetails
+	) {
+		Long id = getUserId(userDetails);
+		CommentLikeStatusDto result = commentService.getCommentLikeStatus(commentId, id);
+
+		return ResponseEntity.ok(
+			ApiResponse.success(ResponseCodeAndMessage.ARTICLE_LIKE_CHECK_SUCCESS, result)
+		);
+	}
+
 }
