@@ -14,13 +14,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.akatsuki.newsum.common.dto.ApiResponse;
 import com.akatsuki.newsum.common.dto.ResponseCodeAndMessage;
-import com.akatsuki.newsum.common.pagination.CursorPaginationService;
 import com.akatsuki.newsum.common.pagination.annotation.CursorParam;
 import com.akatsuki.newsum.common.pagination.model.cursor.CreatedAtIdCursor;
 import com.akatsuki.newsum.common.pagination.model.cursor.Cursor;
-import com.akatsuki.newsum.common.pagination.model.page.CursorPage;
 import com.akatsuki.newsum.common.security.UserDetailsImpl;
-import com.akatsuki.newsum.domain.webtoon.dto.CommentAndSubComments;
 import com.akatsuki.newsum.domain.webtoon.dto.CommentCreateRequest;
 import com.akatsuki.newsum.domain.webtoon.dto.CommentEditRequest;
 import com.akatsuki.newsum.domain.webtoon.dto.CommentListResponse;
@@ -35,7 +32,6 @@ import lombok.RequiredArgsConstructor;
 public class CommentController {
 
 	private final CommentService commentService;
-	private final CursorPaginationService cursorPaginationService;
 
 	@GetMapping("/{webtoonId}/comments")
 	public ResponseEntity<ApiResponse<CommentListResponse>> getComments(
@@ -48,12 +44,8 @@ public class CommentController {
 
 		CommentListResult result = commentService.findCommentsByWebtoon(webtoonId, cursor, size,
 			id);
-		CursorPage<CommentAndSubComments> cursorPage = cursorPaginationService.create(
-			result.comments(),
-			size,
-			cursor);
 
-		CommentListResponse response = CommentListResponse.of(cursorPage, result.commentCount());
+		CommentListResponse response = CommentListResponse.of(result.cursorPage(), result.commentCount());
 		return ResponseEntity.ok(
 			ApiResponse.success(ResponseCodeAndMessage.COMMENT_FIND_SUCCESS, response)
 		);
