@@ -45,14 +45,6 @@ decorator:
       multiline: true
       logging: slf4j
 
-logging:
-  level:
-    org:
-      apache:
-        coyote:
-          http11: trace
-    root: info
-
 user:
   default-profile-image-url: ${USER_DEFAULT_PROFILE_IMAGE_URL}
 
@@ -65,3 +57,12 @@ jwt:
     expiration: ${JWT_ACCESS_TOKEN_EXPIRE}
   refresh-token:
     expiration: ${JWT_REFRESH_TOKEN_EXPIRE}
+
+oauth2:
+  kakao:
+    client-id: ${KAKAO_CLIENT_ID}
+    redirect-uri: ${KAKAO_REDIRECT_URI}
+  google:
+    client-id: ${GOOGLE_CLIENT_ID}
+    client-secret: ${GOOGLE_CLIENT_SECRET}
+    redirect-uri: ${GOOGLE_REDIRECT_UR
