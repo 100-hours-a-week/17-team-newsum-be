@@ -22,7 +22,6 @@ import com.akatsuki.newsum.common.dto.ErrorCodeAndMessage;
 import com.akatsuki.newsum.common.exception.BusinessException;
 import com.akatsuki.newsum.common.exception.NotFoundException;
 import com.akatsuki.newsum.common.pagination.CursorPaginationService;
-import com.akatsuki.newsum.common.pagination.model.cursor.CreatedAtIdCursor;
 import com.akatsuki.newsum.common.pagination.model.cursor.Cursor;
 import com.akatsuki.newsum.common.pagination.model.page.CursorPage;
 import com.akatsuki.newsum.domain.aiAuthor.entity.AiAuthor;
@@ -359,7 +358,7 @@ public class WebtoonService {
 
 	}
 
-	public CursorPage<WebtoonCardDto> getBookmarkedWebtoonCards(Long userId, CreatedAtIdCursor cursor, int size) {
+	public CursorPage<WebtoonCardDto> getBookmarkedWebtoonCards(Long userId, Cursor cursor, int size) {
 		List<WebtoonFavorite> favorites = webtoonFavoriteRepository
 			.findFavoritesByUserIdWithCursor(userId, cursor, size);
 
