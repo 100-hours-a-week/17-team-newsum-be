@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.akatsuki.newsum.common.dto.ApiResponse;
 import com.akatsuki.newsum.common.dto.ResponseCodeAndMessage;
 import com.akatsuki.newsum.common.pagination.annotation.CursorParam;
-import com.akatsuki.newsum.common.pagination.model.cursor.CreatedAtIdCursor;
 import com.akatsuki.newsum.common.pagination.model.cursor.Cursor;
 import com.akatsuki.newsum.common.security.UserDetailsImpl;
 import com.akatsuki.newsum.domain.webtoon.dto.CommentCreateRequest;
@@ -36,7 +35,7 @@ public class CommentController {
 	@GetMapping("/{webtoonId}/comments")
 	public ResponseEntity<ApiResponse<CommentListResponse>> getComments(
 		@PathVariable Long webtoonId,
-		@CursorParam(cursorType = CreatedAtIdCursor.class) Cursor cursor,
+		@CursorParam Cursor cursor,
 		@RequestParam(defaultValue = "10", required = false) Integer size,
 		@AuthenticationPrincipal UserDetailsImpl userDetails
 	) {
