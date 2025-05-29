@@ -340,23 +340,23 @@ public class WebtoonService {
 		Optional<WebtoonFavorite> favoriteOpt = webtoonFavoriteRepository
 			.findByWebtoonIdAndUserId(webtoonId, userId);
 
-		final boolean[] isAdded = new boolean[1];
+		AtomicBoolean bookmarked = new AtomicBoolean(false);
 
 		favoriteOpt.ifPresentOrElse(
 			favorite -> {
 				webtoonFavoriteRepository.delete(favorite);
-				isAdded[0] = false;
+				bookmarked.set(false);
 			},
 			() -> {
 				User user = new User(userId);
 				Webtoon webtoon = webtoonRepository.findById(webtoonId)
 					.orElseThrow(() -> new BusinessException(WEBTOON_NOT_FOUND));
 				webtoonFavoriteRepository.save(new WebtoonFavorite(user, webtoon));
-				isAdded[0] = true;
+				bookmarked.set(true);
 			}
 		);
 
-		return isAdded[0];
+		return bookmarked.get();
 
 	}
 
