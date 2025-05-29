@@ -1,4 +1,4 @@
-package com.akatsuki.newsum.common.pagination.querybuilder.registry;
+package com.akatsuki.newsum.common.pagination.query.registry;
 
 import java.util.List;
 
@@ -8,7 +8,7 @@ import com.akatsuki.newsum.common.dto.ErrorCodeAndMessage;
 import com.akatsuki.newsum.common.exception.BusinessException;
 import com.akatsuki.newsum.common.pagination.model.cursor.Cursor;
 import com.akatsuki.newsum.common.pagination.model.query.QueryEngineType;
-import com.akatsuki.newsum.common.pagination.querybuilder.CursorPageQueryBuilder;
+import com.akatsuki.newsum.common.pagination.query.CursorPageQueryBuilder;
 
 import lombok.RequiredArgsConstructor;
 

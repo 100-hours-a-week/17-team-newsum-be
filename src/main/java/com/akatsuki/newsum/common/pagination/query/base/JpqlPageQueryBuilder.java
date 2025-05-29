@@ -1,4 +1,4 @@
-package com.akatsuki.newsum.common.pagination.querybuilder.base;
+package com.akatsuki.newsum.common.pagination.query.base;
 
 import com.akatsuki.newsum.common.pagination.model.cursor.Cursor;
 import com.akatsuki.newsum.common.pagination.model.query.QueryEngineType;

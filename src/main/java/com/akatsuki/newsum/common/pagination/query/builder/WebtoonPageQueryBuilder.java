@@ -1,8 +1,8 @@
-package com.akatsuki.newsum.common.pagination.querybuilder.query;
+package com.akatsuki.newsum.common.pagination.query.builder;
 
 import org.springframework.stereotype.Component;
 
-import com.akatsuki.newsum.common.pagination.querybuilder.base.CreatedAtIdJpqlPageQueryBuilder;
+import com.akatsuki.newsum.common.pagination.query.base.CreatedAtIdJpqlPageQueryBuilder;
 import com.akatsuki.newsum.domain.webtoon.entity.webtoon.QWebtoon;
 import com.querydsl.core.types.dsl.PathBuilder;
 

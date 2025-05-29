@@ -1,9 +1,9 @@
-package com.akatsuki.newsum.common.pagination.querybuilder.base;
+package com.akatsuki.newsum.common.pagination.query.base;
 
 import com.akatsuki.newsum.common.pagination.model.cursor.Cursor;
 import com.akatsuki.newsum.common.pagination.model.query.QueryEngineType;
 import com.akatsuki.newsum.common.pagination.model.query.QueryFragment;
-import com.akatsuki.newsum.common.pagination.querybuilder.CursorPageQueryBuilder;
+import com.akatsuki.newsum.common.pagination.query.CursorPageQueryBuilder;
 
 public abstract class GenericCursorPageQueryBuilder<T extends Cursor> implements CursorPageQueryBuilder<T> {
 	@Override
