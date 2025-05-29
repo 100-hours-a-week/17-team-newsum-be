@@ -17,7 +17,6 @@ import com.akatsuki.newsum.common.dto.ApiResponse;
 import com.akatsuki.newsum.common.dto.ResponseCodeAndMessage;
 import com.akatsuki.newsum.common.pagination.CursorPaginationService;
 import com.akatsuki.newsum.common.pagination.annotation.CursorParam;
-import com.akatsuki.newsum.common.pagination.model.cursor.CreatedAtIdCursor;
 import com.akatsuki.newsum.common.pagination.model.cursor.Cursor;
 import com.akatsuki.newsum.common.pagination.model.page.CursorPage;
 import com.akatsuki.newsum.common.security.UserDetailsImpl;
@@ -46,7 +45,7 @@ public class WebtoonController {
 	public ResponseEntity<ApiResponse<WebtoonListResponse>> getWebtoons(
 		//TODO : 추후 키워드, AI작가로 조회 가능
 		@RequestParam(required = false) String category,
-		@CursorParam(cursorType = CreatedAtIdCursor.class) Cursor cursor,
+		@CursorParam Cursor cursor,
 		@RequestParam(defaultValue = "10") int size
 	) {
 		List<WebtoonCardDto> result = webtoonService.findWebtoonsByCategory(category, cursor, size);
@@ -146,7 +145,7 @@ public class WebtoonController {
 	@GetMapping("/search")
 	public ResponseEntity<ApiResponse<WebtoonSearchResponse>> searchWebtoons(
 		@RequestParam(name = "q") String query,
-		@CursorParam(cursorType = CreatedAtIdCursor.class) Cursor cursor,
+		@CursorParam Cursor cursor,
 		@RequestParam(defaultValue = "10") int size
 	) {
 		List<WebtoonCardDto> result = webtoonService.searchWebtoons(query, cursor, size);

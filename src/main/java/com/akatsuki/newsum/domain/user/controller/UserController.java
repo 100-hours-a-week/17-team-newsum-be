@@ -14,9 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.akatsuki.newsum.common.dto.ApiResponse;
 import com.akatsuki.newsum.common.dto.ResponseCodeAndMessage;
-import com.akatsuki.newsum.common.pagination.CursorPaginationService;
 import com.akatsuki.newsum.common.pagination.annotation.CursorParam;
-import com.akatsuki.newsum.common.pagination.model.cursor.CreatedAtIdCursor;
 import com.akatsuki.newsum.common.pagination.model.cursor.Cursor;
 import com.akatsuki.newsum.common.pagination.model.page.CursorPage;
 import com.akatsuki.newsum.common.security.UserDetailsImpl;
@@ -39,7 +37,6 @@ public class UserController {
 
 	private final UserService userService;
 	private final WebtoonService webtoonService;
-	private final CursorPaginationService cursorPaginationService;
 
 	@GetMapping("/profile")
 	public ResponseEntity<ApiResponse<UserProfileDto>> getProfile(
@@ -91,12 +88,12 @@ public class UserController {
 	@GetMapping("/favorites/webtoons")
 	public ResponseEntity<ApiResponse<UserFavoriteWebtoonsResponse>> getBookmarkedWebtoons(
 		@AuthenticationPrincipal UserDetailsImpl userDetails,
-		@CursorParam(cursorType = CreatedAtIdCursor.class) Cursor cursor,
+		@CursorParam Cursor cursor,
 		@RequestParam(defaultValue = "10") int size
 	) {
 		Long userId = getUserId(userDetails);
 
-		CursorPage<WebtoonCardDto> page = webtoonService.getBookmarkedWebtoonCards(userId, (CreatedAtIdCursor)cursor,
+		CursorPage<WebtoonCardDto> page = webtoonService.getBookmarkedWebtoonCards(userId, cursor,
 			size);
 
 		UserFavoriteWebtoonsResponse response = new UserFavoriteWebtoonsResponse(
