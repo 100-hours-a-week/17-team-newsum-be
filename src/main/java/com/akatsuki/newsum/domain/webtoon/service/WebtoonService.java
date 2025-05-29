@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
@@ -385,12 +386,12 @@ public class WebtoonService {
 		Optional<WebtoonLike> likeOPt = webtoonLikeRepository
 			.findByWebtoonIdAndUserId(webtoonId, userId);
 
-		final boolean[] isAdded = new boolean[1];
+		AtomicBoolean liked = new AtomicBoolean(false);
 
 		likeOPt.ifPresentOrElse(
 			webtoonLike -> {
 				webtoonLikeRepository.delete(webtoonLike);
-				isAdded[0] = false;
+				liked.set(true);
 			},
 
 			() -> {
@@ -398,12 +399,12 @@ public class WebtoonService {
 				Webtoon webtoon = webtoonRepository.findById(webtoonId)
 					.orElseThrow(() -> new BusinessException(WEBTOON_NOT_FOUND));
 				webtoonLikeRepository.save(new WebtoonLike(user, webtoon));
-				isAdded[0] = true;
+				liked.set(true);
 			}
 
 		);
 
-		return isAdded[0];
+		return liked.get();
 	}
 
 	@Transactional(readOnly = true)
