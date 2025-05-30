@@ -57,7 +57,8 @@ public class CommentService {
 
 		//TODO : isLiked 체크하는 부분 추가 필요
 		//5. 자식 댓글을 parentCommentId 기준으로 그룹핑
-		Map<Long, List<CommentResult>> subCommentsGroupByParentId = collectSubCommentResultByParentId(allSubComments);
+		Map<Long, List<CommentResult>> subCommentsGroupByParentId = collectSubCommentResultByParentId(allSubComments,
+			id);
 
 		//6. 부모 + 자식 댓글을 하나의 CommentAndSubComments로 조립
 		List<CommentAndSubComments> commentAndSubComments = mergeParentAndSubComments(parentCommentResult,
@@ -114,11 +115,12 @@ public class CommentService {
 			.toList();
 	}
 
-	private Map<Long, List<CommentResult>> collectSubCommentResultByParentId(List<CommentReadDto> allSubComments) {
+	private Map<Long, List<CommentResult>> collectSubCommentResultByParentId(List<CommentReadDto> allSubComments,
+		Long userId) {
 		return allSubComments.stream()
 			.collect(Collectors.groupingBy(
 				CommentReadDto::getParentId,
-				Collectors.mapping(sub -> mapToCommentResultWithOwnerAndLiked(sub.getParentId(), sub),
+				Collectors.mapping(sub -> mapToCommentResultWithOwnerAndLiked(userId, sub),
 					Collectors.toList())
 			));
 	}
