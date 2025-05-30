@@ -1,16 +1,15 @@
-name: Backend Dev CD
+name: Backend Main CD
 
 on:
   push:
     branches:
-      - dev
+      - main
     paths-ignore:
       - '**/README.md'
       - '**/.gitignore'
 
 jobs:
   build-for-deploy:
-    # if: github.event_name == 'push' && github.ref == 'refs/heads/dev'
     runs-on: ubuntu-latest
 
     steps:
@@ -40,7 +39,6 @@ jobs:
   # Deployment job (only runs on push to dev)
   deploy:
     needs: build-for-deploy
-    # if: github.event_name == 'push' && github.ref == 'refs/heads/dev'
     runs-on: ubuntu-latest
 
     steps:
@@ -53,9 +51,9 @@ jobs:
       - name: Setup SSH
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_PRIVATE_KEY_DEV }}" > ~/.ssh/id_rsa
+          echo "${{ secrets.SSH_PRIVATE_KEY_PROD }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H ${{ secrets.GCP_VM_DOMAIN_DEV }} >> ~/.ssh/known_hosts
+          ssh-keyscan -H ${{ secrets.GCP_VM_DOMAIN_PROD }} >> ~/.ssh/known_hosts
 
       - name: Install Infisical CLI
         run: |
@@ -65,35 +63,35 @@ jobs:
       - name: Fetch .env from Infisical and upload to VM
         run: |
           infisical export \
-            --env=${{ secrets.INFISICAL_ENV_DEV }} \
+            --env=${{ secrets.INFISICAL_ENV_PROD }} \
             --projectId=${{ secrets.INFISICAL_PROJECT_ID }} \
-            --token=${{ secrets.INFISICAL_TOKEN_DEV }} \
+            --token=${{ secrets.INFISICAL_TOKEN_PROD }} \
             --format=dotenv \
             --domain=${{ secrets.INFISICAL_API_URL }} \
             > .env
 
-          scp .env ${{ secrets.GCP_VM_USER_DEV }}@${{ secrets.GCP_VM_DOMAIN_DEV }}:/home/${{ secrets.GCP_VM_USER_DEV }}/be/.env
+          scp .env ${{ secrets.GCP_VM_USER_PROD }}@${{ secrets.GCP_VM_DOMAIN_PROD }}:/home/${{ secrets.GCP_VM_USER_PROD }}/be/.env
 
       - name: Upload backend JAR to GCP
         run: |
-          scp build/libs/*.jar ${{ secrets.GCP_VM_USER_DEV }}@${{ secrets.GCP_VM_DOMAIN_DEV }}:/home/${{ secrets.GCP_VM_USER_DEV }}/be/
+          scp build/libs/*.jar ${{ secrets.GCP_VM_USER_PROD }}@${{ secrets.GCP_VM_DOMAIN_PROD }}:/home/${{ secrets.GCP_VM_USER_PROD }}/be/
 
       - name: Restart Spring Boot app on VM with .env and then delete it
         run: |
-          ssh ${{ secrets.GCP_VM_USER_DEV }}@${{ secrets.GCP_VM_DOMAIN_DEV }} '
-            cd /home/${{ secrets.GCP_VM_USER_DEV }}/be
-      
+          ssh ${{ secrets.GCP_VM_USER_PROD }}@${{ secrets.GCP_VM_DOMAIN_PROD }} '
+            cd /home/${{ secrets.GCP_VM_USER_PROD }}/be
+          
             if [ -f backend.pid ]; then
               echo "Stopping existing application..."
               kill $(cat backend.pid) 2>/dev/null || true
               rm -f backend.pid
               sleep 3
             fi
-      
+          
             echo "Starting application with environment from .env..."
             nohup env $(grep -v '^#' .env | xargs) java -jar newsum-0.0.1-SNAPSHOT.jar > backend.log 2>&1 &
             echo $! > backend.pid
-      
+          
             sleep 5
             if ps -p $(cat backend.pid) > /dev/null; then
                 echo "✅ Application started with PID: $(cat backend.pid)"

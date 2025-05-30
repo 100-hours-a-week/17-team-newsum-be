@@ -1,8 +1,8 @@
-name: Backend Dev CI
+name: Backend Main CI
 
 on:
   pull_request:
-    branches: [ dev ]
+    branches: [ main ]
     types: [ opened, synchronize, reopened ]
     paths-ignore:
       - '**/README.md'
