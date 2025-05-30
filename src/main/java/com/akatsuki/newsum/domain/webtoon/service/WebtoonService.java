@@ -379,8 +379,6 @@ public class WebtoonService {
 		return cursorPaginationService.create(result, size, cursor);
 	}
 
-	//좋아요 기능
-
 	@Transactional
 	public boolean toggleWebtoonLike(Long webtoonId, Long userId) {
 		Optional<WebtoonLike> likeOPt = webtoonLikeRepository
@@ -401,7 +399,6 @@ public class WebtoonService {
 				webtoonLikeRepository.save(new WebtoonLike(user, webtoon));
 				liked.set(true);
 			}
-
 		);
 
 		return liked.get();

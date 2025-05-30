@@ -112,29 +112,18 @@ public class CommentController {
 	}
 
 	@PostMapping("/{webtoonId}/comments/{commentId}/likes")
-	public ResponseEntity<ApiResponse<CommentListResponse>> toggleCommentLike(
+	public ResponseEntity<ApiResponse<CommentLikeStatusDto>> toggleCommentLike(
 		@PathVariable Long webtoonId,
 		@PathVariable Long commentId,
 		@AuthenticationPrincipal UserDetailsImpl userDetails
 	) {
 		Long id = getUserId(userDetails);
-		boolean result = commentService.toggleCommentLike(commentId, id);
-		return ResponseEntity.ok(
-			ApiResponse.success(ResponseCodeAndMessage.ARTICLE_LIKE_TOGGLE_SUCCESS, null));
-	}
+		commentService.toggleCommentLike(id, commentId);
 
-	@GetMapping("/{webtoonId}/comments/{commentId}/likes")
-	public ResponseEntity<ApiResponse<CommentLikeStatusDto>> getCommentLikeStatus(
-		@PathVariable Long webtoonId,
-		@PathVariable Long commentId,
-		@AuthenticationPrincipal UserDetailsImpl userDetails
-	) {
-		Long id = getUserId(userDetails);
-		CommentLikeStatusDto result = commentService.getCommentLikeStatus(commentId, id);
+		CommentLikeStatusDto status = commentService.getCommentLikeStatus(id, commentId);
 
 		return ResponseEntity.ok(
-			ApiResponse.success(ResponseCodeAndMessage.ARTICLE_LIKE_CHECK_SUCCESS, result)
-		);
+			ApiResponse.success(ResponseCodeAndMessage.ARTICLE_LIKE_TOGGLE_SUCCESS, status));
 	}
 
 }

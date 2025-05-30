@@ -162,7 +162,8 @@ public class CommentService {
 			.orElseThrow(WebtoonNotFoundException::new);
 	}
 
-	public boolean toggleCommentLike(Long commentId, Long userId) {
+	@Transactional
+	public boolean toggleCommentLike(Long userId, Long commentId) {
 		AtomicBoolean liked = new AtomicBoolean(false);
 
 		commentLikeRepository.findByUserIdAndCommentId(userId, commentId)
@@ -181,9 +182,10 @@ public class CommentService {
 		return commentLikeRepository.countByCommentId(commentId);
 	}
 
+	@Transactional(readOnly = true)
 	public CommentLikeStatusDto getCommentLikeStatus(Long userId, Long commentId) {
 		boolean liked = commentLikeRepository.existsByUserIdAndCommentId(userId, commentId);
-		long count = getCommentLikeCount(userId);
+		long count = getCommentLikeCount(commentId);
 
 		return new CommentLikeStatusDto(liked, count);
 	}
