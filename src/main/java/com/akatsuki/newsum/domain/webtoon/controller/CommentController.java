@@ -113,7 +113,6 @@ public class CommentController {
 
 	@PostMapping("/{webtoonId}/comments/{commentId}/likes")
 	public ResponseEntity<ApiResponse<CommentLikeStatusDto>> toggleCommentLike(
-		@PathVariable Long webtoonId,
 		@PathVariable Long commentId,
 		@AuthenticationPrincipal UserDetailsImpl userDetails
 	) {
