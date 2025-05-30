@@ -137,7 +137,9 @@ public class CommentService {
 
 	private CommentResult mapToCommentResultWithOwnerAndLiked(Long id, CommentReadDto commentReadDto) {
 		boolean isOwner = commentReadDto.getAuthorId().equals(id);
-		return CommentResult.of(commentReadDto, false, isOwner);
+		boolean isliked = commentLikeRepository.existsByUserIdAndCommentId(id, commentReadDto.getId());
+		long likecount = commentLikeRepository.countByCommentId(commentReadDto.getId());
+		return CommentResult.of(commentReadDto, isliked, isOwner, likecount);
 	}
 
 	private CommentAndSubComments collectCommentAndSubCommentsByParent(CommentResult parent,
@@ -171,12 +173,17 @@ public class CommentService {
 	@Transactional
 	public boolean toggleCommentLike(Long userId, Long commentId) {
 		AtomicBoolean liked = new AtomicBoolean(false);
+		Comment comment = findCommentById(commentId);
 
 		commentLikeRepository.findByUserIdAndCommentId(userId, commentId)
 			.ifPresentOrElse(
-				commentLikeRepository::delete,
+				existing -> {
+					commentLikeRepository.delete(existing);
+					comment.decrementLikeCount();
+				},
 				() -> {
 					commentLikeRepository.save(new CommentLike(userId, commentId));
+					comment.incrementLikeCount();
 					liked.set(true);
 				}
 			);

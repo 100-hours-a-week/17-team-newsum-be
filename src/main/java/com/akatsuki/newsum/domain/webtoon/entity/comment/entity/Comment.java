@@ -50,6 +50,14 @@ public class Comment extends BaseTimeEntity {
 		this.content = content;
 	}
 
+	public void incrementLikeCount() {
+		likeCount++;
+	}
+
+	public void decrementLikeCount() {
+		likeCount--;
+	}
+
 	public Comment(Long userId, Long webtoonId, Long parentCommentId, String content) {
 		this.userId = userId;
 		this.webtoonId = webtoonId;
