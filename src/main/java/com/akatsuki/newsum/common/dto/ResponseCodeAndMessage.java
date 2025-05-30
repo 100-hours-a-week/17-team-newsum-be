@@ -38,10 +38,14 @@ public enum ResponseCodeAndMessage {
 	COMMENT_ADD_SUCCESS(HttpStatus.CREATED.value(), "댓글 생성에 성공했습니다."),
 
 	//좋아요 관련 성공 응답
-	ARTICLE_LIKE_CHECK_SUCCESS(200, "좋아요 여부 조회에 성공했습니다."),
-	ARTICLE_LIKE_TOGGLE_SUCCESS(200, " 좋아요 요청에 성공했습니다."),
-	ARTICLE_LIKE_COUNT_SUCCESS(200, " 좋아요 수 조회에 성공했습니다.");
+	ARTICLE_LIKE_CHECK_SUCCESS(HttpStatus.OK.value(), "좋아요 여부 조회에 성공했습니다."),
+	ARTICLE_LIKE_TOGGLE_SUCCESS(HttpStatus.OK.value(), "좋아요 요청에 성공했습니다."),
+	ARTICLE_LIKE_COUNT_SUCCESS(HttpStatus.OK.value(), "좋아요 수 조회에 성공했습니다."),
 
+
+	//알림
+	NOTI_LIST_SUCCESS(HttpStatus.OK.value(), "알림 목록 조회에 성공했습니다."),
+	;
 	private final int code;
 	private final String message;
 

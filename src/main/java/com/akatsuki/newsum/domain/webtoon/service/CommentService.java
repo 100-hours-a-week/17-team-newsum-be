@@ -9,7 +9,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.akatsuki.newsum.common.dto.ErrorCodeAndMessage;
+import com.akatsuki.newsum.common.pagination.CursorPaginationService;
 import com.akatsuki.newsum.common.pagination.model.cursor.Cursor;
+import com.akatsuki.newsum.common.pagination.model.page.CursorPage;
 import com.akatsuki.newsum.domain.webtoon.dto.CommentAndSubComments;
 import com.akatsuki.newsum.domain.webtoon.dto.CommentCreateRequest;
 import com.akatsuki.newsum.domain.webtoon.dto.CommentEditRequest;
@@ -36,6 +38,7 @@ public class CommentService {
 	private final CommentRepository commentRepository;
 	private final WebtoonRepository webtoonRepository;
 	private final CommentLikeRepository commentLikeRepository;
+	private final CursorPaginationService cursorPaginationService;
 
 	public CommentListResult findCommentsByWebtoon(Long webtoonId, Cursor cursor, Integer size,
 		Long id) {
@@ -63,7 +66,10 @@ public class CommentService {
 		//7. 댓글 총 개수 조회
 		Long commentCount = commentRepository.countCommentsByWebtoonId(webtoonId);
 
-		return new CommentListResult(commentAndSubComments, commentCount);
+		CursorPage<CommentAndSubComments> cursorPage = cursorPaginationService.create(commentAndSubComments,
+			size,
+			cursor);
+		return new CommentListResult(cursorPage, commentCount);
 	}
 
 	@Transactional

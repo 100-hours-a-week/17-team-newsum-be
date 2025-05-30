@@ -16,7 +16,6 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/oauth2")
-
 public class OAuthLoginController {
 
 	private final GoogleOAuthService googleOAuthService;

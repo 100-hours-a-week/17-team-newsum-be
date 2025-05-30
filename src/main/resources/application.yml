@@ -6,7 +6,12 @@ spring:
   config:
     import: optional:file:.env[.properties]
 
-  # JPA 설정
+  datasource:
+    url: ${DB_URL}
+    driverClassName: ${DB_DRIVER}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+
   jpa:
     open-in-view: false
     properties:
@@ -16,13 +21,11 @@ spring:
         default_batch_fetch_size: 100
     show-sql: false
 
-  # Flyway 설정
   flyway:
     enabled: true
     baseline-on-migrate: true
     locations: classpath:db/migration
 
-# Swagger 설정
 springdoc:
   api-docs:
     path: /api-docs
@@ -35,7 +38,6 @@ springdoc:
   default-produces-media-type: application/json
   swagger-ui.disable-swagger-default-url: true
 
-# P6spy 설정
 decorator:
   datasource:
     p6spy:
@@ -43,13 +45,24 @@ decorator:
       multiline: true
       logging: slf4j
 
-logging:
-  level:
-    org:
-      apache:
-        coyote:
-          http11: trace
-    root: info
-
 user:
   default-profile-image-url: ${USER_DEFAULT_PROFILE_IMAGE_URL}
+
+ai-server:
+  base-url: ${AI_SERVER_BASE_URL}
+
+jwt:
+  secret: ${JWT_SECRET_KEY}
+  access-token:
+    expiration: ${JWT_ACCESS_TOKEN_EXPIRE}
+  refresh-token:
+    expiration: ${JWT_REFRESH_TOKEN_EXPIRE}
+
+oauth2:
+  kakao:
+    client-id: ${KAKAO_CLIENT_ID}
+    redirect-uri: ${KAKAO_REDIRECT_URI}
+  google:
+    client-id: ${GOOGLE_CLIENT_ID}
+    client-secret: ${GOOGLE_CLIENT_SECRET}
+    redirect-uri: ${GOOGLE_REDIRECT_UR

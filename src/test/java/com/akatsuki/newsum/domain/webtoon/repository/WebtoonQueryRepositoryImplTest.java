@@ -24,6 +24,7 @@ import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 @ExtendWith(MockitoExtension.class)
+@DisplayName("레포지토리: WebtoonQuery")
 class WebtoonQueryRepositoryImplTest {
 
 	@Mock
