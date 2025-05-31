@@ -1,0 +1,36 @@
+name: Set reviewers based on branch
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  set-reviewers:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write  # PR에 리뷰어를 추가할 수 있는 권한을 부여
+
+    steps:
+      # feature to dev로 PR 올라왔을 때
+      - name: feature에서 dev로 PR 올라올 때 BE팀으로 리뷰어 설정
+        if: github.base_ref == 'dev' && github.head_ref != 'main'
+        run: |
+          # 프론트 팀을 리뷰어로 설정
+          curl -s -X POST -H "Authorization: token ${{ secrets.REVIEW_TOKEN }}" \
+          -d '{"team_reviewers": ["newsum_be"]}' \
+          https://api.github.com/repos/100-hours-a-week/17-newsum-fe/pulls/${{ github.event.pull_request.number }}/requested_reviewers
+
+      # dev to main으로 PR 올라왔을 때
+      - name: dev에서 main으로 PR 올라올 때 관리자 팀으로 리뷰어 설정
+        if: github.base_ref == 'main' && github.head_ref == 'dev'
+        run: |
+          # GitHub 조직에 속한 팀 목록을 가져오기(팀명 슬러그 디버깅용)
+          teams=$(curl -s -H "Authorization: token ${{ secrets.REVIEW_TOKEN }}" \
+          https://api.github.com/orgs/100-hours-a-week/teams?per_page=100 | jq -r '.[].slug')
+          
+          echo "Teams: $teams"  # 팀 목록 출력
+          
+          # 관리자 팀을 리뷰어로 설정
+          curl -s -X POST -H "Authorization: token ${{ secrets.REVIEW_TOKEN }}" \
+          -d '{"team_reviewers": ["newsum_admin"]}' \
+          https://api.github.com/repos/100-hours-a-week/17-newsum-fe/pulls/${{ github.event.pull_request.number }}/requested_reviewers
