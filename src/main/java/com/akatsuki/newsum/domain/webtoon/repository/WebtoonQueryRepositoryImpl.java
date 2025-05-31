@@ -146,4 +146,3 @@ public class WebtoonQueryRepositoryImpl implements WebtoonQueryRepository {
 		return queryFragment;
 	}
 }
-

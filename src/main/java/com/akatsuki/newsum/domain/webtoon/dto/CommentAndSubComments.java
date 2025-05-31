@@ -14,6 +14,7 @@ public record CommentAndSubComments(
 	LocalDateTime createdAt,
 	Boolean isLiked,
 	Boolean isOwner,
+	Long likeCount,
 	List<CommentResult> subComments
 ) {
 	public static CommentAndSubComments from(CommentResult parent, List<CommentResult> childComments) {
@@ -25,6 +26,7 @@ public record CommentAndSubComments(
 			parent.createdAt(),
 			parent.isLiked(),
 			parent.isOwner(),
+			parent.likeCount(),
 			childComments
 		);
 	}
