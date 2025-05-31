@@ -1,0 +1,70 @@
+spring:
+  config:
+    activate:
+      on-profile: test
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/testdb
+    driver-class-name: org.postgresql.Driver
+    username: test_user
+    password: test_pass
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        default_batch_fetch_size: 100
+
+  flyway:
+    enabled: false
+
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      password:
+
+oauth2:
+  kakao:
+    client-id: test-kakao-client-id
+    redirect-uri: http://localhost:8080/login/oauth2/code/kakao
+  google:
+    client-id: test-google-client-id
+    client-secret: test-google-client-secret
+    redirect-uri: http://localhost:8080/login/oauth2/code/google
+
+jwt:
+  secret: test-secret-key
+  access-token:
+    expiration: 86400000  # 24시간
+  refresh-token:
+    expiration: 604800000  # 7일
+
+ai-server:
+  base-url: http://localhost:9999
+
+user:
+  default-profile-image-url: https://example.com/default-profile.jpg
+
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false
+
+decorator:
+  datasource:
+    p6spy:
+      enable-logging: true
+      multiline: true
+      logging: slf4j
+
+logging:
+  level:
+    org:
+      apache:
+        coyote:
+          http11: trace

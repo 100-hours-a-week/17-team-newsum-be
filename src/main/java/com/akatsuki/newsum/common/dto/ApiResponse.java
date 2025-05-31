@@ -1,0 +1,23 @@
+package com.akatsuki.newsum.common.dto;
+
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+@Getter
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public class ApiResponse<T> {
+	private String message;
+	private int code;
+	private T data;
+
+	private ApiResponse(String message, int code, T data) {
+		this.message = message;
+		this.code = code;
+		this.data = data;
+	}
+
+	public static <T> ApiResponse<T> success(ResponseCodeAndMessage responseCodeAndMessage, T data) {
+		return new ApiResponse<>(responseCodeAndMessage.getMessage(), responseCodeAndMessage.getCode(), data);
+	}
+}

@@ -1,0 +1,36 @@
+name: "🔥트러블슈팅 경험 공유"
+description: "발생한 문제와 해결 방법을 기록하여 공유하는 템플릿입니다."
+labels: ["trouble-shooting", "FE"]
+
+body:
+  - type: textarea
+    attributes:
+      label: "🔗 연관된 이슈"
+      description: "연관된 이슈 번호를 작성해주세요."
+      placeholder: "# 이슈번호"
+    validations:
+      required: false
+
+  - type: textarea
+    attributes:
+      label: "✏️ 수정 내용"
+      description: "문제 해결을 위해 수정한 부분을 간략히 설명해주세요."
+      placeholder: "예시) 스프링 CORS Config 수정, application.yml 수정"
+    validations:
+      required: false
+
+  - type: textarea
+    attributes:
+      label: "⚠️ 문제 상황"
+      description: "문제가 발생한 상황을 간략히 설명해주세요."
+      placeholder: "예시) API 호출 시 CORS 오류가 발생하거나, 데이터베이스 연결 문제 등이 있을 수 있습니다."
+    validations:
+      required: false
+
+  - type: textarea
+    attributes:
+      label: "💡 해결 방법"
+      description: "문제를 해결한 방법을 구체적으로 작성해주세요."
+      placeholder: "예시) CORS 설정을 수정하거나, 데이터베이스 연결 문자열을 업데이트한 방법 등을 설명합니다."
+    validations:
+      required: false
