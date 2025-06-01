@@ -10,5 +10,4 @@ public interface CommentQueryRepository {
 	List<CommentReadDto> findParentCommentsByCursorAndSize(Long webtoonId, Cursor cursor, int size);
 
 	List<CommentReadDto> findByWebtoonIdAndParentCommentIdIn(Long webtoonId, List<Long> parentCommentIds);
-
 }

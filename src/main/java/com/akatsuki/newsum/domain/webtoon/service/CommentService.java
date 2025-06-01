@@ -193,7 +193,7 @@ public class CommentService {
 		return liked.get();
 	}
 
-	public long getCommentLikeCount(Long commentId) {
+	private long getCommentLikeCount(Long commentId) {
 		return commentLikeRepository.countByCommentId(commentId);
 	}
 
