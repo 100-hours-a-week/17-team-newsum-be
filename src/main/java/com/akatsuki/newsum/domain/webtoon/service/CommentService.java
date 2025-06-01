@@ -193,16 +193,16 @@ public class CommentService {
 		return liked.get();
 	}
 
-	private long getCommentLikeCount(Long commentId) {
-		return commentLikeRepository.countByCommentId(commentId);
-	}
-
 	@Transactional(readOnly = true)
 	public CommentLikeResponseDto getCommentLikeStatus(Long userId, Long commentId) {
 		boolean liked = commentLikeRepository.existsByUserIdAndCommentId(userId, commentId);
 		long count = getCommentLikeCount(commentId);
 
 		return new CommentLikeResponseDto(liked, count);
+	}
+
+	private long getCommentLikeCount(Long commentId) {
+		return commentLikeRepository.countByCommentId(commentId);
 	}
 
 }
