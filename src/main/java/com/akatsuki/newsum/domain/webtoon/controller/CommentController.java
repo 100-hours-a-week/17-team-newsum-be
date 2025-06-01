@@ -113,7 +113,7 @@ public class CommentController {
 		CommentLikeStatusDto status = commentService.getCommentLikeStatus(id, commentId);
 
 		return ResponseEntity.ok(
-			ApiResponse.success(ResponseCodeAndMessage.ARTICLE_LIKE_TOGGLE_SUCCESS, status));
+			ApiResponse.success(ResponseCodeAndMessage.COMMENT_LIKE_TOGGLE_SUCCESS, status));
 	}
 
 }
