@@ -47,15 +47,16 @@ public class Comment extends BaseTimeEntity {
 	private LocalDateTime deletedAt;
 
 	public void editComment(String content) {
+
 		this.content = content;
 	}
 
 	public void incrementLikeCount() {
-		likeCount++;
+		this.likeCount++;
 	}
 
 	public void decrementLikeCount() {
-		likeCount--;
+		this.likeCount--;
 	}
 
 	public Comment(Long userId, Long webtoonId, Long parentCommentId, String content) {
