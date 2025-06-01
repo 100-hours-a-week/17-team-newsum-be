@@ -15,7 +15,7 @@ import com.akatsuki.newsum.common.pagination.model.page.CursorPage;
 import com.akatsuki.newsum.domain.webtoon.dto.CommentAndSubComments;
 import com.akatsuki.newsum.domain.webtoon.dto.CommentCreateRequest;
 import com.akatsuki.newsum.domain.webtoon.dto.CommentEditRequest;
-import com.akatsuki.newsum.domain.webtoon.dto.CommentLikeStatusDto;
+import com.akatsuki.newsum.domain.webtoon.dto.CommentLikeResponseDto;
 import com.akatsuki.newsum.domain.webtoon.dto.CommentListResult;
 import com.akatsuki.newsum.domain.webtoon.dto.CommentReadDto;
 import com.akatsuki.newsum.domain.webtoon.dto.CommentResult;
@@ -198,11 +198,11 @@ public class CommentService {
 	}
 
 	@Transactional(readOnly = true)
-	public CommentLikeStatusDto getCommentLikeStatus(Long userId, Long commentId) {
+	public CommentLikeResponseDto getCommentLikeStatus(Long userId, Long commentId) {
 		boolean liked = commentLikeRepository.existsByUserIdAndCommentId(userId, commentId);
 		long count = getCommentLikeCount(commentId);
 
-		return new CommentLikeStatusDto(liked, count);
+		return new CommentLikeResponseDto(liked, count);
 	}
 
 }
