@@ -62,11 +62,9 @@ public class CommentService {
 		//좋아요 누른 댓글 ID 목록 한번에 조회
 		Set<Long> likedCommentIds = commentLikeRepository.findLikedCommentIdsByUserIdAndCommentIds(id, allCommentIds);
 
-		//TODO : isLiked 체크하는 부분 추가 필요
 		//4. 부모 댓글 CommentResult 매핑 및 좋아요 유무, 댓글 작성자 유무 확인
 		List<CommentResult> parentCommentResult = getParentCommentResults(id, allParentComments, likedCommentIds);
 
-		//TODO : isLiked 체크하는 부분 추가 필요
 		//5. 자식 댓글을 parentCommentId 기준으로 그룹핑
 		Map<Long, List<CommentResult>> subCommentsGroupByParentId = collectSubCommentResultByParentId(allSubComments,
 			id, likedCommentIds);
