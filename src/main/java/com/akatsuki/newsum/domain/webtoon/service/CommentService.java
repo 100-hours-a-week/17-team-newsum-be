@@ -2,8 +2,10 @@ package com.akatsuki.newsum.domain.webtoon.service;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -51,14 +53,23 @@ public class CommentService {
 		List<CommentReadDto> allSubComments = commentRepository.findByWebtoonIdAndParentCommentIdIn(webtoonId,
 			parentCommentIds);
 
+		//부모 + 자녀 댓글 전부 수집하기
+		List<Long> allCommentIds = Stream.concat(
+			allParentComments.stream().map(CommentReadDto::getId),
+			allSubComments.stream().map(CommentReadDto::getId)
+		).toList();
+
+		//좋아요 누른 댓글 ID 목록 한번에 조회
+		Set<Long> likedCommentIds = commentLikeRepository.findLikedCommentIdsByUserIdAndCommentIds(id, allCommentIds);
+
 		//TODO : isLiked 체크하는 부분 추가 필요
 		//4. 부모 댓글 CommentResult 매핑 및 좋아요 유무, 댓글 작성자 유무 확인
-		List<CommentResult> parentCommentResult = getParentCommentResults(id, allParentComments);
+		List<CommentResult> parentCommentResult = getParentCommentResults(id, allParentComments, likedCommentIds);
 
 		//TODO : isLiked 체크하는 부분 추가 필요
 		//5. 자식 댓글을 parentCommentId 기준으로 그룹핑
 		Map<Long, List<CommentResult>> subCommentsGroupByParentId = collectSubCommentResultByParentId(allSubComments,
-			id);
+			id, likedCommentIds);
 
 		//6. 부모 + 자식 댓글을 하나의 CommentAndSubComments로 조립
 		List<CommentAndSubComments> commentAndSubComments = mergeParentAndSubComments(parentCommentResult,
@@ -116,18 +127,19 @@ public class CommentService {
 	}
 
 	private Map<Long, List<CommentResult>> collectSubCommentResultByParentId(List<CommentReadDto> allSubComments,
-		Long userId) {
+		Long userId, Set<Long> likedCommentIds) {
 		return allSubComments.stream()
 			.collect(Collectors.groupingBy(
 				CommentReadDto::getParentId,
-				Collectors.mapping(sub -> mapToCommentResultWithOwnerAndLiked(userId, sub),
+				Collectors.mapping(sub -> mapToCommentResultWithOwnerAndLiked(userId, sub, likedCommentIds),
 					Collectors.toList())
 			));
 	}
 
-	private List<CommentResult> getParentCommentResults(Long id, List<CommentReadDto> parentComments) {
+	private List<CommentResult> getParentCommentResults(Long id, List<CommentReadDto> parentComments,
+		Set<Long> likedCommentIds) {
 		return parentComments.stream()
-			.map(commentReadDto -> mapToCommentResultWithOwnerAndLiked(id, commentReadDto))
+			.map(commentReadDto -> mapToCommentResultWithOwnerAndLiked(id, commentReadDto, likedCommentIds))
 			.toList();
 	}
 
@@ -137,11 +149,12 @@ public class CommentService {
 			.toList();
 	}
 
-	private CommentResult mapToCommentResultWithOwnerAndLiked(Long id, CommentReadDto commentReadDto) {
+	private CommentResult mapToCommentResultWithOwnerAndLiked(Long id, CommentReadDto commentReadDto,
+		Set<Long> likedCommentIds) {
 		boolean isOwner = commentReadDto.getAuthorId().equals(id);
-		boolean isliked = commentLikeRepository.existsByUserIdAndCommentId(id, commentReadDto.getId());
-		long likecount = commentLikeRepository.countByCommentId(commentReadDto.getId());
-		return CommentResult.of(commentReadDto, isliked, isOwner, likecount);
+		boolean isLiked = likedCommentIds.contains(commentReadDto.getId());
+		long likecount = commentReadDto.getLikeCount();
+		return CommentResult.of(commentReadDto, isLiked, isOwner, likecount);
 	}
 
 	private CommentAndSubComments collectCommentAndSubCommentsByParent(CommentResult parent,
