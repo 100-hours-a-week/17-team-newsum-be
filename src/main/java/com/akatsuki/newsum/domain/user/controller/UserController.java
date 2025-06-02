@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -24,6 +25,8 @@ import com.akatsuki.newsum.domain.user.dto.UpdateUserResponseDto;
 import com.akatsuki.newsum.domain.user.dto.UserFavoriteWebtoonsResponse;
 import com.akatsuki.newsum.domain.user.dto.UserProfileDto;
 import com.akatsuki.newsum.domain.user.service.UserService;
+import com.akatsuki.newsum.domain.webtoon.dto.KeywordSubscriptionRequest;
+import com.akatsuki.newsum.domain.webtoon.dto.KeywordSubscriptionResponse;
 import com.akatsuki.newsum.domain.webtoon.dto.WebtoonCardDto;
 import com.akatsuki.newsum.domain.webtoon.service.WebtoonService;
 
@@ -69,7 +72,7 @@ public class UserController {
 		@AuthenticationPrincipal UserDetailsImpl userDetails,
 		@Valid @RequestBody UpdateUserRequestDto dto
 	) {
-		Long userId = userDetails.getUserId();
+		Long userId = getUserId(userDetails);
 		UpdateUserResponseDto responseDto = userService.updateUser(userId, dto);
 
 		return ResponseEntity.ok(
@@ -106,4 +109,20 @@ public class UserController {
 		);
 
 	}
+
+	@PostMapping("/keywords/subscriptions")
+	public ResponseEntity<ApiResponse> addKeyword(
+		@AuthenticationPrincipal UserDetailsImpl userDetails,
+		@RequestBody @Valid KeywordSubscriptionRequest request
+	) {
+		Long userId = getUserId(userDetails);
+		webtoonService.subscribeKeyword(userId, request.keyword());
+
+
+		return ResponseEntity.ok(
+			ApiResponse.success(ResponseCodeAndMessage.KEYWORD_SUBSCRIBE_SUCCESS, null)
+		);
+	}
+	}
+
 }
