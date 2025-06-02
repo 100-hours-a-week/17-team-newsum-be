@@ -3,7 +3,6 @@ package com.akatsuki.newsum.domain.webtoon.service;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -184,8 +183,7 @@ public class CommentService {
 	}
 
 	@Transactional
-	public boolean toggleCommentLike(Long userId, Long commentId) {
-		AtomicBoolean liked = new AtomicBoolean(false);
+	public void toggleCommentLike(Long userId, Long commentId) {
 		Comment comment = findCommentById(commentId);
 
 		commentLikeRepository.findByUserIdAndCommentId(userId, commentId)
@@ -197,11 +195,8 @@ public class CommentService {
 				() -> {
 					commentLikeRepository.save(new CommentLike(userId, commentId));
 					comment.incrementLikeCount();
-					liked.set(true);
 				}
 			);
-
-		return liked.get();
 	}
 
 	@Transactional(readOnly = true)
