@@ -26,7 +26,6 @@ import com.akatsuki.newsum.domain.user.dto.UserFavoriteWebtoonsResponse;
 import com.akatsuki.newsum.domain.user.dto.UserProfileDto;
 import com.akatsuki.newsum.domain.user.service.UserService;
 import com.akatsuki.newsum.domain.webtoon.dto.KeywordSubscriptionRequest;
-import com.akatsuki.newsum.domain.webtoon.dto.KeywordSubscriptionResponse;
 import com.akatsuki.newsum.domain.webtoon.dto.WebtoonCardDto;
 import com.akatsuki.newsum.domain.webtoon.service.WebtoonService;
 
@@ -118,11 +117,9 @@ public class UserController {
 		Long userId = getUserId(userDetails);
 		webtoonService.subscribeKeyword(userId, request.keyword());
 
-
 		return ResponseEntity.ok(
 			ApiResponse.success(ResponseCodeAndMessage.KEYWORD_SUBSCRIBE_SUCCESS, null)
 		);
-	}
 	}
 
 }

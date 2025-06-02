@@ -37,9 +37,10 @@ public class KeywordFavorite {
 	@Column(name = "created_at", nullable = false)
 	private LocalDateTime createdAt;
 
-	public KeywordFavorite(User user, Keyword keyword) {
-		this.user = user;
+	public KeywordFavorite(User userId, Keyword keyword) {
+		this.user = userId;
 		this.keyword = keyword;
 		this.createdAt = LocalDateTime.now();
 	}
+
 }

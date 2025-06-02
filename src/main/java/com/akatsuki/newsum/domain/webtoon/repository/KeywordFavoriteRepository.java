@@ -1,4 +1,8 @@
 package com.akatsuki.newsum.domain.webtoon.repository;
 
-public interface KeywordFavoriteRepository {
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import com.akatsuki.newsum.domain.webtoon.entity.webtoon.KeywordFavorite;
+
+public interface KeywordFavoriteRepository extends JpaRepository<KeywordFavorite, Long> {
 }
