@@ -36,8 +36,6 @@ import com.akatsuki.newsum.domain.webtoon.dto.WebtoonResponse;
 import com.akatsuki.newsum.domain.webtoon.dto.WebtoonSlideDto;
 import com.akatsuki.newsum.domain.webtoon.dto.WebtoonSourceDto;
 import com.akatsuki.newsum.domain.webtoon.entity.webtoon.Category;
-import com.akatsuki.newsum.domain.webtoon.entity.webtoon.Keyword;
-import com.akatsuki.newsum.domain.webtoon.entity.webtoon.KeywordFavorite;
 import com.akatsuki.newsum.domain.webtoon.entity.webtoon.NewsSource;
 import com.akatsuki.newsum.domain.webtoon.entity.webtoon.RecentView;
 import com.akatsuki.newsum.domain.webtoon.entity.webtoon.Webtoon;
@@ -45,8 +43,6 @@ import com.akatsuki.newsum.domain.webtoon.entity.webtoon.WebtoonDetail;
 import com.akatsuki.newsum.domain.webtoon.entity.webtoon.WebtoonFavorite;
 import com.akatsuki.newsum.domain.webtoon.entity.webtoon.WebtoonLike;
 import com.akatsuki.newsum.domain.webtoon.exception.WebtoonNotFoundException;
-import com.akatsuki.newsum.domain.webtoon.repository.KeywordFavoriteRepository;
-import com.akatsuki.newsum.domain.webtoon.repository.KeywordRepository;
 import com.akatsuki.newsum.domain.webtoon.repository.NewsSourceRepository;
 import com.akatsuki.newsum.domain.webtoon.repository.RecentViewRepository;
 import com.akatsuki.newsum.domain.webtoon.repository.WebtoonDetailRepository;
@@ -75,8 +71,6 @@ public class WebtoonService {
 	private final WebtoonFavoriteRepository webtoonFavoriteRepository;
 	private final WebtoonLikeRepository webtoonLikeRepository;
 	private final CursorPaginationService cursorPaginationService;
-	private final KeywordRepository keywordRepository;
-	private final KeywordFavoriteRepository keywordFavoriteRepository;
 
 	private final int RECENT_WEBTOON_LIMIT = 4;
 	private final int RELATED_CATEGORY_SIZE = 2;
@@ -415,16 +409,5 @@ public class WebtoonService {
 		long count = webtoonLikeRepository.countByWebtoonId(webtoonId);
 
 		return new WebtoonLikeStatusDto(liked, count);
-	}
-
-	@Transactional(readOnly = false)
-	public void subscribeKeyword(Long userId, String keywordContent) {
-		User user = new User(userId);
-
-		Keyword keyword = keywordRepository.findByContent(keywordContent)
-			.orElseGet(() -> keywordRepository.save(new Keyword(keywordContent)));
-
-		KeywordFavorite favorite = user.subscribeKeyword(keyword);
-		keywordFavoriteRepository.save(favorite);
 	}
 }

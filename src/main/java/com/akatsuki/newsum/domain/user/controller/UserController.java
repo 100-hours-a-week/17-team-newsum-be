@@ -24,6 +24,7 @@ import com.akatsuki.newsum.domain.user.dto.UpdateUserRequestDto;
 import com.akatsuki.newsum.domain.user.dto.UpdateUserResponseDto;
 import com.akatsuki.newsum.domain.user.dto.UserFavoriteWebtoonsResponse;
 import com.akatsuki.newsum.domain.user.dto.UserProfileDto;
+import com.akatsuki.newsum.domain.user.service.KeywordService;
 import com.akatsuki.newsum.domain.user.service.UserService;
 import com.akatsuki.newsum.domain.webtoon.dto.KeywordSubscriptionRequest;
 import com.akatsuki.newsum.domain.webtoon.dto.WebtoonCardDto;
@@ -39,6 +40,7 @@ public class UserController {
 
 	private final UserService userService;
 	private final WebtoonService webtoonService;
+	private final KeywordService keywordService;
 
 	@GetMapping("/profile")
 	public ResponseEntity<ApiResponse<UserProfileDto>> getProfile(
@@ -115,7 +117,7 @@ public class UserController {
 		@RequestBody @Valid KeywordSubscriptionRequest request
 	) {
 		Long userId = getUserId(userDetails);
-		webtoonService.subscribeKeyword(userId, request.keyword());
+		keywordService.subscribeKeyword(userId, request.keyword());
 
 		return ResponseEntity.ok(
 			ApiResponse.success(ResponseCodeAndMessage.KEYWORD_SUBSCRIBE_SUCCESS, null)
