@@ -81,14 +81,6 @@ public class UserController {
 		);
 	}
 
-	private Long getUserId(
-		UserDetailsImpl userDetails) {
-		if (userDetails == null) {
-			return null;
-		}
-		return userDetails.getUserId();
-	}
-
 	@GetMapping("/favorites/webtoons")
 	public ResponseEntity<ApiResponse<UserFavoriteWebtoonsResponse>> getBookmarkedWebtoons(
 		@AuthenticationPrincipal UserDetailsImpl userDetails,
@@ -124,4 +116,11 @@ public class UserController {
 		);
 	}
 
+	private Long getUserId(
+		UserDetailsImpl userDetails) {
+		if (userDetails == null) {
+			return null;
+		}
+		return userDetails.getUserId();
+	}
 }
