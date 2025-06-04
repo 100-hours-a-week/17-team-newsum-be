@@ -18,7 +18,6 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.akatsuki.newsum.cache.RedisService;
 import com.akatsuki.newsum.common.dto.ErrorCodeAndMessage;
 import com.akatsuki.newsum.common.exception.BusinessException;
 import com.akatsuki.newsum.common.exception.NotFoundException;
@@ -70,7 +69,6 @@ public class WebtoonService {
 	private final AiServerApiService aiServerApiService;
 	private final RecentViewRepository recentViewRepository;
 	private final UserRepository userRepository;
-	private final RedisService redisService;
 	private final WebtoonFavoriteRepository webtoonFavoriteRepository;
 	private final WebtoonLikeRepository webtoonLikeRepository;
 	private final CursorPaginationService cursorPaginationService;
@@ -410,5 +408,4 @@ public class WebtoonService {
 
 		return new WebtoonLikeStatusDto(liked, count);
 	}
-
 }

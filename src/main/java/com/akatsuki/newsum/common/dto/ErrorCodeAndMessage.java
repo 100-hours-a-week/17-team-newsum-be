@@ -42,7 +42,10 @@ public enum ErrorCodeAndMessage {
 	// 서버 오류 (5xx)
 	INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR.value(), "서버 내부 오류가 발생했습니다."),
 	NOT_IMPLEMENTED(HttpStatus.NOT_IMPLEMENTED.value(), "아직 구현되지 않은 기능입니다."),
-	SERVICE_UNAVAILABLE(HttpStatus.SERVICE_UNAVAILABLE.value(), "서비스를 일시적으로 사용할 수 없습니다.");
+	SERVICE_UNAVAILABLE(HttpStatus.SERVICE_UNAVAILABLE.value(), "서비스를 일시적으로 사용할 수 없습니다."),
+
+	//구독관련 오류
+	KEYWORD_ALREADY_SUBSCRIBED(HttpStatus.CONFLICT.value(), "이미 구독한 키워드입니다.");
 
 	private final int code;
 	private final String message;
