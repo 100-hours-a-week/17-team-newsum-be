@@ -46,13 +46,13 @@ public class KeywordService {
 		keywordFavoriteRepository.delete(favorite);
 	}
 
-	private User findUserById(Long userId) {
-		return userRepository.findById(userId)
-			.orElseThrow(() -> new NotFoundException(ErrorCodeAndMessage.USER_NOT_FOUND));
-	}
-
 	public KeywordListResponseDto getKeywordList(Long userId) {
 		List<KeywordFavorite> favorites = keywordFavoriteRepository.findByuserId(userId);
 		return KeywordListResponseDto.from(favorites);
+	}
+
+	private User findUserById(Long userId) {
+		return userRepository.findById(userId)
+			.orElseThrow(() -> new NotFoundException(ErrorCodeAndMessage.USER_NOT_FOUND));
 	}
 }
