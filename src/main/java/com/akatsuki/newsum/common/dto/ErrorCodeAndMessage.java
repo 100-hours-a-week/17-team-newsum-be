@@ -45,8 +45,8 @@ public enum ErrorCodeAndMessage {
 	SERVICE_UNAVAILABLE(HttpStatus.SERVICE_UNAVAILABLE.value(), "서비스를 일시적으로 사용할 수 없습니다."),
 
 	//구독관련 오류
-	KEYWORD_ALREADY_SUBSCRIBED(HttpStatus.CONFLICT.value(), "이미 구독한 키워드입니다.");
-
+	KEYWORD_ALREADY_SUBSCRIBED(HttpStatus.CONFLICT.value(), "이미 구독한 키워드입니다."),
+	KEYWORD_SUBSCRIPTION_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "존재하지 않는 키워드입니다.");
 	private final int code;
 	private final String message;
 
