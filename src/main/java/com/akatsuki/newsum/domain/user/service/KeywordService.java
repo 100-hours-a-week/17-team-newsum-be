@@ -23,7 +23,6 @@ public class KeywordService {
 	private final KeywordRepository keywordRepository;
 	private final UserRepository userRepository;
 
-	@Transactional
 	public void subscribeKeyword(Long userId, String keywordContent) {
 		User user = new User(userId);
 		Keyword keyword = keywordRepository.findByContent(keywordContent)
