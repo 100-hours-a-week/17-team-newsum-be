@@ -36,6 +36,7 @@ public enum ResponseCodeAndMessage {
 	COMMENT_DELETE_SUCCESS(HttpStatus.NO_CONTENT.value(), "댓글 삭제에 성공했습니다."),
 	COMMEND_EDIT_SUCCESS(HttpStatus.OK.value(), "댓글 수정에 성공했습니다."),
 	COMMENT_ADD_SUCCESS(HttpStatus.CREATED.value(), "댓글 생성에 성공했습니다."),
+	COMMENT_LIKE_TOGGLE_SUCCESS(HttpStatus.OK.value(), "댓글 좋아요에 성공했습니다."),
 
 	//좋아요 관련 성공 응답
 	ARTICLE_LIKE_CHECK_SUCCESS(HttpStatus.OK.value(), "웹툰 좋아요 여부 조회에 성공했습니다."),
