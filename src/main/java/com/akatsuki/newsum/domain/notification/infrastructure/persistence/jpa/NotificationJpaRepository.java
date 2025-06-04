@@ -14,4 +14,6 @@ public interface NotificationJpaRepository extends JpaRepository<Notification, L
 
 	@Query("select n from Notification n where n.id = :id and n.user.id=:userId")
 	Optional<Notification> findByIdAndUserId(Long id, Long userId);
+
+	Boolean existsByUserId(Long userId);
 }

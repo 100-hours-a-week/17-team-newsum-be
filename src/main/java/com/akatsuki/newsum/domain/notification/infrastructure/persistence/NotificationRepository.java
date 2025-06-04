@@ -18,4 +18,6 @@ public interface NotificationRepository {
 	void delete(Notification notification);
 
 	Optional<Notification> findNotificationByIdAndUserById(Long id, Long userId);
+
+	Boolean existByUserId(Long userId);
 }

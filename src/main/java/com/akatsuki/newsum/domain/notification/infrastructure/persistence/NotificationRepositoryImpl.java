@@ -43,4 +43,9 @@ public class NotificationRepositoryImpl implements NotificationRepository {
 	public Optional<Notification> findNotificationByIdAndUserById(Long id, Long userId) {
 		return notificationJpaRepository.findByIdAndUserId(id, userId);
 	}
+
+	@Override
+	public Boolean existByUserId(Long userId) {
+		return notificationJpaRepository.existsByUserId(userId);
+	}
 }

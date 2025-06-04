@@ -108,6 +108,11 @@ public class NotificationService implements NotificationUseCase {
 		notification.read();
 	}
 
+	@Override
+	public Boolean hasNotReadNotification(Long userId) {
+		return notificationRepository.existByUserId(userId);
+	}
+
 	private Notification findNotificationByIdAndUserById(Long notificationId, Long userId) {
 		return notificationRepository.findNotificationByIdAndUserById(notificationId, userId)
 			.orElseThrow(() -> new BusinessException(NOTIFICATION_NOT_FOUND));
@@ -117,6 +122,7 @@ public class NotificationService implements NotificationUseCase {
 		return new NotificationResult(
 			model.getId(),
 			model.getNotificationType().name(),
+			model.getTitle(),
 			model.getContent(),
 			model.getCreatedAt(),
 			model.getIsRead()

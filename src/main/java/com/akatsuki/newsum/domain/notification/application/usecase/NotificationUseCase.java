@@ -14,4 +14,6 @@ public interface NotificationUseCase {
 	void removeNotification(Long userId, Long notificationId);
 
 	void readNotification(Long userId, Long notificationId);
+
+	Boolean hasNotReadNotification(Long userId);
 }
