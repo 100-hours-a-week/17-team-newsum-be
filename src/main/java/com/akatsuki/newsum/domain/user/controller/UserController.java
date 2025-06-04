@@ -21,6 +21,7 @@ import com.akatsuki.newsum.common.pagination.annotation.CursorParam;
 import com.akatsuki.newsum.common.pagination.model.cursor.Cursor;
 import com.akatsuki.newsum.common.pagination.model.page.CursorPage;
 import com.akatsuki.newsum.common.security.UserDetailsImpl;
+import com.akatsuki.newsum.domain.user.dto.KeywordResponseDto;
 import com.akatsuki.newsum.domain.user.dto.RecentViewWebtoonListResponse;
 import com.akatsuki.newsum.domain.user.dto.UpdateUserRequestDto;
 import com.akatsuki.newsum.domain.user.dto.UpdateUserResponseDto;
@@ -127,6 +128,16 @@ public class UserController {
 		keywordService.unsubscribeKeyword(userId, keywordId);
 
 		return ResponseEntity.noContent().build();
+	}
+
+	@GetMapping("/keywords")
+	public ResponseEntity<ApiResponse<KeywordResponseDto>> getkeyword(
+		@AuthenticationPrincipal UserDetailsImpl userDetails
+	) {
+		Long userId = getUserId(userDetails);
+		keywordService.getkeywordlist(userId);
+
+		return ResponseEntity.ok()
 	}
 
 	private Long getUserId(
