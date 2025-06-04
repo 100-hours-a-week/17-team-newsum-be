@@ -19,7 +19,7 @@ public class NotificationSendService implements NotificationSendUseCase {
 
 	@Override
 	public void send(WebPushSendCommand command) {
-		sseService.sendData(String.valueOf(command.userId()), new WebPushNotificationResponse(
+		sseService.sendDataToUser(String.valueOf(command.userId()), new WebPushNotificationResponse(
 			command.targetId(),
 			command.title(),
 			command.content(),
