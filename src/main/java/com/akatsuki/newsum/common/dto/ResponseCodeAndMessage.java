@@ -47,7 +47,8 @@ public enum ResponseCodeAndMessage {
 	NOTI_LIST_SUCCESS(HttpStatus.OK.value(), "알림 목록 조회에 성공했습니다."),
 
 	//키워드 성공 응답
-	KEYWORD_SUBSCRIBE_SUCCESS(HttpStatus.OK.value(), "키워드 구독에 성공했습니다.");
+	KEYWORD_SUBSCRIBE_SUCCESS(HttpStatus.OK.value(), "키워드 구독에 성공했습니다."),
+	KEYWORD_SUBSCRIBE_DELETE_SUCCESS(HttpStatus.OK.value(), "키워드 구독에 삭제에 성공했습니다.");
 
 	private final int code;
 	private final String message;
