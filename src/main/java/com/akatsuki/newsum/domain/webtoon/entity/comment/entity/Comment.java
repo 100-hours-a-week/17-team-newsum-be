@@ -56,4 +56,8 @@ public class Comment extends BaseTimeEntity {
 		this.parentCommentId = parentCommentId;
 		this.content = content;
 	}
+
+	public boolean isParent() {
+		return parentCommentId == null;
+	}
 }
