@@ -75,6 +75,6 @@ public class User extends BaseTimeEntity {
 	}
 
 	public KeywordFavorite subscribeKeyword(Keyword keyword) {
-		return new KeywordFavorite(this.id, keyword.getId());
+		return new KeywordFavorite(this.id, keyword);
 	}
 }
