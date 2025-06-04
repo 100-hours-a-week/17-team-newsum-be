@@ -21,7 +21,7 @@ import com.akatsuki.newsum.common.pagination.annotation.CursorParam;
 import com.akatsuki.newsum.common.pagination.model.cursor.Cursor;
 import com.akatsuki.newsum.common.pagination.model.page.CursorPage;
 import com.akatsuki.newsum.common.security.UserDetailsImpl;
-import com.akatsuki.newsum.domain.user.dto.KeywordResponseDto;
+import com.akatsuki.newsum.domain.user.dto.KeywordListResponseDto;
 import com.akatsuki.newsum.domain.user.dto.RecentViewWebtoonListResponse;
 import com.akatsuki.newsum.domain.user.dto.UpdateUserRequestDto;
 import com.akatsuki.newsum.domain.user.dto.UpdateUserResponseDto;
@@ -131,13 +131,15 @@ public class UserController {
 	}
 
 	@GetMapping("/keywords")
-	public ResponseEntity<ApiResponse<KeywordResponseDto>> getkeyword(
+	public ResponseEntity<ApiResponse<KeywordListResponseDto>> getKeywordList(
 		@AuthenticationPrincipal UserDetailsImpl userDetails
 	) {
 		Long userId = getUserId(userDetails);
-		keywordService.getkeywordlist(userId);
+		KeywordListResponseDto result = keywordService.getKeywordList(userId);
 
-		return ResponseEntity.ok()
+		return ResponseEntity.ok(
+			ApiResponse.success(ResponseCodeAndMessage.KEYWORD_LIST_SUCCESS, result)
+		);
 	}
 
 	private Long getUserId(

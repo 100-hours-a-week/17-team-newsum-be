@@ -11,6 +11,8 @@ import com.akatsuki.newsum.common.exception.BusinessException;
 import com.akatsuki.newsum.common.exception.NotFoundException;
 import com.akatsuki.newsum.domain.user.dto.KeywordListResponseDto;
 import com.akatsuki.newsum.domain.user.entity.User;
+import com.akatsuki.newsum.domain.user.repository.KeywordFavoriteRepository;
+import com.akatsuki.newsum.domain.user.repository.KeywordRepository;
 import com.akatsuki.newsum.domain.user.repository.UserRepository;
 import com.akatsuki.newsum.domain.webtoon.entity.webtoon.Keyword;
 import com.akatsuki.newsum.domain.webtoon.entity.webtoon.KeywordFavorite;
@@ -50,7 +52,7 @@ public class KeywordService {
 	}
 
 	public KeywordListResponseDto getKeywordList(Long userId) {
-		List<KeywordFavorite> favorites = keywordFavoriteRepository.findAllByUserId(userId);
+		List<KeywordFavorite> favorites = keywordFavoriteRepository.findByuserId(userId);
 		return KeywordListResponseDto.from(favorites);
 	}
 }
