@@ -44,7 +44,7 @@ public enum ResponseCodeAndMessage {
 
 	//알림
 	NOTI_LIST_SUCCESS(HttpStatus.OK.value(), "알림 목록 조회에 성공했습니다."),
-	;
+	NOTI_READ_SUCCESS(HttpStatus.OK.value(), "알람 읽음 처리에 성공했습니다.");
 
 	private final int code;
 	private final String message;
