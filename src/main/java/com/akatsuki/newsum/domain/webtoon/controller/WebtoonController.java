@@ -20,6 +20,7 @@ import com.akatsuki.newsum.common.pagination.annotation.CursorParam;
 import com.akatsuki.newsum.common.pagination.model.cursor.Cursor;
 import com.akatsuki.newsum.common.pagination.model.page.CursorPage;
 import com.akatsuki.newsum.common.security.UserDetailsImpl;
+import com.akatsuki.newsum.domain.notification.application.usecase.NotificationUseCase;
 import com.akatsuki.newsum.domain.webtoon.dto.CreateWebtoonReqeust;
 import com.akatsuki.newsum.domain.webtoon.dto.WebtoonCardDto;
 import com.akatsuki.newsum.domain.webtoon.dto.WebtoonDetailResponse;
@@ -27,6 +28,7 @@ import com.akatsuki.newsum.domain.webtoon.dto.WebtoonLikeStatusDto;
 import com.akatsuki.newsum.domain.webtoon.dto.WebtoonListResponse;
 import com.akatsuki.newsum.domain.webtoon.dto.WebtoonResponse;
 import com.akatsuki.newsum.domain.webtoon.dto.WebtoonSearchResponse;
+import com.akatsuki.newsum.domain.webtoon.dto.WebtoonTopResponse;
 import com.akatsuki.newsum.domain.webtoon.service.WebtoonService;
 
 import lombok.RequiredArgsConstructor;
@@ -40,6 +42,7 @@ public class WebtoonController {
 
 	private final WebtoonService webtoonService;
 	private final CursorPaginationService cursorPaginationService;
+	private final NotificationUseCase notificationUseCase;
 
 	@GetMapping
 	public ResponseEntity<ApiResponse<WebtoonListResponse>> getWebtoons(
@@ -105,18 +108,25 @@ public class WebtoonController {
 
 	//메인페이지
 	@GetMapping("/top")
-	public ResponseEntity<ApiResponse<Map<String, List<WebtoonCardDto>>>> getTop() {
-		List<WebtoonCardDto> topToons = webtoonService.getTop3TodayByViewCount();
-		List<WebtoonCardDto> newsCards = webtoonService.getTodayNewsCards();
+	public ResponseEntity<ApiResponse<WebtoonTopResponse>> getTop(
+		@AuthenticationPrincipal UserDetailsImpl userDetails
+	) {
+		List<WebtoonCardDto> top3News = webtoonService.getTop3TodayByViewCount();
+		List<WebtoonCardDto> todayNews = webtoonService.getTodayNewsCards();
 
-		Map<String, List<WebtoonCardDto>> response = Map.of(
-			"topToons", topToons,
-			"todaysNews", newsCards
-		);
-
-		return ResponseEntity.ok(
-			ApiResponse.success(ResponseCodeAndMessage.WEBTOON_TOP_SUCCESS, response)
-		);
+		Long userId = getUserId(userDetails);
+		if (userId == null) {
+			WebtoonTopResponse response = new WebtoonTopResponse(top3News, todayNews, false);
+			return ResponseEntity.ok(
+				ApiResponse.success(ResponseCodeAndMessage.WEBTOON_TOP_SUCCESS, response)
+			);
+		} else {
+			Boolean hasNotReadNotification = notificationUseCase.hasNotReadNotification(userId);
+			WebtoonTopResponse response = new WebtoonTopResponse(top3News, todayNews, hasNotReadNotification);
+			return ResponseEntity.ok(
+				ApiResponse.success(ResponseCodeAndMessage.WEBTOON_TOP_SUCCESS, response)
+			);
+		}
 	}
 
 	//카테고리별페이지

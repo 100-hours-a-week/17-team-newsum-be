@@ -69,7 +69,7 @@ public class User extends BaseTimeEntity {
 	public void profileImageUrl(String profileImageUrl) {
 		this.profileImageUrl = profileImageUrl;
 	}
-	
+
 	public User(Long id) {
 		this.id = id;
 	}

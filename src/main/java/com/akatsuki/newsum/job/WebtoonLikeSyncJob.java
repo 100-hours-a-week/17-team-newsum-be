@@ -1,4 +1,4 @@
-package com.akatsuki.newsum.batch;
+package com.akatsuki.newsum.job;
 
 import java.util.Set;
 

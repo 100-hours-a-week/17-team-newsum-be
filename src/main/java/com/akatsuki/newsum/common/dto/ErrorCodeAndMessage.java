@@ -39,6 +39,11 @@ public enum ErrorCodeAndMessage {
 	INVALID_USER_CREDENTIALS(HttpStatus.UNAUTHORIZED.value(), "유효하지 않은 사용자 인증정보입니다."),
 	DUPLICATE_NICKNAME_GENERATION_FAILED(409, "중복되지 않는 닉네임을 찾을 수 없습니다."),
 
+	NOTIFICATION_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "알림을 찾을 수 없습니다"),
+
+	//SSE관련 오류
+	SSE_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "SSE연결 객체를 찾을 수 없습니다."),
+
 	// 서버 오류 (5xx)
 	INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR.value(), "서버 내부 오류가 발생했습니다."),
 	NOT_IMPLEMENTED(HttpStatus.NOT_IMPLEMENTED.value(), "아직 구현되지 않은 기능입니다."),

@@ -36,7 +36,6 @@ public enum ResponseCodeAndMessage {
 	COMMENT_DELETE_SUCCESS(HttpStatus.NO_CONTENT.value(), "댓글 삭제에 성공했습니다."),
 	COMMEND_EDIT_SUCCESS(HttpStatus.OK.value(), "댓글 수정에 성공했습니다."),
 	COMMENT_ADD_SUCCESS(HttpStatus.CREATED.value(), "댓글 생성에 성공했습니다."),
-	COMMENT_LIKE_TOGGLE_SUCCESS(HttpStatus.OK.value(), "댓글 좋아요에 성공했습니다."),
 
 	//좋아요 관련 성공 응답
 	ARTICLE_LIKE_CHECK_SUCCESS(HttpStatus.OK.value(), "웹툰 좋아요 여부 조회에 성공했습니다."),
@@ -45,7 +44,11 @@ public enum ResponseCodeAndMessage {
 
 	//알림
 	NOTI_LIST_SUCCESS(HttpStatus.OK.value(), "알림 목록 조회에 성공했습니다."),
+	NOTI_READ_SUCCESS(HttpStatus.OK.value(), "알람 읽음 처리에 성공했습니다."),
 
+	COMMENT_LIKE_CHECK_SUCCESS(HttpStatus.OK.value(), "댓글 좋아요 여부 조회에 성공했습니다."),
+	COMMENT_LIKE_TOGGLE_SUCCESS(HttpStatus.OK.value(), "댓글 좋아요 요청에 성공했습니다."),
+	
 	//키워드 성공 응답
 	KEYWORD_SUBSCRIBE_SUCCESS(HttpStatus.OK.value(), "키워드 구독에 성공했습니다.");
 
