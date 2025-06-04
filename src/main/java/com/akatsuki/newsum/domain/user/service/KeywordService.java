@@ -47,5 +47,4 @@ public class KeywordService {
 		return userRepository.findById(userId)
 			.orElseThrow(() -> new NotFoundException(ErrorCodeAndMessage.USER_NOT_FOUND));
 	}
-
 }
