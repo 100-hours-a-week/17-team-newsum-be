@@ -12,12 +12,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.akatsuki.newsum.cache.RedisService;
 import com.akatsuki.newsum.common.dto.ErrorCodeAndMessage;
 import com.akatsuki.newsum.common.exception.BusinessException;
 import com.akatsuki.newsum.common.exception.NotFoundException;
@@ -69,7 +69,6 @@ public class WebtoonService {
 	private final AiServerApiService aiServerApiService;
 	private final RecentViewRepository recentViewRepository;
 	private final UserRepository userRepository;
-	private final RedisService redisService;
 	private final WebtoonFavoriteRepository webtoonFavoriteRepository;
 	private final WebtoonLikeRepository webtoonLikeRepository;
 	private final CursorPaginationService cursorPaginationService;
@@ -338,23 +337,23 @@ public class WebtoonService {
 		Optional<WebtoonFavorite> favoriteOpt = webtoonFavoriteRepository
 			.findByWebtoonIdAndUserId(webtoonId, userId);
 
-		final boolean[] isAdded = new boolean[1];
+		AtomicBoolean bookmarked = new AtomicBoolean(false);
 
 		favoriteOpt.ifPresentOrElse(
 			favorite -> {
 				webtoonFavoriteRepository.delete(favorite);
-				isAdded[0] = false;
+				bookmarked.set(false);
 			},
 			() -> {
 				User user = new User(userId);
 				Webtoon webtoon = webtoonRepository.findById(webtoonId)
 					.orElseThrow(() -> new BusinessException(WEBTOON_NOT_FOUND));
 				webtoonFavoriteRepository.save(new WebtoonFavorite(user, webtoon));
-				isAdded[0] = true;
+				bookmarked.set(true);
 			}
 		);
 
-		return isAdded[0];
+		return bookmarked.get();
 
 	}
 
@@ -377,19 +376,17 @@ public class WebtoonService {
 		return cursorPaginationService.create(result, size, cursor);
 	}
 
-	//좋아요 기능
-
 	@Transactional
 	public boolean toggleWebtoonLike(Long webtoonId, Long userId) {
 		Optional<WebtoonLike> likeOPt = webtoonLikeRepository
 			.findByWebtoonIdAndUserId(webtoonId, userId);
 
-		final boolean[] isAdded = new boolean[1];
+		AtomicBoolean liked = new AtomicBoolean(false);
 
 		likeOPt.ifPresentOrElse(
 			webtoonLike -> {
 				webtoonLikeRepository.delete(webtoonLike);
-				isAdded[0] = false;
+				liked.set(true);
 			},
 
 			() -> {
@@ -397,12 +394,11 @@ public class WebtoonService {
 				Webtoon webtoon = webtoonRepository.findById(webtoonId)
 					.orElseThrow(() -> new BusinessException(WEBTOON_NOT_FOUND));
 				webtoonLikeRepository.save(new WebtoonLike(user, webtoon));
-				isAdded[0] = true;
+				liked.set(true);
 			}
-
 		);
 
-		return isAdded[0];
+		return liked.get();
 	}
 
 	@Transactional(readOnly = true)
@@ -412,5 +408,4 @@ public class WebtoonService {
 
 		return new WebtoonLikeStatusDto(liked, count);
 	}
-
 }

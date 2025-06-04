@@ -6,6 +6,8 @@ import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
 import com.akatsuki.newsum.common.entity.BaseTimeEntity;
+import com.akatsuki.newsum.domain.webtoon.entity.webtoon.Keyword;
+import com.akatsuki.newsum.domain.webtoon.entity.webtoon.KeywordFavorite;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -70,5 +72,9 @@ public class User extends BaseTimeEntity {
 
 	public User(Long id) {
 		this.id = id;
+	}
+
+	public KeywordFavorite subscribeKeyword(Keyword keyword) {
+		return new KeywordFavorite(this, keyword);
 	}
 }
