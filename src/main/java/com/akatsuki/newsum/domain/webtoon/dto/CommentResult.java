@@ -9,9 +9,10 @@ public record CommentResult(
 	String authorProfileImageUrl,
 	LocalDateTime createdAt,
 	Boolean isLiked,
-	Boolean isOwner
+	Boolean isOwner,
+	Long likeCount
 ) {
-	public static CommentResult of(CommentReadDto commentReadDto, Boolean isLiked, Boolean isOwner) {
+	public static CommentResult of(CommentReadDto commentReadDto, Boolean isLiked, Boolean isOwner, long likeCount) {
 		return new CommentResult(
 			commentReadDto.getId(),
 			commentReadDto.getContent(),
@@ -19,7 +20,8 @@ public record CommentResult(
 			commentReadDto.getAuthorProfileImageUrl(),
 			commentReadDto.getCreatedAt(),
 			isLiked,
-			isOwner
+			isOwner,
+			likeCount
 		);
 	}
 }
