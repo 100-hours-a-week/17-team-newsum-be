@@ -139,6 +139,51 @@ public class WebtoonQueryRepositoryImpl implements WebtoonQueryRepository {
 			.fetch();
 	}
 
+	@Override
+	public List<Webtoon> searchByUserKeywordBookmarks(String ftsQuery, Cursor cursor, int size) {
+		CreatedAtIdCursor createdAtIdCursor = (CreatedAtIdCursor)cursor;
+
+		final String sql = """
+				SELECT DISTINCT w.id,
+					w.title,
+					w.content,
+					w.created_at,
+					w.thumbnail_image_url,
+					w.view_count
+				FROM webtoon w
+				LEFT JOIN webtoon_detail d ON w.id = d.webtoon_id
+				WHERE (
+					to_tsvector('simple', coalesce(w.title, '') || ' ' || coalesce(w.content, '')) @@ plainto_tsquery('simple', ?)
+					OR
+					to_tsvector('simple', coalesce(d.content, '')) @@ plainto_tsquery('simple', ?)
+				)
+				AND (
+					w.created_at < ?
+					OR (w.created_at = ? AND w.id < ?)
+				)
+				ORDER BY w.created_at DESC, w.id DESC
+				LIMIT ?
+			""";
+
+		return jdbcTemplate.query(sql,
+			new Object[] {
+				ftsQuery,        // for webtoon.title + content
+				ftsQuery,        // for webtoon_detail.content
+				createdAtIdCursor.getCreatedAt(),
+				createdAtIdCursor.getCreatedAt(),
+				createdAtIdCursor.getId(),
+				size + 1
+			},
+			(rs, rowNum) -> new Webtoon(
+				rs.getTimestamp("created_at").toLocalDateTime(),
+				rs.getLong("id"),
+				rs.getString("title"),
+				rs.getString("thumbnail_image_url"),
+				rs.getLong("view_count")
+			)
+		);
+	}
+
 	private QueryFragment buildQueryFragment(Cursor cursor) {
 		CursorPageQueryBuilder<Cursor> queryBuilder = cursorQueryRegistry.resolve(QWebtoon.class, cursor,
 			QueryEngineType.QUERYDSL);

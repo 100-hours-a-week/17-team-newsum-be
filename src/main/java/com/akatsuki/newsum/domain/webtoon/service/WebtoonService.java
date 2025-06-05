@@ -51,6 +51,7 @@ import com.akatsuki.newsum.domain.webtoon.repository.RecentViewRepository;
 import com.akatsuki.newsum.domain.webtoon.repository.WebtoonDetailRepository;
 import com.akatsuki.newsum.domain.webtoon.repository.WebtoonFavoriteRepository;
 import com.akatsuki.newsum.domain.webtoon.repository.WebtoonLikeRepository;
+import com.akatsuki.newsum.domain.webtoon.repository.WebtoonQueryRepository;
 import com.akatsuki.newsum.domain.webtoon.repository.WebtoonRepository;
 import com.akatsuki.newsum.extern.dto.CreateWebtoonApiRequest;
 import com.akatsuki.newsum.extern.service.AiServerApiService;
@@ -74,6 +75,7 @@ public class WebtoonService {
 	private final WebtoonFavoriteRepository webtoonFavoriteRepository;
 	private final WebtoonLikeRepository webtoonLikeRepository;
 	private final CursorPaginationService cursorPaginationService;
+	private final WebtoonQueryRepository webtoonQueryRepository;
 
 	private final int RECENT_WEBTOON_LIMIT = 4;
 	private final int RELATED_CATEGORY_SIZE = 2;
@@ -323,7 +325,7 @@ public class WebtoonService {
 		String query = String.join(" | ", keywordContents);
 
 		//합친걸 기반으로 웹툰 검색을 시작함
-		List<Webtoon> webtoons = webtoonQueryRepository.searchByUserKeywordBookmarks(query, cursor, size);
+		List<Webtoon> webtoons = webtoonRepository.searchByUserKeywordBookmarks(query, cursor, size);
 		return webtoons.stream()
 			.map(WebtoonCardDto::from)
 			.toList();
