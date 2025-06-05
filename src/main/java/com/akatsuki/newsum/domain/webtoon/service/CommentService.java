@@ -55,8 +55,6 @@ public class CommentService {
 			allSubComments.stream().map(CommentReadDto::getId)
 		).toList();
 
-		//비회원일 경우 비어있는 set 으로 호출하기
-		
 		Set<Long> likedCommentIds = commentLikeRepository.findLikedCommentIdsByUserIdAndCommentIds(id, allCommentIds);
 		List<CommentResult> parentCommentResult = getParentCommentResults(id, allParentComments, likedCommentIds);
 		Map<Long, List<CommentResult>> subCommentsGroupByParentId = collectSubCommentResultByParentId(allSubComments,
