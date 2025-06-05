@@ -1,5 +1,7 @@
 package com.akatsuki.newsum.domain.user.dto;
 
+import jakarta.validation.constraints.NotBlank;
+
 public interface OAuthUserInfo {
 	String getEmail();
 
@@ -8,4 +10,10 @@ public interface OAuthUserInfo {
 	String getPicture();
 
 	String getId();
+
+	record KeywordSubscriptionRequest(
+		@NotBlank
+		String keyword
+	) {
+	}
 }
