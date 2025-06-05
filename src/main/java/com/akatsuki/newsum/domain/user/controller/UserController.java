@@ -142,6 +142,27 @@ public class UserController {
 		);
 	}
 
+	@GetMapping("/keywords/webtoons")
+	public ResponseEntity<ApiResponse<KeywordListResponseDto>> getWebtoonsByKeywordBookmarks(
+		@AuthenticationPrincipal UserDetailsImpl userDetails,
+		@CursorParam Cursor cusor,
+		@RequestParam(defaultValue = "10") int size
+	) {
+		Long userId = getUserId(userDetails);
+
+		List<WebtoonCardDto> webtoons = webtoonService.findWebtoonsByUserKeywords(userId, cursor, size);
+		CursorPage<WebtoonCardDto> page = cursorPaginationService.create(webtoons, size, cursor);
+
+		UserFavoriteWebtoonsResponse response = new UserFavoriteWebtoonsResponse(
+			page.getItems(),
+			page.getPageInfo()
+		);
+
+		return ResponseEntity.ok(
+			ApiResponse.success(ResponseCodeAndMessage.WEBTOON_LIST_SUCCESS, response)
+		);
+	}
+
 	private Long getUserId(
 		UserDetailsImpl userDetails) {
 		if (userDetails == null) {

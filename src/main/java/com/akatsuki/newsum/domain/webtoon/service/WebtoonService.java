@@ -228,6 +228,83 @@ public class WebtoonService {
 			.toList();
 	}
 
+	@Transactional
+	public boolean toggleBookmark(Long webtoonId, Long userId) {
+		Optional<WebtoonFavorite> favoriteOpt = webtoonFavoriteRepository
+			.findByWebtoonIdAndUserId(webtoonId, userId);
+
+		AtomicBoolean bookmarked = new AtomicBoolean(false);
+
+		favoriteOpt.ifPresentOrElse(
+			favorite -> {
+				webtoonFavoriteRepository.delete(favorite);
+				bookmarked.set(false);
+			},
+			() -> {
+				User user = new User(userId);
+				Webtoon webtoon = webtoonRepository.findById(webtoonId)
+					.orElseThrow(() -> new BusinessException(WEBTOON_NOT_FOUND));
+				webtoonFavoriteRepository.save(new WebtoonFavorite(user, webtoon));
+				bookmarked.set(true);
+			}
+		);
+
+		return bookmarked.get();
+
+	}
+
+	public CursorPage<WebtoonCardDto> getBookmarkedWebtoonCards(Long userId, Cursor cursor, int size) {
+		List<WebtoonFavorite> favorites = webtoonFavoriteRepository
+			.findFavoritesByUserIdWithCursor(userId, cursor, size);
+
+		List<WebtoonCardDto> result = favorites.stream()
+			.map(fav -> {
+				Webtoon webtoon = fav.getWebtoon();
+				return new WebtoonCardDto(
+					webtoon.getId(),
+					webtoon.getTitle(),
+					webtoon.getThumbnailImageUrl(),
+					fav.getCreatedAt(),
+					webtoon.getViewCount()
+				);
+			})
+			.toList();
+		return cursorPaginationService.create(result, size, cursor);
+	}
+
+	@Transactional
+	public boolean toggleWebtoonLike(Long webtoonId, Long userId) {
+		Optional<WebtoonLike> likeOPt = webtoonLikeRepository
+			.findByWebtoonIdAndUserId(webtoonId, userId);
+
+		AtomicBoolean liked = new AtomicBoolean(false);
+
+		likeOPt.ifPresentOrElse(
+			webtoonLike -> {
+				webtoonLikeRepository.delete(webtoonLike);
+				liked.set(true);
+			},
+
+			() -> {
+				User user = new User(userId);
+				Webtoon webtoon = webtoonRepository.findById(webtoonId)
+					.orElseThrow(() -> new BusinessException(WEBTOON_NOT_FOUND));
+				webtoonLikeRepository.save(new WebtoonLike(user, webtoon));
+				liked.set(true);
+			}
+		);
+
+		return liked.get();
+	}
+
+	@Transactional(readOnly = true)
+	public WebtoonLikeStatusDto getWebtoonLikeStatus(Long webtoonId, Long userId) {
+		boolean liked = webtoonLikeRepository.existsByWebtoonIdAndUserId(webtoonId, userId);
+		long count = webtoonLikeRepository.countByWebtoonId(webtoonId);
+
+		return new WebtoonLikeStatusDto(liked, count);
+	}
+
 	private AiAuthor findAiAuthorById(Long id) {
 		return aiAuthorRepository.findById(id)
 			.orElseThrow(() -> new NotFoundException(ErrorCodeAndMessage.AI_AUTHOR_NOT_FOUND));
@@ -330,82 +407,5 @@ public class WebtoonService {
 			webtoon.getCreatedAt(),
 			webtoon.getViewCount()
 		);
-	}
-
-	@Transactional
-	public boolean toggleBookmark(Long webtoonId, Long userId) {
-		Optional<WebtoonFavorite> favoriteOpt = webtoonFavoriteRepository
-			.findByWebtoonIdAndUserId(webtoonId, userId);
-
-		AtomicBoolean bookmarked = new AtomicBoolean(false);
-
-		favoriteOpt.ifPresentOrElse(
-			favorite -> {
-				webtoonFavoriteRepository.delete(favorite);
-				bookmarked.set(false);
-			},
-			() -> {
-				User user = new User(userId);
-				Webtoon webtoon = webtoonRepository.findById(webtoonId)
-					.orElseThrow(() -> new BusinessException(WEBTOON_NOT_FOUND));
-				webtoonFavoriteRepository.save(new WebtoonFavorite(user, webtoon));
-				bookmarked.set(true);
-			}
-		);
-
-		return bookmarked.get();
-
-	}
-
-	public CursorPage<WebtoonCardDto> getBookmarkedWebtoonCards(Long userId, Cursor cursor, int size) {
-		List<WebtoonFavorite> favorites = webtoonFavoriteRepository
-			.findFavoritesByUserIdWithCursor(userId, cursor, size);
-
-		List<WebtoonCardDto> result = favorites.stream()
-			.map(fav -> {
-				Webtoon webtoon = fav.getWebtoon();
-				return new WebtoonCardDto(
-					webtoon.getId(),
-					webtoon.getTitle(),
-					webtoon.getThumbnailImageUrl(),
-					fav.getCreatedAt(),
-					webtoon.getViewCount()
-				);
-			})
-			.toList();
-		return cursorPaginationService.create(result, size, cursor);
-	}
-
-	@Transactional
-	public boolean toggleWebtoonLike(Long webtoonId, Long userId) {
-		Optional<WebtoonLike> likeOPt = webtoonLikeRepository
-			.findByWebtoonIdAndUserId(webtoonId, userId);
-
-		AtomicBoolean liked = new AtomicBoolean(false);
-
-		likeOPt.ifPresentOrElse(
-			webtoonLike -> {
-				webtoonLikeRepository.delete(webtoonLike);
-				liked.set(true);
-			},
-
-			() -> {
-				User user = new User(userId);
-				Webtoon webtoon = webtoonRepository.findById(webtoonId)
-					.orElseThrow(() -> new BusinessException(WEBTOON_NOT_FOUND));
-				webtoonLikeRepository.save(new WebtoonLike(user, webtoon));
-				liked.set(true);
-			}
-		);
-
-		return liked.get();
-	}
-
-	@Transactional(readOnly = true)
-	public WebtoonLikeStatusDto getWebtoonLikeStatus(Long webtoonId, Long userId) {
-		boolean liked = webtoonLikeRepository.existsByWebtoonIdAndUserId(webtoonId, userId);
-		long count = webtoonLikeRepository.countByWebtoonId(webtoonId);
-
-		return new WebtoonLikeStatusDto(liked, count);
 	}
 }
