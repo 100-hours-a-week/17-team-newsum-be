@@ -27,6 +27,7 @@ import com.akatsuki.newsum.common.pagination.model.page.CursorPage;
 import com.akatsuki.newsum.domain.aiAuthor.entity.AiAuthor;
 import com.akatsuki.newsum.domain.aiAuthor.repository.AiAuthorRepository;
 import com.akatsuki.newsum.domain.user.entity.User;
+import com.akatsuki.newsum.domain.user.repository.KeywordFavoriteRepository;
 import com.akatsuki.newsum.domain.user.repository.UserRepository;
 import com.akatsuki.newsum.domain.webtoon.dto.AiAuthorInfoDto;
 import com.akatsuki.newsum.domain.webtoon.dto.CreateWebtoonReqeust;
@@ -37,6 +38,7 @@ import com.akatsuki.newsum.domain.webtoon.dto.WebtoonResponse;
 import com.akatsuki.newsum.domain.webtoon.dto.WebtoonSlideDto;
 import com.akatsuki.newsum.domain.webtoon.dto.WebtoonSourceDto;
 import com.akatsuki.newsum.domain.webtoon.entity.webtoon.Category;
+import com.akatsuki.newsum.domain.webtoon.entity.webtoon.KeywordFavorite;
 import com.akatsuki.newsum.domain.webtoon.entity.webtoon.NewsSource;
 import com.akatsuki.newsum.domain.webtoon.entity.webtoon.RecentView;
 import com.akatsuki.newsum.domain.webtoon.entity.webtoon.Webtoon;
@@ -77,6 +79,7 @@ public class WebtoonService {
 	private final int RELATED_CATEGORY_SIZE = 2;
 	private final int RELATED_AI_AUTHOR_SIZE = 2;
 	private final int RELATED_NEWS_SIZE = RELATED_CATEGORY_SIZE + RELATED_AI_AUTHOR_SIZE;
+	private final KeywordFavoriteRepository keywordFavoriteRepository;
 
 	public List<WebtoonCardDto> findWebtoonsByCategory(String category, Cursor cursor, int size) {
 		List<Webtoon> webtoons = webtoonRepository.findWebtoonByCategoryWithCursor(Category.valueOf(category), cursor,
@@ -303,6 +306,27 @@ public class WebtoonService {
 		long count = webtoonLikeRepository.countByWebtoonId(webtoonId);
 
 		return new WebtoonLikeStatusDto(liked, count);
+	}
+
+	public List<WebtoonCardDto> findWebtoonsByUserKeywords(Long userId, Cursor cursor, int size) {
+		List<KeywordFavorite> keywords = keywordFavoriteRepository.findByuserId(userId);
+		if (keywords.isEmpty()) {
+			return Collections.emptyList();
+		}
+
+		//받아온 유저기반id의 키워드아이디, 일자들을 string 으로 변환해야함
+		List<String> keywordContents = keywords.stream()
+			.map(favorite -> favorite.getKeyword().getContent())
+			.toList();
+
+		//변환한걸 다시 키워드끼리 합침
+		String query = String.join(" | ", keywordContents);
+
+		//합친걸 기반으로 웹툰 검색을 시작함
+		List<Webtoon> webtoons = webtoonQueryRepository.searchByUserKeywordBookmarks(query, cursor, size);
+		return webtoons.stream()
+			.map(WebtoonCardDto::from)
+			.toList();
 	}
 
 	private AiAuthor findAiAuthorById(Long id) {
