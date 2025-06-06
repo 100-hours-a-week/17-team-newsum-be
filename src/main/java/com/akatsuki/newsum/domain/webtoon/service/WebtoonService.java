@@ -26,9 +26,13 @@ import com.akatsuki.newsum.common.pagination.model.cursor.Cursor;
 import com.akatsuki.newsum.common.pagination.model.page.CursorPage;
 import com.akatsuki.newsum.domain.aiAuthor.entity.AiAuthor;
 import com.akatsuki.newsum.domain.aiAuthor.repository.AiAuthorRepository;
+import com.akatsuki.newsum.domain.user.dto.KeywordListResponse;
+import com.akatsuki.newsum.domain.user.dto.KeywordResponse;
 import com.akatsuki.newsum.domain.user.entity.User;
 import com.akatsuki.newsum.domain.user.repository.KeywordFavoriteRepository;
+import com.akatsuki.newsum.domain.user.repository.KeywordRepository;
 import com.akatsuki.newsum.domain.user.repository.UserRepository;
+import com.akatsuki.newsum.domain.user.service.KeywordService;
 import com.akatsuki.newsum.domain.webtoon.dto.AiAuthorInfoDto;
 import com.akatsuki.newsum.domain.webtoon.dto.CreateWebtoonReqeust;
 import com.akatsuki.newsum.domain.webtoon.dto.WebtoonCardDto;
@@ -38,7 +42,6 @@ import com.akatsuki.newsum.domain.webtoon.dto.WebtoonResponse;
 import com.akatsuki.newsum.domain.webtoon.dto.WebtoonSlideDto;
 import com.akatsuki.newsum.domain.webtoon.dto.WebtoonSourceDto;
 import com.akatsuki.newsum.domain.webtoon.entity.webtoon.Category;
-import com.akatsuki.newsum.domain.webtoon.entity.webtoon.KeywordFavorite;
 import com.akatsuki.newsum.domain.webtoon.entity.webtoon.NewsSource;
 import com.akatsuki.newsum.domain.webtoon.entity.webtoon.RecentView;
 import com.akatsuki.newsum.domain.webtoon.entity.webtoon.Webtoon;
@@ -80,6 +83,8 @@ public class WebtoonService {
 	private final int RELATED_AI_AUTHOR_SIZE = 2;
 	private final int RELATED_NEWS_SIZE = RELATED_CATEGORY_SIZE + RELATED_AI_AUTHOR_SIZE;
 	private final KeywordFavoriteRepository keywordFavoriteRepository;
+	private final KeywordRepository keywordRepository;
+	private final KeywordService keywordService;
 
 	public List<WebtoonCardDto> findWebtoonsByCategory(String category, Cursor cursor, int size) {
 		List<Webtoon> webtoons = webtoonRepository.findWebtoonByCategoryWithCursor(Category.valueOf(category), cursor,
@@ -309,27 +314,19 @@ public class WebtoonService {
 	}
 
 	public List<WebtoonCardDto> findWebtoonsByUserKeywords(Long userId, Cursor cursor, int size) {
-		//dto로 받게 수정
-		List<KeywordFavorite> keywords = keywordFavoriteRepository.findByUserId(userId);
-		if (keywords.isEmpty()) {
-			return Collections.emptyList();
-		}
-		//받아온 유저기반id의 키워드아이디, 일자들을 string 으로 변환해야함
-		List<String> keywordContents = keywords.stream()
-			.map(favorite -> favorite.getKeyword().getContent())
-			.filter(content -> content != null && !content.trim().isEmpty())
-			.toList();
+		KeywordListResponse keywordList = keywordService.getKeywordList(userId);
 
-		if (keywordContents.isEmpty()) {
-			return Collections.emptyList();
-		}
-		//변환한걸 다시 키워드끼리 합침
-		String query = keywordContents.stream()
-			.map(k -> k.replaceAll("[:&|!]", "")) // 특수문자 제거하자
+		String query = keywordList.keywords().stream()
+			.map(KeywordResponse::content)
+			.filter(content -> content != null && !content.trim().isEmpty())
+			.map(content -> content.replaceAll("[:&|!]", ""))
 			.collect(Collectors.joining(" | "));
 
-		//합친걸 기반으로 웹툰 검색을 시작함
+		if (query.isBlank())
+			return Collections.emptyList();
+
 		List<Webtoon> webtoons = webtoonRepository.searchByUserKeywordBookmarks(query, cursor, size);
+
 		return webtoons.stream()
 			.map(WebtoonCardDto::from)
 			.toList();
