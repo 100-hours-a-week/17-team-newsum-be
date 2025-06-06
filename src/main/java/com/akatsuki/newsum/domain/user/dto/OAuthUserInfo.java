@@ -7,8 +7,6 @@ public interface OAuthUserInfo {
 
 	String getName();
 
-	String getPicture();
-
 	String getId();
 
 	record KeywordSubscriptionRequest(
