@@ -314,7 +314,6 @@ public class WebtoonService {
 		if (keywords.isEmpty()) {
 			return Collections.emptyList();
 		}
-
 		//받아온 유저기반id의 키워드아이디, 일자들을 string 으로 변환해야함
 		List<String> keywordContents = keywords.stream()
 			.map(favorite -> favorite.getKeyword().getContent())
@@ -324,7 +323,6 @@ public class WebtoonService {
 		if (keywordContents.isEmpty()) {
 			return Collections.emptyList();
 		}
-
 		//변환한걸 다시 키워드끼리 합침
 		String query = keywordContents.stream()
 			.map(k -> k.replaceAll("[:&|!]", "")) // 특수문자 제거하자
