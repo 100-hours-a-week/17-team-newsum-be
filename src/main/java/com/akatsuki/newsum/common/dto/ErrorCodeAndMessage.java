@@ -19,6 +19,7 @@ public enum ErrorCodeAndMessage {
 	CONFLICT(HttpStatus.CONFLICT.value(), "리소스 상태가 충돌합니다."),
 	PRECONDITION_FAILED(HttpStatus.PRECONDITION_FAILED.value(), "사전 조건이 충족되지 않았습니다."),
 	UNPROCESSABLE_ENTITY(HttpStatus.UNPROCESSABLE_ENTITY.value(), "요청은 유효하나 처리할 수 없습니다."),
+	INVALID_INPUT(HttpStatus.BAD_REQUEST.value(), "잘못된 입력값입니다."),
 
 	//커서, 페이지 네이션 관련 오류
 	CURSOR_WRONG_EXPRESSION(HttpStatus.BAD_REQUEST.value(), "지원하지 않는 커서 형식입니다."),

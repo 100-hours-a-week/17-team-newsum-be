@@ -167,14 +167,6 @@ public class WebtoonController {
 		);
 	}
 
-	private Long getUserId(
-		UserDetailsImpl userDetails) {
-		if (userDetails == null) {
-			return null;
-		}
-		return userDetails.getUserId();
-	}
-
 	@PostMapping("/{webtoonId}/favorites")
 	public ResponseEntity<ApiResponse<Boolean>> toggleFavorites(
 		@PathVariable Long webtoonId,
@@ -186,7 +178,6 @@ public class WebtoonController {
 		);
 	}
 
-	//웹툰 좋아요
 	@PostMapping("/{webtoonId}/likes")
 	public ResponseEntity<ApiResponse<WebtoonLikeStatusDto>> like(
 		@PathVariable Long webtoonId,
@@ -203,6 +194,14 @@ public class WebtoonController {
 			ApiResponse.success(ResponseCodeAndMessage.WEBTOON_LIKE_SUCCESS, dto)
 		);
 
+	}
+
+	private Long getUserId(
+		UserDetailsImpl userDetails) {
+		if (userDetails == null) {
+			return null;
+		}
+		return userDetails.getUserId();
 	}
 
 }
