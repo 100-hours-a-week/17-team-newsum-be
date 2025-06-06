@@ -11,4 +11,6 @@ public interface KeywordFavoriteRepository extends JpaRepository<KeywordFavorite
 	List<KeywordFavorite> findByuserId(Long userid);
 
 	Optional<KeywordFavorite> findByUserIdAndKeywordId(Long userId, Long keywordId);
+
+	List<KeywordFavorite> findByUserId(Long userId);
 }

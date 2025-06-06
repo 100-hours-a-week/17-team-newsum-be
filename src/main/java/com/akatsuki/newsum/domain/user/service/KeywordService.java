@@ -10,6 +10,7 @@ import com.akatsuki.newsum.common.dto.ErrorCodeAndMessage;
 import com.akatsuki.newsum.common.exception.BusinessException;
 import com.akatsuki.newsum.common.exception.NotFoundException;
 import com.akatsuki.newsum.domain.user.dto.KeywordListResponse;
+import com.akatsuki.newsum.domain.user.dto.KeywordResponse;
 import com.akatsuki.newsum.domain.user.entity.User;
 import com.akatsuki.newsum.domain.user.repository.KeywordFavoriteRepository;
 import com.akatsuki.newsum.domain.user.repository.KeywordRepository;
@@ -47,8 +48,17 @@ public class KeywordService {
 	}
 
 	public KeywordListResponse getKeywordList(Long userId) {
-		List<KeywordFavorite> favorites = keywordFavoriteRepository.findByuserId(userId);
-		return KeywordListResponse.from(favorites);
+		List<KeywordFavorite> favorites = keywordFavoriteRepository.findByUserId(userId);
+
+		List<KeywordResponse> keywordDtos = favorites.stream()
+			.map(fav -> KeywordResponse.of(
+				fav.getKeyword().getId(),
+				fav.getKeyword().getContent(),
+				fav.getCreatedAt()
+			))
+			.toList();
+
+		return new KeywordListResponse(keywordDtos);
 	}
 
 	private User findUserById(Long userId) {
