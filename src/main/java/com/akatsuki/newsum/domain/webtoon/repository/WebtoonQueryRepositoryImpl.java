@@ -153,9 +153,9 @@ public class WebtoonQueryRepositoryImpl implements WebtoonQueryRepository {
 				FROM webtoon w
 				LEFT JOIN webtoon_detail d ON w.id = d.webtoon_id
 				WHERE (
-					to_tsvector('simple', coalesce(w.title, '') || ' ' || coalesce(w.content, '')) @@ plainto_tsquery('simple', ?)
+					to_tsvector('simple', coalesce(w.title, '') || ' ' || coalesce(w.content, '')) @@ to_tsquery('simple', ?)
 					OR
-					to_tsvector('simple', coalesce(d.content, '')) @@ plainto_tsquery('simple', ?)
+					to_tsvector('simple', coalesce(d.content, '')) @@ to_tsquery('simple', ?)
 				)
 				AND (
 					w.created_at < ?
