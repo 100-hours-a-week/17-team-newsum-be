@@ -21,8 +21,8 @@ import com.akatsuki.newsum.common.pagination.annotation.CursorParam;
 import com.akatsuki.newsum.common.pagination.model.cursor.Cursor;
 import com.akatsuki.newsum.common.pagination.model.page.CursorPage;
 import com.akatsuki.newsum.common.security.UserDetailsImpl;
-import com.akatsuki.newsum.domain.user.dto.KeywordListResponseDto;
-import com.akatsuki.newsum.domain.user.dto.OAuthUserInfo;
+import com.akatsuki.newsum.domain.user.dto.KeywordListResponse;
+import com.akatsuki.newsum.domain.user.dto.KeywordSubscriptionRequest;
 import com.akatsuki.newsum.domain.user.dto.RecentViewWebtoonListResponse;
 import com.akatsuki.newsum.domain.user.dto.UpdateUserRequestDto;
 import com.akatsuki.newsum.domain.user.dto.UpdateUserResponseDto;
@@ -109,7 +109,7 @@ public class UserController {
 	@PostMapping("/keywords/subscriptions")
 	public ResponseEntity<ApiResponse> addKeyword(
 		@AuthenticationPrincipal UserDetailsImpl userDetails,
-		@RequestBody @Valid OAuthUserInfo.KeywordSubscriptionRequest request
+		@RequestBody @Valid KeywordSubscriptionRequest request
 	) {
 		Long userId = getUserId(userDetails);
 		keywordService.subscribeKeyword(userId, request.keyword());
@@ -131,11 +131,11 @@ public class UserController {
 	}
 
 	@GetMapping("/keywords")
-	public ResponseEntity<ApiResponse<KeywordListResponseDto>> getKeywordList(
+	public ResponseEntity<ApiResponse<KeywordListResponse>> getKeywordList(
 		@AuthenticationPrincipal UserDetailsImpl userDetails
 	) {
 		Long userId = getUserId(userDetails);
-		KeywordListResponseDto result = keywordService.getKeywordList(userId);
+		KeywordListResponse result = keywordService.getKeywordList(userId);
 
 		return ResponseEntity.ok(
 			ApiResponse.success(ResponseCodeAndMessage.KEYWORD_LIST_SUCCESS, result)
