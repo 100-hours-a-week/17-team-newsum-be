@@ -144,34 +144,48 @@ public class WebtoonQueryRepositoryImpl implements WebtoonQueryRepository {
 		CreatedAtIdCursor createdAtIdCursor = (CreatedAtIdCursor)cursor;
 
 		final String sql = """
-				SELECT DISTINCT w.id,
-					w.title,
-					w.content,
-					w.created_at,
-					w.thumbnail_image_url,
-					w.view_count
-				FROM webtoon w
-				LEFT JOIN webtoon_detail d ON w.id = d.webtoon_id
-				WHERE (
-					to_tsvector('simple', coalesce(w.title, '') || ' ' || coalesce(w.content, '')) @@ to_tsquery('simple', ?)
-					OR
-					to_tsvector('simple', coalesce(d.content, '')) @@ to_tsquery('simple', ?)
-				)
-				AND (
-					w.created_at < ?
-					OR (w.created_at = ? AND w.id < ?)
-				)
-				ORDER BY w.created_at DESC, w.id DESC
-				LIMIT ?
+			SELECT w.id,
+			       w.title,
+			       w.content,
+			       w.created_at,
+			       w.thumbnail_image_url,
+			       w.view_count
+			FROM webtoon w
+			WHERE to_tsvector('simple', coalesce(w.title, '') || ' ' || coalesce(w.content, '')) @@ to_tsquery('simple', ?)
+			  AND (w.created_at < ? OR (w.created_at = ? AND w.id < ?))
+
+			UNION
+
+			SELECT w.id,
+			       w.title,
+			       w.content,
+			       w.created_at,
+			       w.thumbnail_image_url,
+			       w.view_count
+			FROM webtoon w
+			JOIN (
+				SELECT DISTINCT webtoon_id
+				FROM webtoon_detail
+				WHERE to_tsvector('simple', coalesce(content, '')) @@ to_tsquery('simple', ?)
+			) d ON w.id = d.webtoon_id
+			WHERE (w.created_at < ? OR (w.created_at = ? AND w.id < ?))
+
+			ORDER BY created_at DESC, id DESC
+			LIMIT ?
 			""";
 
 		return jdbcTemplate.query(sql,
 			new Object[] {
-				ftsQuery,        // for webtoon.title + content
-				ftsQuery,        // for webtoon_detail.content
+				ftsQuery, // for webtoon
 				createdAtIdCursor.getCreatedAt(),
 				createdAtIdCursor.getCreatedAt(),
 				createdAtIdCursor.getId(),
+
+				ftsQuery, // for webtoon_detail
+				createdAtIdCursor.getCreatedAt(),
+				createdAtIdCursor.getCreatedAt(),
+				createdAtIdCursor.getId(),
+
 				size + 1
 			},
 			(rs, rowNum) -> new Webtoon(
