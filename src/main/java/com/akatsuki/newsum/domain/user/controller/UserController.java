@@ -21,6 +21,8 @@ import com.akatsuki.newsum.common.pagination.annotation.CursorParam;
 import com.akatsuki.newsum.common.pagination.model.cursor.Cursor;
 import com.akatsuki.newsum.common.pagination.model.page.CursorPage;
 import com.akatsuki.newsum.common.security.UserDetailsImpl;
+import com.akatsuki.newsum.domain.user.dto.KeywordListResponse;
+import com.akatsuki.newsum.domain.user.dto.KeywordSubscriptionRequest;
 import com.akatsuki.newsum.domain.user.dto.RecentViewWebtoonListResponse;
 import com.akatsuki.newsum.domain.user.dto.UpdateUserRequestDto;
 import com.akatsuki.newsum.domain.user.dto.UpdateUserResponseDto;
@@ -28,7 +30,6 @@ import com.akatsuki.newsum.domain.user.dto.UserFavoriteWebtoonsResponse;
 import com.akatsuki.newsum.domain.user.dto.UserProfileDto;
 import com.akatsuki.newsum.domain.user.service.KeywordService;
 import com.akatsuki.newsum.domain.user.service.UserService;
-import com.akatsuki.newsum.domain.webtoon.dto.KeywordSubscriptionRequest;
 import com.akatsuki.newsum.domain.webtoon.dto.WebtoonCardDto;
 import com.akatsuki.newsum.domain.webtoon.service.WebtoonService;
 
@@ -129,6 +130,18 @@ public class UserController {
 		return ResponseEntity.noContent().build();
 	}
 
+	@GetMapping("/keywords")
+	public ResponseEntity<ApiResponse<KeywordListResponse>> getKeywordList(
+		@AuthenticationPrincipal UserDetailsImpl userDetails
+	) {
+		Long userId = getUserId(userDetails);
+		KeywordListResponse result = keywordService.getKeywordList(userId);
+
+		return ResponseEntity.ok(
+			ApiResponse.success(ResponseCodeAndMessage.KEYWORD_LIST_SUCCESS, result)
+		);
+	}
+
 	private Long getUserId(
 		UserDetailsImpl userDetails) {
 		if (userDetails == null) {
@@ -136,5 +149,4 @@ public class UserController {
 		}
 		return userDetails.getUserId();
 	}
-
 }
