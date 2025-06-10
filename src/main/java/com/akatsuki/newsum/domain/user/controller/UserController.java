@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.akatsuki.newsum.common.dto.ApiResponse;
 import com.akatsuki.newsum.common.dto.ResponseCodeAndMessage;
+import com.akatsuki.newsum.common.pagination.CursorPaginationService;
 import com.akatsuki.newsum.common.pagination.annotation.CursorParam;
 import com.akatsuki.newsum.common.pagination.model.cursor.Cursor;
 import com.akatsuki.newsum.common.pagination.model.page.CursorPage;
@@ -44,6 +45,7 @@ public class UserController {
 	private final UserService userService;
 	private final WebtoonService webtoonService;
 	private final KeywordService keywordService;
+	private final CursorPaginationService cursorPaginationService;
 
 	@GetMapping("/profile")
 	public ResponseEntity<ApiResponse<UserProfileDto>> getProfile(
@@ -142,6 +144,27 @@ public class UserController {
 		);
 	}
 
+	@GetMapping("/keywords/webtoons")
+	public ResponseEntity<ApiResponse<UserFavoriteWebtoonsResponse>> getWebtoonsByKeywordBookmarks(
+		@AuthenticationPrincipal UserDetailsImpl userDetails,
+		@CursorParam Cursor cursor,
+		@RequestParam(defaultValue = "10") int size
+	) {
+		Long userId = getUserId(userDetails);
+
+		List<WebtoonCardDto> webtoons = webtoonService.findWebtoonsByUserKeywords(userId, cursor, size);
+		CursorPage<WebtoonCardDto> page = cursorPaginationService.create(webtoons, size, cursor);
+
+		UserFavoriteWebtoonsResponse response = new UserFavoriteWebtoonsResponse(
+			page.getItems(),
+			page.getPageInfo()
+		);
+
+		return ResponseEntity.ok(
+			ApiResponse.success(ResponseCodeAndMessage.WEBTOON_LIST_SUCCESS, response)
+		);
+	}
+
 	private Long getUserId(
 		UserDetailsImpl userDetails) {
 		if (userDetails == null) {
@@ -149,4 +172,5 @@ public class UserController {
 		}
 		return userDetails.getUserId();
 	}
+
 }
