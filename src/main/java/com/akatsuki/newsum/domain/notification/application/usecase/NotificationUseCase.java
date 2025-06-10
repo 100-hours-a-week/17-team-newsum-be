@@ -16,4 +16,6 @@ public interface NotificationUseCase {
 	void readNotification(Long userId, Long notificationId);
 
 	Boolean hasNotReadNotification(Long userId);
+
+	int deleteBefore7Days();
 }
