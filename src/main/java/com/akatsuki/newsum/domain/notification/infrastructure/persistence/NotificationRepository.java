@@ -1,5 +1,6 @@
 package com.akatsuki.newsum.domain.notification.infrastructure.persistence;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -20,4 +21,6 @@ public interface NotificationRepository {
 	Optional<Notification> findNotificationByIdAndUserById(Long id, Long userId);
 
 	Boolean existByUserId(Long userId);
+
+	int deleteBefore(LocalDateTime threshold);
 }

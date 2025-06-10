@@ -1,5 +1,6 @@
 package com.akatsuki.newsum.domain.notification.infrastructure.persistence;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -47,5 +48,10 @@ public class NotificationRepositoryImpl implements NotificationRepository {
 	@Override
 	public Boolean existByUserId(Long userId) {
 		return notificationJpaRepository.existsByUserId(userId);
+	}
+
+	@Override
+	public int deleteBefore(LocalDateTime threshold) {
+		return notificationJpaRepository.deleteBefore(threshold);
 	}
 }

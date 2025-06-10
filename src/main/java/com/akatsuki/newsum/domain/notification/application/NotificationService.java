@@ -2,6 +2,7 @@ package com.akatsuki.newsum.domain.notification.application;
 
 import static com.akatsuki.newsum.common.dto.ErrorCodeAndMessage.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -12,6 +13,7 @@ import com.akatsuki.newsum.common.exception.BusinessException;
 import com.akatsuki.newsum.common.exception.NotFoundException;
 import com.akatsuki.newsum.common.pagination.CursorPaginationService;
 import com.akatsuki.newsum.common.pagination.model.page.CursorPage;
+import com.akatsuki.newsum.common.util.DateUtil;
 import com.akatsuki.newsum.domain.notification.application.dto.NotificationPageListCommand;
 import com.akatsuki.newsum.domain.notification.application.dto.NotificationPageListResult;
 import com.akatsuki.newsum.domain.notification.application.dto.ReplyNotificationCommand;
@@ -111,6 +113,13 @@ public class NotificationService implements NotificationUseCase {
 	@Override
 	public Boolean hasNotReadNotification(Long userId) {
 		return notificationRepository.existByUserId(userId);
+	}
+
+	@Override
+	@Transactional
+	public int deleteBefore7Days() {
+		LocalDateTime threshold = DateUtil.beforeDaysFromToday(6);
+		return notificationRepository.deleteBefore(threshold);
 	}
 
 	private Notification findNotificationByIdAndUserById(Long notificationId, Long userId) {
