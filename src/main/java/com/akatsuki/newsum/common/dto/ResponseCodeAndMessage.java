@@ -53,7 +53,6 @@ public enum ResponseCodeAndMessage {
 	KEYWORD_SUBSCRIBE_SUCCESS(HttpStatus.OK.value(), "키워드 구독에 성공했습니다."),
 	WEBTOON_KEYWORD_SEARCH_SUCCESS(HttpStatus.OK.value(), "키워드 기반 웹툰 목록 조회에 성공했습니다."),
 	KEYWORD_LIST_SUCCESS(HttpStatus.OK.value(), "키워드 목록 조회에 성공했습니다");
-
 	private final int code;
 	private final String message;
 
