@@ -3,10 +3,10 @@ package com.akatsuki.newsum.domain.webtoon.entity.webtoon;
 import java.time.LocalDateTime;
 import java.util.Map;
 
-import com.akatsuki.newsum.common.converter.JsonbConverter;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import jakarta.persistence.Column;
-import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -60,7 +60,8 @@ public class ImageGenerationQueue {
 
 	// 이미지 및 대사
 	@Column(name = "image_prompts", columnDefinition = "jsonb")
-	@Convert(converter = JsonbConverter.class)
+	// @Convert(converter = JsonbConverter.class)
+	@JdbcTypeCode(SqlTypes.JSON)
 	private Map<String, Object> imagePrompts;
 
 	// 상태 및 시각

@@ -45,7 +45,7 @@ public class WebtoonController {
 	private final WebtoonService webtoonService;
 	private final CursorPaginationService cursorPaginationService;
 	private final NotificationUseCase notificationUseCase;
-	private final AiServerApiService aiServerApiService
+	private final AiServerApiService aiServerApiService;
 
 	@GetMapping
 	public ResponseEntity<ApiResponse<WebtoonListResponse>> getWebtoons(

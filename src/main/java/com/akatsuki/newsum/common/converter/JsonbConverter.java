@@ -14,10 +14,11 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class JsonbConverter implements AttributeConverter<Map<String, Object>, String> {
 
-	private final ObjectMapper mapper;
+	private static final ObjectMapper mapper = new ObjectMapper();
 
 	@Override
 	public String convertToDatabaseColumn(Map<String, Object> attribute) {
+		System.out.println("👉 JsonbConverter: convertToDatabaseColumn 호출됨");
 		try {
 			return mapper.writeValueAsString(attribute);
 		} catch (JsonProcessingException e) {
