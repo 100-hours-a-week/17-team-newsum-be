@@ -1,0 +1,103 @@
+name: Backend Dev CD
+
+on:
+  push:
+    branches:
+      - dev
+    paths-ignore:
+      - '**/README.md'
+      - '**/.gitignore'
+
+jobs:
+  build-for-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: 'gradle'
+
+      - name: Build with Gradle
+        run: |
+          ./gradlew clean build
+          mkdir -p deploy
+          cp build/libs/*.jar deploy/
+
+      - name: Upload deployment artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: deploy-jar
+          path: deploy/*.jar
+          retention-days: 1
+
+  deploy:
+    needs: build-for-deploy
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download deployment artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: deploy-jar
+          path: build/libs/
+
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY_DEV }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.EC2_HOST_DEV }} >> ~/.ssh/known_hosts
+
+      - name: Install Infisical CLI
+        run: |
+          curl -L https://${{ secrets.AWS_CLOUDFRONT_URL }}/tools/infisical-linux-amd64 -o infisical
+          chmod +x infisical
+          sudo mv infisical /usr/local/bin/infisical
+
+      - name: Fetch .env from Infisical and upload to VM
+        run: |
+          infisical export \
+            --env=${{ secrets.INFISICAL_ENV_DEV }} \
+            --projectId=${{ secrets.INFISICAL_PROJECT_ID }} \
+            --token=${{ secrets.INFISICAL_TOKEN_DEV }} \
+            --format=dotenv \
+            --domain=${{ secrets.INFISICAL_API_URL }} \
+            > .env
+
+          scp .env ${{ secrets.EC2_USER_DEV }}@${{ secrets.EC2_HOST_DEV }}:${{ secrets.BACKEND_PATH_DEV }}/.env
+
+      - name: Upload backend JAR to EC2
+        run: |
+          scp build/libs/*.jar ${{ secrets.EC2_USER_DEV }}@${{ secrets.EC2_HOST_DEV }}:${{ secrets.BACKEND_PATH_DEV }}/
+
+      - name: Restart Spring Boot app on EC2
+        run: |
+          ssh ${{ secrets.EC2_USER_DEV }}@${{ secrets.EC2_HOST_DEV }} '
+            cd ${{ secrets.BACKEND_PATH_DEV }}
+
+            if [ -f backend.pid ]; then
+              echo "Stopping existing application..."
+              kill $(cat backend.pid) 2>/dev/null || true
+              rm -f backend.pid
+              sleep 3
+            fi
+
+            echo "Starting application with environment from .env..."
+            nohup env $(grep -v "^#" .env | xargs) java -jar *.jar > backend.log 2>&1 &
+            echo $! > backend.pid
+
+            sleep 5
+            if ps -p $(cat backend.pid) > /dev/null; then
+              echo "✅ Application started with PID: $(cat backend.pid)"
+              echo "Deleting .env file for security..."
+              rm -f .env
+            else
+              echo "❌ Failed to start application"
+              exit 1
+            fi
+          '
