@@ -60,7 +60,6 @@ public class ImageGenerationQueue {
 
 	// 이미지 및 대사
 	@Column(name = "image_prompts", columnDefinition = "jsonb")
-	// @Convert(converter = JsonbConverter.class)
 	@JdbcTypeCode(SqlTypes.JSON)
 	private Map<String, Object> imagePrompts;
 
