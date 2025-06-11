@@ -36,7 +36,7 @@ jobs:
       - name: Fetch .env from Infisical
         run: |
           infisical export \
-            --env=${{ secrets.INFISICAL_ENV_DEV }} \
+            --env=${{ secrets.INFISICAL_ENV_PROD }} \
             --projectId=${{ secrets.INFISICAL_PROJECT_ID }} \
             --token=${{ secrets.INFISICAL_TOKEN_DEV }} \
             --format=dotenv \
