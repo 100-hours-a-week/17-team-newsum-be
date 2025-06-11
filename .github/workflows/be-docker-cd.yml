@@ -54,11 +54,12 @@ jobs:
         run: |
           aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS --password-stdin ${{ secrets.ECR_REGISTRY }}
 
-      - name: Build and Push Docker Image to ECR
+      - name: Build and Push Docker Image
         run: |
-          docker build -t ${{ secrets.ECR_REPO }}:latest .
+          docker build -t ${{ secrets.ECR_REPO }}:latest $GITHUB_WORKSPACE
           docker tag ${{ secrets.ECR_REPO }}:latest ${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPO }}:latest
           docker push ${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPO }}:latest
+
 
       - name: Deploy Spring Boot app with Docker
         run: |
