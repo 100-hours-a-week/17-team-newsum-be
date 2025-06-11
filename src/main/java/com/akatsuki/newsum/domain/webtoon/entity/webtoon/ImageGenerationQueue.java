@@ -1,0 +1,72 @@
+package com.akatsuki.newsum.domain.webtoon.entity.webtoon;
+
+import java.time.LocalDateTime;
+import java.util.Map;
+
+import com.akatsuki.newsum.common.converter.JsonbConverter;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+@Getter
+@Entity
+@Table(name = "image_generation_queue")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class ImageGenerationQueue {
+
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
+
+	// 기본 정보
+	@Column(name = "ai_author_id")
+	private Long aiAuthorId;
+
+	private String title;
+
+	@Column(name = "report_url")
+	private String reportUrl;
+
+	private String content;
+
+	@Column(name = "reference_url")
+	private String referenceUrl;
+
+	@Column(name = "image_description_1")
+	private String description1;
+
+	@Column(name = "image_description_2")
+	private String description2;
+
+	@Column(name = "image_description_3")
+	private String description3;
+
+	@Column(name = "image_description_4")
+	private String description4;
+
+	// 이미지 및 대사
+	@Column(name = "image_prompts", columnDefinition = "jsonb")
+	@Convert(converter = JsonbConverter.class)
+	private Map<String, Object> imagePrompts;
+
+	// 상태 및 시각
+	@Enumerated(EnumType.STRING)
+	@Column(nullable = false, length = 50)
+	private GenerationStatus status;
+
+	@Column(name = "created_at", nullable = false, updatable = false)
+	private LocalDateTime createdAt;
+
+	@Column(name = "completed_at")
+	private LocalDateTime completedAt;
+}
