@@ -24,8 +24,7 @@ jobs:
           cache: 'gradle'
 
       - name: Build with Gradle
-        run: |
-          ./gradlew clean build
+        run: ./gradlew clean build
 
       - name: Install Infisical CLI from CloudFront
         run: |
@@ -43,18 +42,43 @@ jobs:
             --domain=${{ secrets.INFISICAL_API_URL }} \
             > .env
 
-      - name: Deploy Spring Boot app with Docker
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-northeast-2
+
+      - name: Log in to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build and Push Docker image to ECR
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: newsum-backend
+          IMAGE_TAG: latest
         run: |
-          cd ${{ secrets.BACKEND_PATH_DEV }}
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
 
-          # 기존 컨테이너 중지 및 제거
-          docker compose -f docker-compose.yml down
+      - name: SSH into EC2 and Deploy Container
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: newsum-backend
+          IMAGE_TAG: latest
+        run: |
+          echo "${{ secrets.SSH_PRIVATE_KEY_DEV }}" > private_key.pem
+          chmod 600 private_key.pem
 
-          # .env 덮어쓰기
-          mv $GITHUB_WORKSPACE/.env .env
+          scp -i private_key.pem .env ${{ secrets.EC2_USER_DEV }}@${{ secrets.EC2_HOST_DEV }}:/home/${{ secrets.EC2_USER_DEV }}/app/.env
 
-          # 새 버전 배포
-          docker compose -f docker-compose.yml up -d --build
+          ssh -o StrictHostKeyChecking=no -i private_key.pem ${{ secrets.EC2_USER_DEV }}@${{ secrets.EC2_HOST_DEV }} << 'EOF'
+            cd /home/${{ secrets.EC2_USER_DEV }}/app
+            docker pull $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+            docker compose -f docker-compose.yml down
+            docker compose -f docker-compose.yml up -d
+            rm -f .env
+          EOF
 
-          # 보안상 .env 제거
-          rm -f .env
+          rm -f private_key.pem
