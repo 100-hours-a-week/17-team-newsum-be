@@ -106,6 +106,11 @@ public class WebtoonController {
 		);
 	}
 
+	// @PostMapping("/prompts")
+	// public ResponseEntity<ApiResponse> prompts(
+	//
+	// )
+
 	//메인페이지
 	@GetMapping("/top")
 	public ResponseEntity<ApiResponse<WebtoonTopResponse>> getTop(

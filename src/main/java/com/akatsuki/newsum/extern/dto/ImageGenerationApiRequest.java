@@ -2,7 +2,7 @@ package com.akatsuki.newsum.extern.dto;
 
 import java.util.Map;
 
-public record ImageGenerationRequest(
+public record ImageGenerationApiRequest(
 	String workId,
 	Long personaId,
 	String keyword,
