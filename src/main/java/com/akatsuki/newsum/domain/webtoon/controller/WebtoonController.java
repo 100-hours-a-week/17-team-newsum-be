@@ -21,7 +21,6 @@ import com.akatsuki.newsum.common.pagination.model.cursor.Cursor;
 import com.akatsuki.newsum.common.pagination.model.page.CursorPage;
 import com.akatsuki.newsum.common.security.UserDetailsImpl;
 import com.akatsuki.newsum.domain.notification.application.usecase.NotificationUseCase;
-import com.akatsuki.newsum.domain.webtoon.dto.CreateWebtoonReqeust;
 import com.akatsuki.newsum.domain.webtoon.dto.WebtoonCardDto;
 import com.akatsuki.newsum.domain.webtoon.dto.WebtoonDetailResponse;
 import com.akatsuki.newsum.domain.webtoon.dto.WebtoonLikeStatusDto;
@@ -31,6 +30,7 @@ import com.akatsuki.newsum.domain.webtoon.dto.WebtoonSearchResponse;
 import com.akatsuki.newsum.domain.webtoon.dto.WebtoonTopResponse;
 import com.akatsuki.newsum.domain.webtoon.service.WebtoonService;
 import com.akatsuki.newsum.extern.dto.ImageGenerationApiRequest;
+import com.akatsuki.newsum.extern.dto.ImageGenerationCallbackRequest;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -61,6 +61,17 @@ public class WebtoonController {
 		);
 	}
 
+	@PostMapping
+	public ResponseEntity<ApiResponse> receiveImageLinks(
+		@RequestBody ImageGenerationCallbackRequest request
+	) {
+		webtoonService.ImageGenerationCallbackRequest(request);
+
+		return ResponseEntity.ok(
+			ApiResponse.success(ResponseCodeAndMessage.AI_WEBTOON_CREATED_SUCCESSFULLY, null)
+		);
+	}
+
 	@GetMapping("/{webtoonId}")
 	public ResponseEntity<ApiResponse<WebtoonResponse>> getWebtoon(
 		@PathVariable Long webtoonId,
@@ -86,15 +97,15 @@ public class WebtoonController {
 		);
 	}
 
-	@PostMapping
-	public ResponseEntity<ApiResponse> createWWebtoons(
-		@RequestBody CreateWebtoonReqeust request
-	) {
-		webtoonService.createWebtoon(request);
-		return ResponseEntity.ok(
-			ApiResponse.success(ResponseCodeAndMessage.WEBTOON_CREATE_SUCCESS, null)
-		);
-	}
+	// @PostMapping
+	// public ResponseEntity<ApiResponse> createWWebtoons(
+	// 	@RequestBody CreateWebtoonReqeust request
+	// ) {
+	// 	webtoonService.createWebtoon(request);
+	// 	return ResponseEntity.ok(
+	// 		ApiResponse.success(ResponseCodeAndMessage.WEBTOON_CREATE_SUCCESS, null)
+	// 	);
+	// }
 
 	//TODO : 테스트 용도의 API, 삭제해야함.
 	@PostMapping("/testCreate/{authorId}")
