@@ -63,9 +63,10 @@ jobs:
 
       - name: Build and Push Docker Image
         run: |
-          docker build -t ${{ secrets.ECR_REPO }}:latest $GITHUB_WORKSPACE
+          docker build -t ${{ secrets.ECR_REPO }}:latest .
           docker tag ${{ secrets.ECR_REPO }}:latest ${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPO }}:latest
           docker push ${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPO }}:latest
+
 
 
       - name: Deploy Spring Boot app with Docker
