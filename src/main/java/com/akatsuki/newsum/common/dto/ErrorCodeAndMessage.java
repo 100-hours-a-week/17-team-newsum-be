@@ -20,8 +20,9 @@ public enum ErrorCodeAndMessage {
 	PRECONDITION_FAILED(HttpStatus.PRECONDITION_FAILED.value(), "사전 조건이 충족되지 않았습니다."),
 	UNPROCESSABLE_ENTITY(HttpStatus.UNPROCESSABLE_ENTITY.value(), "요청은 유효하나 처리할 수 없습니다."),
 	INVALID_INPUT(HttpStatus.BAD_REQUEST.value(), "잘못된 입력값입니다."),
+	INVALID_CATEGORY(HttpStatus.BAD_REQUEST.value(), "유효하지 않은 카테고리입니다."), // ✅ 추가된 부분
 
-	//커서, 페이지 네이션 관련 오류
+	// 커서, 페이지 네이션 관련 오류
 	CURSOR_WRONG_EXPRESSION(HttpStatus.BAD_REQUEST.value(), "지원하지 않는 커서 형식입니다."),
 
 	// 웹툰 관련 클라이언트 오류
@@ -42,7 +43,7 @@ public enum ErrorCodeAndMessage {
 
 	NOTIFICATION_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "알림을 찾을 수 없습니다"),
 
-	//SSE관련 오류
+	// SSE 관련 오류
 	SSE_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "SSE연결 객체를 찾을 수 없습니다."),
 
 	// 서버 오류 (5xx)
@@ -50,12 +51,14 @@ public enum ErrorCodeAndMessage {
 	NOT_IMPLEMENTED(HttpStatus.NOT_IMPLEMENTED.value(), "아직 구현되지 않은 기능입니다."),
 	SERVICE_UNAVAILABLE(HttpStatus.SERVICE_UNAVAILABLE.value(), "서비스를 일시적으로 사용할 수 없습니다."),
 
-	//구독관련 오류
+	// 구독 관련 오류
 	KEYWORD_ALREADY_SUBSCRIBED(HttpStatus.CONFLICT.value(), "이미 구독한 키워드입니다."),
 	KEYWORD_SUBSCRIPTION_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "존재하지 않는 키워드입니다."),
 
 	EXTERN_SERVER_HEALTH_CHECK_FAIL(HttpStatus.INTERNAL_SERVER_ERROR.value(), "외부 서버가 연결되지 않습니다."),
-	EXTERN_SERVER_UNAVAILABLE(HttpStatus.INTERNAL_SERVER_ERROR.value(), "외부 서버의 접근이 불가합니다.");
+	EXTERN_SERVER_UNAVAILABLE(HttpStatus.INTERNAL_SERVER_ERROR.value(), "외부 서버의 접근이 불가합니다."),
+	// 이미지 생성 큐 관련 오류
+	IMAGE_GENERATION_QUEUE_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "존재하지 않는 이미지 생성 요청입니다.");
 
 	private final int code;
 	private final String message;

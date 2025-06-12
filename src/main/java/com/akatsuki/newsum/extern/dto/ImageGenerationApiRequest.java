@@ -15,6 +15,6 @@ public record ImageGenerationApiRequest(
 	String description2,
 	String description3,
 	String description4,
-	Map<String, Object> imagePrompts
+	List<Map<String, Object>> imagePrompts
 ) {
 }

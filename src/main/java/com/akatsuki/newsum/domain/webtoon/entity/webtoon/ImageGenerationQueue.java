@@ -69,7 +69,7 @@ public class ImageGenerationQueue {
 	// 이미지 및 대사
 	@Column(name = "image_prompts", columnDefinition = "jsonb")
 	@JdbcTypeCode(SqlTypes.JSON)
-	private Map<String, Object> imagePrompts;
+	private List<Map<String, Object>> imagePrompts;
 
 	// 상태 및 시각
 	@Enumerated(EnumType.STRING)

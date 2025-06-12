@@ -55,8 +55,8 @@ public enum ResponseCodeAndMessage {
 	KEYWORD_LIST_SUCCESS(HttpStatus.OK.value(), "키워드 목록 조회에 성공했습니다"),
 
 	//AI서버 성공 응답
-	AI_IMAGE_PROMPT_SAVED_SUCCESS(HttpStatus.OK.value(), "이미지 생성 큐 저장에 성공했습니다.");
-
+	AI_IMAGE_PROMPT_SAVED_SUCCESS(HttpStatus.OK.value(), "이미지 생성 큐 저장에 성공했습니다."),
+	AI_WEBTOON_CREATED_SUCCESSFULLY(HttpStatus.OK.value(), "AI 이미지 결과를 기반으로 웹툰이 성공적으로 저장되었습니다");
 	private final int code;
 	private final String message;
 
