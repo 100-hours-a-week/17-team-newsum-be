@@ -48,7 +48,8 @@ jobs:
             --token=${{ secrets.INFISICAL_TOKEN_PROD }} \
             --format=dotenv \
             --domain=${{ secrets.INFISICAL_API_URL }} \
-            > .env
+            > $GITHUB_WORKSPACE/.env
+
 
       - name: Authenticate to AWS
         uses: aws-actions/configure-aws-credentials@v2
