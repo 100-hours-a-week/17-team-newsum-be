@@ -29,8 +29,6 @@ import com.akatsuki.newsum.domain.aiAuthor.repository.AiAuthorRepository;
 import com.akatsuki.newsum.domain.user.dto.KeywordListResponse;
 import com.akatsuki.newsum.domain.user.dto.KeywordResponse;
 import com.akatsuki.newsum.domain.user.entity.User;
-import com.akatsuki.newsum.domain.user.repository.KeywordFavoriteRepository;
-import com.akatsuki.newsum.domain.user.repository.KeywordRepository;
 import com.akatsuki.newsum.domain.user.repository.UserRepository;
 import com.akatsuki.newsum.domain.user.service.KeywordService;
 import com.akatsuki.newsum.domain.webtoon.dto.AiAuthorInfoDto;
@@ -42,6 +40,8 @@ import com.akatsuki.newsum.domain.webtoon.dto.WebtoonResponse;
 import com.akatsuki.newsum.domain.webtoon.dto.WebtoonSlideDto;
 import com.akatsuki.newsum.domain.webtoon.dto.WebtoonSourceDto;
 import com.akatsuki.newsum.domain.webtoon.entity.webtoon.Category;
+import com.akatsuki.newsum.domain.webtoon.entity.webtoon.GenerationStatus;
+import com.akatsuki.newsum.domain.webtoon.entity.webtoon.ImageGenerationQueue;
 import com.akatsuki.newsum.domain.webtoon.entity.webtoon.NewsSource;
 import com.akatsuki.newsum.domain.webtoon.entity.webtoon.RecentView;
 import com.akatsuki.newsum.domain.webtoon.entity.webtoon.Webtoon;
@@ -49,12 +49,14 @@ import com.akatsuki.newsum.domain.webtoon.entity.webtoon.WebtoonDetail;
 import com.akatsuki.newsum.domain.webtoon.entity.webtoon.WebtoonFavorite;
 import com.akatsuki.newsum.domain.webtoon.entity.webtoon.WebtoonLike;
 import com.akatsuki.newsum.domain.webtoon.exception.WebtoonNotFoundException;
+import com.akatsuki.newsum.domain.webtoon.repository.ImageGenerationQueueRepository;
 import com.akatsuki.newsum.domain.webtoon.repository.NewsSourceRepository;
 import com.akatsuki.newsum.domain.webtoon.repository.RecentViewRepository;
 import com.akatsuki.newsum.domain.webtoon.repository.WebtoonDetailRepository;
 import com.akatsuki.newsum.domain.webtoon.repository.WebtoonFavoriteRepository;
 import com.akatsuki.newsum.domain.webtoon.repository.WebtoonLikeRepository;
 import com.akatsuki.newsum.domain.webtoon.repository.WebtoonRepository;
+import com.akatsuki.newsum.extern.dto.ImageGenerationApiRequest;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -74,14 +76,13 @@ public class WebtoonService {
 	private final WebtoonFavoriteRepository webtoonFavoriteRepository;
 	private final WebtoonLikeRepository webtoonLikeRepository;
 	private final CursorPaginationService cursorPaginationService;
+	private final ImageGenerationQueueRepository imageGenerationQueueRepository;
+	private final KeywordService keywordService;
 
 	private final int RECENT_WEBTOON_LIMIT = 4;
 	private final int RELATED_CATEGORY_SIZE = 2;
 	private final int RELATED_AI_AUTHOR_SIZE = 2;
 	private final int RELATED_NEWS_SIZE = RELATED_CATEGORY_SIZE + RELATED_AI_AUTHOR_SIZE;
-	private final KeywordFavoriteRepository keywordFavoriteRepository;
-	private final KeywordRepository keywordRepository;
-	private final KeywordService keywordService;
 
 	public List<WebtoonCardDto> findWebtoonsByCategory(String category, Cursor cursor, int size) {
 		List<Webtoon> webtoons = webtoonRepository.findWebtoonByCategoryWithCursor(Category.valueOf(category), cursor,
@@ -296,6 +297,28 @@ public class WebtoonService {
 		);
 
 		return liked.get();
+	}
+
+	@Transactional
+	public void saveimageprompts(ImageGenerationApiRequest request) {
+		ImageGenerationQueue entity = ImageGenerationQueue.builder()
+			.workId(request.workId())
+			.aiAuthorId(request.aiAuthorId())
+			.title(request.title())
+			.content(request.content())
+			.keyword(request.keyword())
+			.category(request.category())
+			.reportUrl(request.reportUrl())
+			.description1(request.description1())
+			.description2(request.description2())
+			.description3(request.description3())
+			.description4(request.description4())
+			.imagePrompts(request.imagePrompts())
+			.status(GenerationStatus.PENDING)
+			.createdAt(LocalDateTime.now())
+			.build();
+
+		imageGenerationQueueRepository.save(entity);
 	}
 
 	@Transactional(readOnly = true)

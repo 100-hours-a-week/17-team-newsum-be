@@ -30,6 +30,7 @@ import com.akatsuki.newsum.domain.webtoon.dto.WebtoonResponse;
 import com.akatsuki.newsum.domain.webtoon.dto.WebtoonSearchResponse;
 import com.akatsuki.newsum.domain.webtoon.dto.WebtoonTopResponse;
 import com.akatsuki.newsum.domain.webtoon.service.WebtoonService;
+import com.akatsuki.newsum.extern.dto.ImageGenerationApiRequest;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -92,6 +93,16 @@ public class WebtoonController {
 		webtoonService.createWebtoon(request);
 		return ResponseEntity.ok(
 			ApiResponse.success(ResponseCodeAndMessage.WEBTOON_CREATE_SUCCESS, null)
+		);
+	}
+
+	@PostMapping("/prompts")
+	public ResponseEntity<ApiResponse> imageprompts(
+		@RequestBody ImageGenerationApiRequest request
+	) {
+		webtoonService.saveimageprompts(request);
+		return ResponseEntity.ok(
+			ApiResponse.success(ResponseCodeAndMessage.AI_IMAGE_PROMPT_SAVED_SUCCESS, null)
 		);
 	}
 

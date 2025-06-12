@@ -26,7 +26,14 @@ jobs:
       - name: Build with Gradle
         run: |
           ./gradlew clean build
-
+          
+      - name: Check build output
+        run: |
+          ls -alh build/libs
+          
+      - name: Copy JAR to root
+        run: cp build/libs/newsum-0.0.1-SNAPSHOT.jar app.jar
+  
       - name: Install Infisical CLI from CloudFront
         run: |
           curl -L https://${{ secrets.AWS_CLOUDFRONT_URL }}/tools/infisical-linux-amd64 -o infisical
@@ -54,11 +61,16 @@ jobs:
         run: |
           aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS --password-stdin ${{ secrets.ECR_REGISTRY }}
 
-      - name: Build and Push Docker Image to ECR
+      - name: Show Dockerfile contents
+        run: cat Dockerfile
+
+      - name: Build and Push Docker Image
         run: |
           docker build -t ${{ secrets.ECR_REPO }}:latest .
           docker tag ${{ secrets.ECR_REPO }}:latest ${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPO }}:latest
           docker push ${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPO }}:latest
+
+
 
       - name: Deploy Spring Boot app with Docker
         run: |
