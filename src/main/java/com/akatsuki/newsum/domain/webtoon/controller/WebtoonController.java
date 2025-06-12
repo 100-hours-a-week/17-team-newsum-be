@@ -31,7 +31,6 @@ import com.akatsuki.newsum.domain.webtoon.dto.WebtoonSearchResponse;
 import com.akatsuki.newsum.domain.webtoon.dto.WebtoonTopResponse;
 import com.akatsuki.newsum.domain.webtoon.service.WebtoonService;
 import com.akatsuki.newsum.extern.dto.ImageGenerationApiRequest;
-import com.akatsuki.newsum.extern.service.AiServerApiService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -45,7 +44,6 @@ public class WebtoonController {
 	private final WebtoonService webtoonService;
 	private final CursorPaginationService cursorPaginationService;
 	private final NotificationUseCase notificationUseCase;
-	private final AiServerApiService aiServerApiService;
 
 	@GetMapping
 	public ResponseEntity<ApiResponse<WebtoonListResponse>> getWebtoons(
@@ -113,7 +111,7 @@ public class WebtoonController {
 	public ResponseEntity<ApiResponse> imageprompts(
 		@RequestBody ImageGenerationApiRequest request
 	) {
-		aiServerApiService.saveimageprompts(request);
+		webtoonService.saveimageprompts(request);
 		return ResponseEntity.ok(
 			ApiResponse.success(ResponseCodeAndMessage.AI_IMAGE_PROMPT_SAVED_SUCCESS, null)
 		);

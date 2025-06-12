@@ -1,13 +1,8 @@
 package com.akatsuki.newsum.extern.service;
 
-import java.time.LocalDateTime;
-
 import org.springframework.stereotype.Service;
 
-import com.akatsuki.newsum.domain.webtoon.entity.webtoon.GenerationStatus;
-import com.akatsuki.newsum.domain.webtoon.entity.webtoon.ImageGenerationQueue;
 import com.akatsuki.newsum.extern.dto.CreateWebtoonApiRequest;
-import com.akatsuki.newsum.extern.dto.ImageGenerationApiRequest;
 import com.akatsuki.newsum.extern.properties.AiServerProperties;
 import com.akatsuki.newsum.extern.repository.ImageGenerationQueueRepository;
 
@@ -33,26 +28,4 @@ public class AiServerApiService {
 				log.error(error.getMessage());
 			});
 	}
-
-	public void saveimageprompts(ImageGenerationApiRequest request) {
-		ImageGenerationQueue entity = ImageGenerationQueue.builder()
-			.workId(request.workId())
-			.aiAuthorId(request.aiAuthorId())
-			.title(request.title())
-			.content(request.content())
-			.keyword(request.keyword())
-			.category(request.category())
-			.reportUrl(request.reportUrl())
-			.description1(request.description1())
-			.description2(request.description2())
-			.description3(request.description3())
-			.description4(request.description4())
-			.imagePrompts(request.imagePrompts())
-			.status(GenerationStatus.PENDING)
-			.createdAt(LocalDateTime.now())
-			.build();
-
-		imageGenerationQueueRepository.save(entity);
-	}
-
 }
