@@ -95,17 +95,6 @@ public class WebtoonController {
 		);
 	}
 
-	//TODO : 테스트 용도의 API, 삭제해야함.
-	@PostMapping("/testCreate/{authorId}")
-	public ResponseEntity<ApiResponse> testCreateWebtoons(
-		@RequestParam Long authorId
-	) {
-		webtoonService.createWebtoonTest(authorId);
-		return ResponseEntity.ok(
-			ApiResponse.success(ResponseCodeAndMessage.WEBTOON_CREATE_SUCCESS, null)
-		);
-	}
-
 	//메인페이지
 	@GetMapping("/top")
 	public ResponseEntity<ApiResponse<WebtoonTopResponse>> getTop(
