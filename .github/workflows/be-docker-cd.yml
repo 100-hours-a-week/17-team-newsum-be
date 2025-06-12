@@ -48,7 +48,7 @@ jobs:
             --token=${{ secrets.INFISICAL_TOKEN_PROD }} \
             --format=dotenv \
             --domain=${{ secrets.INFISICAL_API_URL }} \
-            > $GITHUB_WORKSPACE/.env
+            > .env
 
 
       - name: Authenticate to AWS
@@ -75,17 +75,10 @@ jobs:
 
       - name: Deploy Spring Boot app with Docker
         run: |
+          cp .env ${{ secrets.BACKEND_PATH_PROD }}/.env
           cd ${{ secrets.BACKEND_PATH_PROD }}
-
-          # 기존 컨테이너 중지 및 제거
-          docker compose -f docker-compose.yml down
-
-          # .env 덮어쓰기
-          cp $GITHUB_WORKSPACE/.env .env
-
-          # 새 버전 배포
-          docker compose -f docker-compose.yml up -d
-
-          # 보안상 .env 제거
+          docker compose down || true
+          docker compose up -d
           rm -f .env
+
 
