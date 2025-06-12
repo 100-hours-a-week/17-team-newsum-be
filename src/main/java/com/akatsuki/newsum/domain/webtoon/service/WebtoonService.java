@@ -494,7 +494,6 @@ public class WebtoonService {
 
 	private List<WebtoonDetail> mapToWebtoonDetails(ImageGenerationQueue queue, Webtoon webtoon,
 		List<String> imageUrls) {
-		//디비에서 찾아서 내용들 넣기
 		List<String> descriptions = List.of(
 			queue.getDescription1(),
 			queue.getDescription2(),
