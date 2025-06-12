@@ -31,6 +31,9 @@ jobs:
         run: |
           ls -alh build/libs
           
+      - name: Copy JAR to root
+        run: cp build/libs/newsum-0.0.1-SNAPSHOT.jar app.jar
+  
       - name: Install Infisical CLI from CloudFront
         run: |
           curl -L https://${{ secrets.AWS_CLOUDFRONT_URL }}/tools/infisical-linux-amd64 -o infisical
