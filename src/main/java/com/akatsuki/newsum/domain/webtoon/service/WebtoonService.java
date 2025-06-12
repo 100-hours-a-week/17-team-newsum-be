@@ -59,6 +59,7 @@ import com.akatsuki.newsum.domain.webtoon.repository.WebtoonLikeRepository;
 import com.akatsuki.newsum.domain.webtoon.repository.WebtoonRepository;
 import com.akatsuki.newsum.extern.dto.CreateWebtoonApiRequest;
 import com.akatsuki.newsum.extern.dto.ImageGenerationApiRequest;
+import com.akatsuki.newsum.extern.dto.ImageGenerationCallbackRequest;
 import com.akatsuki.newsum.extern.repository.ImageGenerationQueueRepository;
 import com.akatsuki.newsum.extern.service.AiServerApiService;
 
@@ -340,6 +341,16 @@ public class WebtoonService {
 		return new WebtoonLikeStatusDto(liked, count);
 	}
 
+	@Transactional
+	public void ImageGenerationCallbackRequest(ImageGenerationCallbackRequest request) {
+		ImageGenerationQueue queue = findQueueById(request.requestId());
+		Webtoon webtoon = mapToWebtoonEntity(queue, request.imagelink().get(0));
+		webtoonRepository.save(webtoon);
+
+		List<WebtoonDetail> details = mapToWebtoonDetails(queue, webtoon, request.imagelink());
+		webtoonDetailRepository.saveAll(details);
+	}
+
 	public List<WebtoonCardDto> findWebtoonsByUserKeywords(Long userId, Cursor cursor, int size) {
 		KeywordListResponse keywordList = keywordService.getKeywordList(userId);
 
@@ -461,5 +472,44 @@ public class WebtoonService {
 			webtoon.getCreatedAt(),
 			webtoon.getViewCount()
 		);
+	}
+
+	private ImageGenerationQueue findQueueById(Long requestId) {
+		return imageGenerationQueueRepository.findById(requestId)
+			.orElseThrow(() -> new NotFoundException(ErrorCodeAndMessage.IMAGE_GENERATION_QUEUE_NOT_FOUND));
+	}
+
+	private Webtoon mapToWebtoonEntity(ImageGenerationQueue queue, String thumbnailImageUrl) {
+		AiAuthor aiAuthor = aiAuthorRepository.findById(queue.getAiAuthorId())
+			.orElseThrow(() -> new BusinessException(ErrorCodeAndMessage.AI_AUTHOR_NOT_FOUND));
+
+		return new Webtoon(
+			aiAuthor,
+			Category.from(queue.getCategory()),
+			queue.getTitle(),
+			queue.getContent(),
+			thumbnailImageUrl
+		);
+	}
+
+	private List<WebtoonDetail> mapToWebtoonDetails(ImageGenerationQueue queue, Webtoon webtoon,
+		List<String> imageUrls) {
+		List<String> descriptions = List.of(
+			queue.getDescription1(),
+			queue.getDescription2(),
+			queue.getDescription3(),
+			queue.getDescription4()
+		);
+
+		List<WebtoonDetail> details = new ArrayList<>();
+		for (int i = 0; i < 4; i++) {
+			details.add(new WebtoonDetail(
+				webtoon,
+				imageUrls.get(i),
+				descriptions.get(i),
+				(byte)i // Byte 타입으로 seq 번호 캐스팅
+			));
+		}
+		return details;
 	}
 }
