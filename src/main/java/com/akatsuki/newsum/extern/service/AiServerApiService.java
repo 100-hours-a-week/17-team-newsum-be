@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 
 import com.akatsuki.newsum.extern.dto.CreateWebtoonApiRequest;
 import com.akatsuki.newsum.extern.properties.AiServerProperties;
+import com.akatsuki.newsum.extern.repository.ImageGenerationQueueRepository;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,6 +16,7 @@ public class AiServerApiService {
 
 	private final ExternApiService externApiService;
 	private final AiServerProperties aiServerProperties;
+	private final ImageGenerationQueueRepository imageGenerationQueueRepository;
 
 	private final String CREATE_WEBTOON_API_ENDPOINT = "/v1/comics";
 

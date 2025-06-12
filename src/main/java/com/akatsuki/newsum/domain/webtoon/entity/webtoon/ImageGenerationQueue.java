@@ -1,12 +1,13 @@
 package com.akatsuki.newsum.domain.webtoon.entity.webtoon;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 
-import com.akatsuki.newsum.common.converter.JsonbConverter;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import jakarta.persistence.Column;
-import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -15,6 +16,8 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -22,6 +25,8 @@ import lombok.NoArgsConstructor;
 @Entity
 @Table(name = "image_generation_queue")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Builder
+@AllArgsConstructor
 public class ImageGenerationQueue {
 
 	@Id
@@ -29,18 +34,26 @@ public class ImageGenerationQueue {
 	private Long id;
 
 	// 기본 정보
+	@Column(name = "work_id")
+	private String workId;
+
 	@Column(name = "ai_author_id")
 	private Long aiAuthorId;
 
+	@Column(name = "title")
 	private String title;
+
+	@Column(name = "category")
+	private String category;
+
+	@JdbcTypeCode(SqlTypes.JSON)
+	@Column(name = "keyword", columnDefinition = "jsonb")
+	private List<String> keyword;
 
 	@Column(name = "report_url")
 	private String reportUrl;
 
 	private String content;
-
-	@Column(name = "reference_url")
-	private String referenceUrl;
 
 	@Column(name = "image_description_1")
 	private String description1;
@@ -56,7 +69,7 @@ public class ImageGenerationQueue {
 
 	// 이미지 및 대사
 	@Column(name = "image_prompts", columnDefinition = "jsonb")
-	@Convert(converter = JsonbConverter.class)
+	@JdbcTypeCode(SqlTypes.JSON)
 	private Map<String, Object> imagePrompts;
 
 	// 상태 및 시각

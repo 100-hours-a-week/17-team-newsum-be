@@ -42,6 +42,8 @@ import com.akatsuki.newsum.domain.webtoon.dto.WebtoonResponse;
 import com.akatsuki.newsum.domain.webtoon.dto.WebtoonSlideDto;
 import com.akatsuki.newsum.domain.webtoon.dto.WebtoonSourceDto;
 import com.akatsuki.newsum.domain.webtoon.entity.webtoon.Category;
+import com.akatsuki.newsum.domain.webtoon.entity.webtoon.GenerationStatus;
+import com.akatsuki.newsum.domain.webtoon.entity.webtoon.ImageGenerationQueue;
 import com.akatsuki.newsum.domain.webtoon.entity.webtoon.NewsSource;
 import com.akatsuki.newsum.domain.webtoon.entity.webtoon.RecentView;
 import com.akatsuki.newsum.domain.webtoon.entity.webtoon.Webtoon;
@@ -56,6 +58,8 @@ import com.akatsuki.newsum.domain.webtoon.repository.WebtoonFavoriteRepository;
 import com.akatsuki.newsum.domain.webtoon.repository.WebtoonLikeRepository;
 import com.akatsuki.newsum.domain.webtoon.repository.WebtoonRepository;
 import com.akatsuki.newsum.extern.dto.CreateWebtoonApiRequest;
+import com.akatsuki.newsum.extern.dto.ImageGenerationApiRequest;
+import com.akatsuki.newsum.extern.repository.ImageGenerationQueueRepository;
 import com.akatsuki.newsum.extern.service.AiServerApiService;
 
 import lombok.RequiredArgsConstructor;
@@ -77,6 +81,7 @@ public class WebtoonService {
 	private final WebtoonFavoriteRepository webtoonFavoriteRepository;
 	private final WebtoonLikeRepository webtoonLikeRepository;
 	private final CursorPaginationService cursorPaginationService;
+	private final ImageGenerationQueueRepository imageGenerationQueueRepository;
 
 	private final int RECENT_WEBTOON_LIMIT = 4;
 	private final int RELATED_CATEGORY_SIZE = 2;
@@ -303,6 +308,28 @@ public class WebtoonService {
 		);
 
 		return liked.get();
+	}
+
+	@Transactional
+	public void saveimageprompts(ImageGenerationApiRequest request) {
+		ImageGenerationQueue entity = ImageGenerationQueue.builder()
+			.workId(request.workId())
+			.aiAuthorId(request.aiAuthorId())
+			.title(request.title())
+			.content(request.content())
+			.keyword(request.keyword())
+			.category(request.category())
+			.reportUrl(request.reportUrl())
+			.description1(request.description1())
+			.description2(request.description2())
+			.description3(request.description3())
+			.description4(request.description4())
+			.imagePrompts(request.imagePrompts())
+			.status(GenerationStatus.PENDING)
+			.createdAt(LocalDateTime.now())
+			.build();
+
+		imageGenerationQueueRepository.save(entity);
 	}
 
 	@Transactional(readOnly = true)
