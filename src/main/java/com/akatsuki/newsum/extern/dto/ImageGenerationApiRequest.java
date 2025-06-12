@@ -1,11 +1,12 @@
 package com.akatsuki.newsum.extern.dto;
 
+import java.util.List;
 import java.util.Map;
 
 public record ImageGenerationApiRequest(
 	String workId,
 	Long aiAuthorId,
-	String keyword,
+	List<String> keyword,
 	String category,
 	String title,
 	String reportUrl,

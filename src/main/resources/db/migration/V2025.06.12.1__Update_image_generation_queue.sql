@@ -5,7 +5,7 @@ ALTER TABLE image_generation_queue
     ADD COLUMN work_id VARCHAR;
 
 ALTER TABLE image_generation_queue
-    ADD COLUMN keyword VARCHAR;
+    ADD COLUMN keyword JSONB;
 
 ALTER TABLE image_generation_queue
     ADD COLUMN category VARCHAR;

@@ -1,6 +1,7 @@
 package com.akatsuki.newsum.domain.webtoon.entity.webtoon;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 
 import org.hibernate.annotations.JdbcTypeCode;
@@ -45,8 +46,9 @@ public class ImageGenerationQueue {
 	@Column(name = "category")
 	private String category;
 
-	@Column(name = "keyword")
-	private String keyword;
+	@JdbcTypeCode(SqlTypes.JSON)
+	@Column(name = "keyword", columnDefinition = "jsonb")
+	private List<String> keyword;
 
 	@Column(name = "report_url")
 	private String reportUrl;

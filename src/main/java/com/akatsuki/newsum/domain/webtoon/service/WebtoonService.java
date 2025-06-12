@@ -310,6 +310,28 @@ public class WebtoonService {
 		return liked.get();
 	}
 
+	@Transactional
+	public void saveimageprompts(ImageGenerationApiRequest request) {
+		ImageGenerationQueue entity = ImageGenerationQueue.builder()
+			.workId(request.workId())
+			.aiAuthorId(request.aiAuthorId())
+			.title(request.title())
+			.content(request.content())
+			.keyword(request.keyword())
+			.category(request.category())
+			.reportUrl(request.reportUrl())
+			.description1(request.description1())
+			.description2(request.description2())
+			.description3(request.description3())
+			.description4(request.description4())
+			.imagePrompts(request.imagePrompts())
+			.status(GenerationStatus.PENDING)
+			.createdAt(LocalDateTime.now())
+			.build();
+
+		imageGenerationQueueRepository.save(entity);
+	}
+
 	@Transactional(readOnly = true)
 	public WebtoonLikeStatusDto getWebtoonLikeStatus(Long webtoonId, Long userId) {
 		boolean liked = webtoonLikeRepository.existsByWebtoonIdAndUserId(webtoonId, userId);
@@ -335,27 +357,6 @@ public class WebtoonService {
 		return webtoons.stream()
 			.map(WebtoonCardDto::from)
 			.toList();
-	}
-
-	public void saveimageprompts(ImageGenerationApiRequest request) {
-		ImageGenerationQueue entity = ImageGenerationQueue.builder()
-			.workId(request.workId())
-			.aiAuthorId(request.aiAuthorId())
-			.title(request.title())
-			.content(request.content())
-			.keyword(request.keyword())
-			.category(request.category())
-			.reportUrl(request.reportUrl())
-			.description1(request.description1())
-			.description2(request.description2())
-			.description3(request.description3())
-			.description4(request.description4())
-			.imagePrompts(request.imagePrompts())
-			.status(GenerationStatus.PENDING)
-			.createdAt(LocalDateTime.now())
-			.build();
-
-		imageGenerationQueueRepository.save(entity);
 	}
 
 	private AiAuthor findAiAuthorById(Long id) {
