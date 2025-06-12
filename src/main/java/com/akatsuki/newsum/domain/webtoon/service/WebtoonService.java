@@ -55,8 +55,6 @@ import com.akatsuki.newsum.domain.webtoon.repository.WebtoonDetailRepository;
 import com.akatsuki.newsum.domain.webtoon.repository.WebtoonFavoriteRepository;
 import com.akatsuki.newsum.domain.webtoon.repository.WebtoonLikeRepository;
 import com.akatsuki.newsum.domain.webtoon.repository.WebtoonRepository;
-import com.akatsuki.newsum.extern.dto.CreateWebtoonApiRequest;
-import com.akatsuki.newsum.extern.service.AiServerApiService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -71,7 +69,6 @@ public class WebtoonService {
 	private final AiAuthorRepository aiAuthorRepository;
 	private final WebtoonDetailRepository webtoonDetailRepository;
 	private final NewsSourceRepository newsSourceRepository;
-	private final AiServerApiService aiServerApiService;
 	private final RecentViewRepository recentViewRepository;
 	private final UserRepository userRepository;
 	private final WebtoonFavoriteRepository webtoonFavoriteRepository;
@@ -182,10 +179,6 @@ public class WebtoonService {
 
 		webtoonDetailRepository.saveAll(webtoonDetails);
 		newsSourceRepository.saveAll(newsSources);
-	}
-
-	public void createWebtoonTest(Long authorId) {
-		aiServerApiService.createWebtoonApi(new CreateWebtoonApiRequest(authorId, null));
 	}
 
 	public List<WebtoonCardDto> getTop3TodayByViewCount() {
