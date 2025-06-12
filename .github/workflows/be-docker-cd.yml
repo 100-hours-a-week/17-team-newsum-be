@@ -80,7 +80,7 @@ jobs:
           docker compose -f docker-compose.yml down
 
           # .env 덮어쓰기
-          mv $GITHUB_WORKSPACE/.env .env
+          cp $GITHUB_WORKSPACE/.env .env
 
           # 새 버전 배포
           docker compose -f docker-compose.yml up -d
