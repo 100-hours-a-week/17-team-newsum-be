@@ -52,7 +52,11 @@ public enum ErrorCodeAndMessage {
 
 	//구독관련 오류
 	KEYWORD_ALREADY_SUBSCRIBED(HttpStatus.CONFLICT.value(), "이미 구독한 키워드입니다."),
-	KEYWORD_SUBSCRIPTION_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "존재하지 않는 키워드입니다.");
+	KEYWORD_SUBSCRIPTION_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "존재하지 않는 키워드입니다."),
+
+	EXTERN_SERVER_HEALTH_CHECK_FAIL(HttpStatus.INTERNAL_SERVER_ERROR.value(), "외부 서버가 연결되지 않습니다."),
+	EXTERN_SERVER_UNAVAILABLE(HttpStatus.INTERNAL_SERVER_ERROR.value(), "외부 서버의 접근이 불가합니다.");
+
 	private final int code;
 	private final String message;
 
