@@ -18,7 +18,7 @@ public class WebtoonCreateJob {
 	private final ImageQueueService imageQueueService;
 	private final ReentrantLock lock = new ReentrantLock();
 
-	private static final long THIRTY_MINUTES = 30 * 60 * 1000; // 30분
+	private static final long THIRTY_MINUTES = 5 * 60 * 1000; // 5분
 
 	@Scheduled(fixedRate = THIRTY_MINUTES)
 	public void process() {

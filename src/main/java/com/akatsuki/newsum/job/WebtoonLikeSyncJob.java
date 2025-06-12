@@ -27,7 +27,7 @@ public class WebtoonLikeSyncJob {
 	private final WebtoonLikeRepository webtoonLikeRepository;
 	private final UserRepository userRepository;
 
-	@Scheduled(cron = "0 */30 * * * *")
+	@Scheduled(cron = "0 0 0 * * *")
 	public void syncLikesFromRedisToDB() {
 		Set<String> keys = redisService.getKeys("webtoon:likes:*");
 
