@@ -4,13 +4,12 @@ import java.util.Map;
 
 public record ImageGenerationApiRequest(
 	String workId,
-	Long personaId,
+	Long aiAuthorId,
 	String keyword,
 	String category,
 	String title,
 	String reportUrl,
 	String content,
-	String referenceUrl,
 	String description1,
 	String description2,
 	String description3,

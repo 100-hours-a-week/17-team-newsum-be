@@ -33,18 +33,25 @@ public class ImageGenerationQueue {
 	private Long id;
 
 	// 기본 정보
+	@Column(name = "work_id")
+	private String workId;
+
 	@Column(name = "ai_author_id")
 	private Long aiAuthorId;
 
+	@Column(name = "title")
 	private String title;
+
+	@Column(name = "category")
+	private String category;
+
+	@Column(name = "keyword")
+	private String keyword;
 
 	@Column(name = "report_url")
 	private String reportUrl;
 
 	private String content;
-
-	@Column(name = "reference_url")
-	private String referenceUrl;
 
 	@Column(name = "image_description_1")
 	private String description1;

@@ -36,11 +36,13 @@ public class AiServerApiService {
 
 	public void saveimageprompts(ImageGenerationApiRequest request) {
 		ImageGenerationQueue entity = ImageGenerationQueue.builder()
-			.aiAuthorId(request.personaId())
+			.workId(request.workId())
+			.aiAuthorId(request.aiAuthorId())
 			.title(request.title())
-			.reportUrl(request.reportUrl())
 			.content(request.content())
-			.referenceUrl(request.referenceUrl())
+			.keyword(request.keyword())
+			.category(request.category())
+			.reportUrl(request.reportUrl())
 			.description1(request.description1())
 			.description2(request.description2())
 			.description3(request.description3())
