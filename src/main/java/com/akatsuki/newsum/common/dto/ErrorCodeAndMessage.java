@@ -55,6 +55,8 @@ public enum ErrorCodeAndMessage {
 	KEYWORD_ALREADY_SUBSCRIBED(HttpStatus.CONFLICT.value(), "이미 구독한 키워드입니다."),
 	KEYWORD_SUBSCRIPTION_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "존재하지 않는 키워드입니다."),
 
+	EXTERN_SERVER_HEALTH_CHECK_FAIL(HttpStatus.INTERNAL_SERVER_ERROR.value(), "외부 서버가 연결되지 않습니다."),
+	EXTERN_SERVER_UNAVAILABLE(HttpStatus.INTERNAL_SERVER_ERROR.value(), "외부 서버의 접근이 불가합니다."),
 	// 이미지 생성 큐 관련 오류
 	IMAGE_GENERATION_QUEUE_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "존재하지 않는 이미지 생성 요청입니다.");
 

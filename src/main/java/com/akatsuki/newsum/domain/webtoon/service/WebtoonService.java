@@ -29,8 +29,6 @@ import com.akatsuki.newsum.domain.aiAuthor.repository.AiAuthorRepository;
 import com.akatsuki.newsum.domain.user.dto.KeywordListResponse;
 import com.akatsuki.newsum.domain.user.dto.KeywordResponse;
 import com.akatsuki.newsum.domain.user.entity.User;
-import com.akatsuki.newsum.domain.user.repository.KeywordFavoriteRepository;
-import com.akatsuki.newsum.domain.user.repository.KeywordRepository;
 import com.akatsuki.newsum.domain.user.repository.UserRepository;
 import com.akatsuki.newsum.domain.user.service.KeywordService;
 import com.akatsuki.newsum.domain.webtoon.dto.AiAuthorInfoDto;
@@ -51,17 +49,15 @@ import com.akatsuki.newsum.domain.webtoon.entity.webtoon.WebtoonDetail;
 import com.akatsuki.newsum.domain.webtoon.entity.webtoon.WebtoonFavorite;
 import com.akatsuki.newsum.domain.webtoon.entity.webtoon.WebtoonLike;
 import com.akatsuki.newsum.domain.webtoon.exception.WebtoonNotFoundException;
+import com.akatsuki.newsum.domain.webtoon.repository.ImageGenerationQueueRepository;
 import com.akatsuki.newsum.domain.webtoon.repository.NewsSourceRepository;
 import com.akatsuki.newsum.domain.webtoon.repository.RecentViewRepository;
 import com.akatsuki.newsum.domain.webtoon.repository.WebtoonDetailRepository;
 import com.akatsuki.newsum.domain.webtoon.repository.WebtoonFavoriteRepository;
 import com.akatsuki.newsum.domain.webtoon.repository.WebtoonLikeRepository;
 import com.akatsuki.newsum.domain.webtoon.repository.WebtoonRepository;
-import com.akatsuki.newsum.extern.dto.CreateWebtoonApiRequest;
 import com.akatsuki.newsum.extern.dto.ImageGenerationApiRequest;
 import com.akatsuki.newsum.extern.dto.ImageGenerationCallbackRequest;
-import com.akatsuki.newsum.extern.repository.ImageGenerationQueueRepository;
-import com.akatsuki.newsum.extern.service.AiServerApiService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -76,21 +72,18 @@ public class WebtoonService {
 	private final AiAuthorRepository aiAuthorRepository;
 	private final WebtoonDetailRepository webtoonDetailRepository;
 	private final NewsSourceRepository newsSourceRepository;
-	private final AiServerApiService aiServerApiService;
 	private final RecentViewRepository recentViewRepository;
 	private final UserRepository userRepository;
 	private final WebtoonFavoriteRepository webtoonFavoriteRepository;
 	private final WebtoonLikeRepository webtoonLikeRepository;
 	private final CursorPaginationService cursorPaginationService;
 	private final ImageGenerationQueueRepository imageGenerationQueueRepository;
+	private final KeywordService keywordService;
 
 	private final int RECENT_WEBTOON_LIMIT = 4;
 	private final int RELATED_CATEGORY_SIZE = 2;
 	private final int RELATED_AI_AUTHOR_SIZE = 2;
 	private final int RELATED_NEWS_SIZE = RELATED_CATEGORY_SIZE + RELATED_AI_AUTHOR_SIZE;
-	private final KeywordFavoriteRepository keywordFavoriteRepository;
-	private final KeywordRepository keywordRepository;
-	private final KeywordService keywordService;
 
 	public List<WebtoonCardDto> findWebtoonsByCategory(String category, Cursor cursor, int size) {
 		List<Webtoon> webtoons = webtoonRepository.findWebtoonByCategoryWithCursor(Category.valueOf(category), cursor,
@@ -188,10 +181,6 @@ public class WebtoonService {
 
 		webtoonDetailRepository.saveAll(webtoonDetails);
 		newsSourceRepository.saveAll(newsSources);
-	}
-
-	public void createWebtoonTest(Long authorId) {
-		aiServerApiService.createWebtoonApi(new CreateWebtoonApiRequest(authorId, null));
 	}
 
 	public List<WebtoonCardDto> getTop3TodayByViewCount() {
