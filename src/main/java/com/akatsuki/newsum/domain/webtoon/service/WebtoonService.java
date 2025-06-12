@@ -485,7 +485,7 @@ public class WebtoonService {
 
 		return new Webtoon(
 			aiAuthor,
-			Category.valueOf(queue.getCategory()),
+			Category.from(queue.getCategory()),
 			queue.getTitle(),
 			queue.getContent(),
 			thumbnailImageUrl
