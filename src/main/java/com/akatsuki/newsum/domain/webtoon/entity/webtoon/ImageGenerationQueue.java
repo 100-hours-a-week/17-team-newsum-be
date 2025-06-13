@@ -85,4 +85,9 @@ public class ImageGenerationQueue {
 	public void processing() {
 		this.status = GenerationStatus.PROCESSING;
 	}
+
+	public void completed() {
+		this.status = GenerationStatus.COMPLETED;
+		this.completedAt = LocalDateTime.now();
+	}
 }

@@ -338,6 +338,7 @@ public class WebtoonService {
 
 		List<WebtoonDetail> details = mapToWebtoonDetails(queue, webtoon, request.imagelink());
 		webtoonDetailRepository.saveAll(details);
+		queue.completed();
 	}
 
 	public List<WebtoonCardDto> findWebtoonsByUserKeywords(Long userId, Cursor cursor, int size) {
