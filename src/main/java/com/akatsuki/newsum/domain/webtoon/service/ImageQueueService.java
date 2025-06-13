@@ -13,8 +13,6 @@ import com.akatsuki.newsum.domain.webtoon.exception.ImageGenerationException;
 import com.akatsuki.newsum.domain.webtoon.repository.ImageGenerationQueueRepository;
 import com.akatsuki.newsum.extern.dto.CreateWebtoonApiRequest;
 import com.akatsuki.newsum.extern.service.AiServerApi;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import feign.Response;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
@@ -30,7 +28,6 @@ public class ImageQueueService {
 
 	private final ImageGenerationQueueRepository imageGenerationQueueRepository;
 	private final AiServerApi aiServerApi;
-	private final ObjectMapper objectMapper;
 
 	@Transactional
 	public void processWebtoonQueue() {
@@ -45,9 +42,10 @@ public class ImageQueueService {
 			while (!completed && retryCount < 5) {
 				try {
 					CreateWebtoonApiRequest request = buildRequest(task);
+					log.info("작업 요청 정보 {}", request);
 					Response response = requestWithResilience(request).join(); // async 처리 후 block
-
-					if (response.status() == 200) {
+					log.info("작업 응답 정보 {}", response);
+					if (response.status() == 202) {
 						log.info("작업 {} 성공, 다음 작업까지 5분 대기", task.getId());
 						Thread.sleep(5 * 60 * 1000);
 						task.processing();
@@ -79,10 +77,10 @@ public class ImageQueueService {
 		}
 	}
 
-	private CreateWebtoonApiRequest buildRequest(ImageGenerationQueue task) throws JsonProcessingException {
+	private CreateWebtoonApiRequest buildRequest(ImageGenerationQueue task) {
 		return new CreateWebtoonApiRequest(
 			String.valueOf(task.getId()),
-			objectMapper.writeValueAsString(task.getImagePrompts())
+			task.getImagePrompts()
 		);
 	}
 
