@@ -169,28 +169,30 @@ jobs:
           aws-access-key-id:     ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region:            ap-northeast-2
-
+  
       - name: Pick TargetGroup ARN
         id: pick
         run: |
-          if [ "${{ needs.deploy-az1.outputs.target }}" = "blue" ]; then
-            echo "arn=${{ secrets.TG_BLUE_ARN }}"  >> "$GITHUB_OUTPUT"
+          if [ "$TARGET" = "blue" ]; then
+            echo "arn=${{ secrets.TG_BLUE_ARN }}" >> "$GITHUB_OUTPUT"
           else
             echo "arn=${{ secrets.TG_GREEN_ARN }}" >> "$GITHUB_OUTPUT"
           fi
-
+  
       - name: Switch ALB Listener
         run: |
           aws elbv2 modify-listener \
             --listener-arn ${{ secrets.ALB_LISTENER_ARN }} \
             --default-actions Type=forward,TargetGroupArn=${{ steps.pick.outputs.arn }} \
             --region ap-northeast-2
-
+  
       - name: Update SSM activeColor
         run: |
+          echo "🔁 SSM에 저장할 activeColor: $TARGET"
           aws ssm put-parameter \
             --name "/newsum/activeColor" \
-            --value "${{ needs.deploy-az1.outputs.target }}" \
+            --value "$TARGET" \
             --type String \
             --overwrite \
             --region ap-northeast-2
+
