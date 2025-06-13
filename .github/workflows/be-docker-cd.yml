@@ -160,7 +160,7 @@ jobs:
       - name: Choose Target Group ARN
         id: pick
         run: |
-          if [ "${{ needs.build.outputs.target }}" = "blue" ]; then
+          if [ "${{ env.TARGET }}" = "blue" ]; then
                echo "arn=${{ secrets.TG_BLUE_ARN }}"  >> $GITHUB_OUTPUT
           else echo "arn=${{ secrets.TG_GREEN_ARN }}" >> $GITHUB_OUTPUT; fi
 
