@@ -28,6 +28,7 @@ public enum ErrorCodeAndMessage {
 	// 웹툰 관련 클라이언트 오류
 	WEBTOON_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "존재하지 않는 웹툰입니다."),
 	INVALID_WEBTOON_ID(HttpStatus.BAD_REQUEST.value(), "유효하지 않은 웹툰 ID입니다."),
+	INVALID_WEBTOON_IMAGE_URL(HttpStatus.BAD_REQUEST.value(), "잘못된 이미지 생성 요청입니다."),
 	DUPLICATE_WEBTOON_LIKE(HttpStatus.CONFLICT.value(), "이미 좋아요한 웹툰입니다."),
 	DUPLICATE_WEBTOON_BOOKMARK(HttpStatus.CONFLICT.value(), "이미 북마크한 웹툰입니다."),
 
@@ -58,7 +59,8 @@ public enum ErrorCodeAndMessage {
 	EXTERN_SERVER_HEALTH_CHECK_FAIL(HttpStatus.INTERNAL_SERVER_ERROR.value(), "외부 서버가 연결되지 않습니다."),
 	EXTERN_SERVER_UNAVAILABLE(HttpStatus.INTERNAL_SERVER_ERROR.value(), "외부 서버의 접근이 불가합니다."),
 	// 이미지 생성 큐 관련 오류
-	IMAGE_GENERATION_QUEUE_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "존재하지 않는 이미지 생성 요청입니다.");
+	IMAGE_GENERATION_QUEUE_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "존재하지 않는 이미지 생성 요청입니다."),
+	;
 
 	private final int code;
 	private final String message;

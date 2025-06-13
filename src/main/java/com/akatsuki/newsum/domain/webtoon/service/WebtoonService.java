@@ -331,14 +331,32 @@ public class WebtoonService {
 	}
 
 	@Transactional
-	public void ImageGenerationCallbackRequest(ImageGenerationCallbackRequest request) {
-		ImageGenerationQueue queue = findQueueById(request.requestId());
-		Webtoon webtoon = mapToWebtoonEntity(queue, request.imagelink().get(0));
-		webtoonRepository.save(webtoon);
+	public void imageGenerationCallbackRequest(ImageGenerationCallbackRequest request) {
+		List<String> imageLinks = request.imageLinks();
+		validateImageLinks(imageLinks);
 
-		List<WebtoonDetail> details = mapToWebtoonDetails(queue, webtoon, request.imagelink());
+		ImageGenerationQueue queue = findQueueById(request.requestId());
+		List<String> descriptions = queue.getDescriptions();
+
+		Webtoon webtoon = mapToWebtoonEntity(queue, parseThumbnailImage(imageLinks));
+		List<WebtoonDetail> details = mapToWebtoonDetails(webtoon, descriptions, parseImageDescriptions(imageLinks));
+		webtoonRepository.save(webtoon);
 		webtoonDetailRepository.saveAll(details);
 		queue.completed();
+	}
+
+	private String parseThumbnailImage(List<String> imageLinks) {
+		return imageLinks.get(0);
+	}
+
+	private List<String> parseImageDescriptions(List<String> imageLinks) {
+		return imageLinks.subList(1, imageLinks.size());
+	}
+
+	private void validateImageLinks(List<String> imageLinks) {
+		if (imageLinks == null || imageLinks.isEmpty()) {
+			throw new BusinessException(ErrorCodeAndMessage.INVALID_WEBTOON_IMAGE_URL);
+		}
 	}
 
 	public List<WebtoonCardDto> findWebtoonsByUserKeywords(Long userId, Cursor cursor, int size) {
@@ -470,8 +488,7 @@ public class WebtoonService {
 	}
 
 	private Webtoon mapToWebtoonEntity(ImageGenerationQueue queue, String thumbnailImageUrl) {
-		AiAuthor aiAuthor = aiAuthorRepository.findById(queue.getAiAuthorId())
-			.orElseThrow(() -> new BusinessException(ErrorCodeAndMessage.AI_AUTHOR_NOT_FOUND));
+		AiAuthor aiAuthor = findAiAuthorById(queue.getAiAuthorId());
 
 		return new Webtoon(
 			aiAuthor,
@@ -482,16 +499,10 @@ public class WebtoonService {
 		);
 	}
 
-	private List<WebtoonDetail> mapToWebtoonDetails(ImageGenerationQueue queue, Webtoon webtoon,
+	private List<WebtoonDetail> mapToWebtoonDetails(Webtoon webtoon, List<String> descriptions,
 		List<String> imageUrls) {
-		List<String> descriptions = List.of(
-			queue.getDescription1(),
-			queue.getDescription2(),
-			queue.getDescription3(),
-			queue.getDescription4()
-		);
-
 		List<WebtoonDetail> details = new ArrayList<>();
+
 		for (int i = 0; i < imageUrls.size(); i++) {
 			details.add(new WebtoonDetail(
 				webtoon,

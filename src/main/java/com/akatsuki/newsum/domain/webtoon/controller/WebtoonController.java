@@ -151,7 +151,7 @@ public class WebtoonController {
 	public ResponseEntity<ApiResponse> receiveImageLinks(
 		@RequestBody ImageGenerationCallbackRequest request
 	) {
-		webtoonService.ImageGenerationCallbackRequest(request);
+		webtoonService.imageGenerationCallbackRequest(request);
 
 		return ResponseEntity.ok(
 			ApiResponse.success(ResponseCodeAndMessage.AI_WEBTOON_CREATED_SUCCESSFULLY, null)
