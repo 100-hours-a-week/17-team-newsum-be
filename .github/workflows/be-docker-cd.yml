@@ -7,16 +7,14 @@ on:
       - '**/README.md'
       - '**/.gitignore'
 
-#───────────────────────────────────────────────────────────
-# 1️⃣  Build & Push (GitHub-hosted runner)
-#───────────────────────────────────────────────────────────
 jobs:
+# ──────────────────────────────────────────────────────────
+# 1️⃣ Build & Push  (GitHub-hosted)
+# ──────────────────────────────────────────────────────────
   build:
     runs-on: ubuntu-latest
     outputs:
-      image:  ${{ steps.build-push.outputs.image }}
-      target: ${{ steps.decide.outputs.target }}
-
+      image:  ${{ steps.push.outputs.image }}
     steps:
       - uses: actions/checkout@v3
 
@@ -29,10 +27,10 @@ jobs:
       - name: Gradle Build
         run: |
           ./gradlew clean build
-          cp build/libs/newsum-0.0.1-SNAPSHOT.jar app.jar   # JAR → 루트
+          cp build/libs/newsum-0.0.1-SNAPSHOT.jar app.jar   # 루트에 JAR
 
-      - name: AWS Login ( for ECR push )
-        uses: aws-actions/configure-aws-credentials@v2
+      # — AWS & ECR 로그인 —
+      - uses: aws-actions/configure-aws-credentials@v2
         with:
           aws-access-key-id:      ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key:  ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -43,55 +41,61 @@ jobs:
           aws ecr get-login-password --region ap-northeast-2 \
           | docker login --username AWS --password-stdin ${{ secrets.ECR_REGISTRY }}
 
+      # — Docker Build & Push —
       - name: Build & Push image
-        id: build-push
+        id: push
         run: |
           IMAGE="${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPO }}:latest"
           docker build -t "$IMAGE" .
           docker push  "$IMAGE"
-          echo "image=$IMAGE"   >> $GITHUB_OUTPUT
+          echo "image=$IMAGE" >> "$GITHUB_OUTPUT"
 
-      # ── Blue-Green 결정 : 지금 살아있는 쪽이 blue → 다음은 green (반대도 동일)
-      - name: Decide next target (blue or green)
+# ──────────────────────────────────────────────────────────
+# 2️⃣ Deploy (AZ-1, 타깃 결정 & 출력)
+# ──────────────────────────────────────────────────────────
+  deploy-az1:
+    needs: build
+    runs-on: [ self-hosted, linux, ec2-prod-runner ]   # EC2-1
+    outputs:
+      target: ${{ steps.decide.outputs.target }}
+
+    steps:
+      # AWS 로그인 & ECR 로그인
+      - uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id:     ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region:            ap-northeast-2
+
+      - name: ECR Login
+        run: |
+          aws ecr get-login-password --region ap-northeast-2 \
+          | docker login --username AWS --password-stdin ${{ secrets.ECR_REGISTRY }}
+
+      # Infisical .env
+      - name: Fetch .env
+        run: |
+          curl -Ls https://${{ secrets.AWS_CLOUDFRONT_URL }}/tools/infisical-linux-amd64 -o infisical
+          chmod +x infisical && sudo mv infisical /usr/local/bin/infisical
+          infisical export \
+            --env=${{ secrets.INFISICAL_ENV_PROD }} \
+            --projectId=${{ secrets.INFISICAL_PROJECT_ID }} \
+            --token=${{ secrets.INFISICAL_TOKEN_PROD }} \
+            --format=dotenv \
+            --domain=${{ secrets.INFISICAL_API_URL }} > /tmp/deploy.env
+
+      # 🔍 Blue/Green 결정(EC2 내부)
+      - name: Decide target
         id: decide
         run: |
           if docker ps --format '{{.Names}}' | grep -q backend-blue; then
-               echo "target=green" >> $GITHUB_OUTPUT
-          else echo "target=blue"  >> $GITHUB_OUTPUT; fi
-#───────────────────────────────────────────────────────────
-# 2️⃣  Deploy to EC2 (AZ-1)
-#───────────────────────────────────────────────────────────
-  deploy-az1:
-    needs: build
-    runs-on: [ self-hosted, linux, ec2-prod-runner ]   # EC2-1 runner
-    env:
-      TARGET: ${{ needs.build.outputs.target }}
+               echo "target=green" >> "$GITHUB_OUTPUT"
+               echo "TARGET=green"  >> "$GITHUB_ENV"
+          else echo "target=blue"  >> "$GITHUB_OUTPUT"
+               echo "TARGET=blue"  >> "$GITHUB_ENV"; fi
 
-    steps:
-      - name: AWS Login (ECR pull)
-        uses: aws-actions/configure-aws-credentials@v2
-        with:
-          aws-access-key-id:     ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region:            ap-northeast-2
-
-      - name: ECR Docker Login
-        run: |
-          aws ecr get-login-password --region ap-northeast-2 \
-          | docker login --username AWS --password-stdin ${{ secrets.ECR_REGISTRY }}
-
-      - name: Install Infisical & Fetch .env
-        run: |
-          curl -L https://${{ secrets.AWS_CLOUDFRONT_URL }}/tools/infisical-linux-amd64 -o infisical
-          chmod +x infisical && sudo mv infisical /usr/local/bin/infisical
-          infisical export \
-            --env=${{ secrets.INFISICAL_ENV_PROD }} \
-            --projectId=${{ secrets.INFISICAL_PROJECT_ID }} \
-            --token=${{ secrets.INFISICAL_TOKEN_PROD }} \
-            --format=dotenv \
-            --domain=${{ secrets.INFISICAL_API_URL }} > /tmp/deploy.env
-
-      - name: Deploy to AZ-1 (Blue-Green)
+      # 배포
+      - name: Deploy to AZ-1
         run: |
           cd ${{ secrets.BACKEND_PATH_PROD }}
           cp /tmp/deploy.env .env
@@ -100,32 +104,31 @@ jobs:
           docker compose -f docker-compose-${TARGET}.yml up -d --remove-orphans
 
           rm -f .env
-#───────────────────────────────────────────────────────────
-# 3️⃣  Deploy to EC2 (AZ-2) — 동일 로직
-#───────────────────────────────────────────────────────────
+
+# ──────────────────────────────────────────────────────────
+# 3️⃣ Deploy (AZ-2, 동일 타깃)
+# ──────────────────────────────────────────────────────────
   deploy-az2:
-    needs: build
-    runs-on: [ self-hosted, linux, ec2-prod-runner ]   # EC2-2 runner
+    needs: deploy-az1               # 타깃 값 받아오기
+    runs-on: [ self-hosted, linux, ec2-prod-runner ]   # EC2-2
     env:
-      TARGET: ${{ needs.build.outputs.target }}
+      TARGET: ${{ needs.deploy-az1.outputs.target }}
 
     steps:
-      # -- 동일 단계 (AWS Login, ECR Login, .env Fetch, Compose Deploy)
-      - name: AWS Login (ECR pull)
-        uses: aws-actions/configure-aws-credentials@v2
+      - uses: aws-actions/configure-aws-credentials@v2
         with:
           aws-access-key-id:     ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region:            ap-northeast-2
 
-      - name: ECR Docker Login
+      - name: ECR Login
         run: |
           aws ecr get-login-password --region ap-northeast-2 \
           | docker login --username AWS --password-stdin ${{ secrets.ECR_REGISTRY }}
 
-      - name: Install Infisical & Fetch .env
+      - name: Fetch .env
         run: |
-          curl -L https://${{ secrets.AWS_CLOUDFRONT_URL }}/tools/infisical-linux-amd64 -o infisical
+          curl -Ls https://${{ secrets.AWS_CLOUDFRONT_URL }}/tools/infisical-linux-amd64 -o infisical
           chmod +x infisical && sudo mv infisical /usr/local/bin/infisical
           infisical export \
             --env=${{ secrets.INFISICAL_ENV_PROD }} \
@@ -134,7 +137,7 @@ jobs:
             --format=dotenv \
             --domain=${{ secrets.INFISICAL_API_URL }} > /tmp/deploy.env
 
-      - name: Deploy to AZ-2 (Blue-Green)
+      - name: Deploy to AZ-2
         run: |
           cd ${{ secrets.BACKEND_PATH_PROD }}
           cp /tmp/deploy.env .env
@@ -143,27 +146,27 @@ jobs:
           docker compose -f docker-compose-${TARGET}.yml up -d --remove-orphans
 
           rm -f .env
-#───────────────────────────────────────────────────────────
-# 4️⃣  ALB Target Group 스위치 (완료 후)
-#───────────────────────────────────────────────────────────
+
+# ──────────────────────────────────────────────────────────
+# 4️⃣ Switch ALB Listener  (Blue ⇄ Green)
+# ──────────────────────────────────────────────────────────
   switch-alb:
-    needs: [ deploy-az1, deploy-az2, build ]
+    needs: [ deploy-az2 ]
     runs-on: ubuntu-latest
     steps:
-      - name: Authenticate to AWS
-        uses: aws-actions/configure-aws-credentials@v2
+      - uses: aws-actions/configure-aws-credentials@v2
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-access-key-id:     ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ap-northeast-2
-  
-      - name: Choose Target Group ARN
+          aws-region:            ap-northeast-2
+
+      - name: Pick TargetGroup ARN
         id: pick
         run: |
-          if [ "${{ needs.build.outputs.target }}" = "blue" ]; then
-               echo "arn=${{ secrets.TG_BLUE_ARN }}"  >> $GITHUB_OUTPUT
-          else echo "arn=${{ secrets.TG_GREEN_ARN }}" >> $GITHUB_OUTPUT; fi
-  
+          if [ "${{ needs.deploy-az1.outputs.target }}" = "blue" ]; then
+               echo "arn=${{ secrets.TG_BLUE_ARN }}"  >> "$GITHUB_OUTPUT"
+          else echo "arn=${{ secrets.TG_GREEN_ARN }}" >> "$GITHUB_OUTPUT"; fi
+
       - name: Switch ALB Listener
         run: |
           aws elbv2 modify-listener \
