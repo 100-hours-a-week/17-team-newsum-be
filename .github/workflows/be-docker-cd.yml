@@ -89,14 +89,19 @@ jobs:
             --region ap-northeast-2 \
             --query 'Parameter.Value' \
             --output text || echo "none")
-
+      
+          echo "🟡 현재 activeColor 값: $CURRENT"
+      
           if [ "$CURRENT" = "blue" ]; then
+            echo "🟢 다음 배포 대상: green"
             echo "target=green" >> "$GITHUB_OUTPUT"
             echo "TARGET=green"  >> "$GITHUB_ENV"
           else
-            echo "target=blue"  >> "$GITHUB_OUTPUT"
-            echo "TARGET=blue"  >> "$GITHUB_ENV"
+            echo "🔵 다음 배포 대상: blue"
+            echo "target=blue" >> "$GITHUB_OUTPUT"
+            echo "TARGET=blue" >> "$GITHUB_ENV"
           fi
+
 
       - name: Deploy to AZ-1
         run: |
