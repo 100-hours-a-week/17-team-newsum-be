@@ -90,4 +90,8 @@ public class ImageGenerationQueue {
 		this.status = GenerationStatus.COMPLETED;
 		this.completedAt = LocalDateTime.now();
 	}
+
+	public List<String> getDescriptions() {
+		return List.of(description1, description2, description3, description4);
+	}
 }
