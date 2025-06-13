@@ -8,13 +8,14 @@ on:
       - '**/.gitignore'
 
 jobs:
-# ──────────────────────────────────────────────────────────
-# 1️⃣ Build & Push  (GitHub-hosted)
-# ──────────────────────────────────────────────────────────
+# ──────────────────────────────────────────────
+# 1️⃣ Build & Push
+# ──────────────────────────────────────────────
   build:
     runs-on: ubuntu-latest
     outputs:
       image:  ${{ steps.push.outputs.image }}
+
     steps:
       - uses: actions/checkout@v3
 
@@ -27,21 +28,19 @@ jobs:
       - name: Gradle Build
         run: |
           ./gradlew clean build
-          cp build/libs/newsum-0.0.1-SNAPSHOT.jar app.jar   # 루트에 JAR
+          cp build/libs/newsum-0.0.1-SNAPSHOT.jar app.jar
 
-      # — AWS & ECR 로그인 —
       - uses: aws-actions/configure-aws-credentials@v2
         with:
           aws-access-key-id:      ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key:  ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region:             ap-northeast-2
 
-      - name: ECR Docker Login
+      - name: ECR Login
         run: |
           aws ecr get-login-password --region ap-northeast-2 \
           | docker login --username AWS --password-stdin ${{ secrets.ECR_REGISTRY }}
 
-      # — Docker Build & Push —
       - name: Build & Push image
         id: push
         run: |
@@ -50,17 +49,16 @@ jobs:
           docker push  "$IMAGE"
           echo "image=$IMAGE" >> "$GITHUB_OUTPUT"
 
-# ──────────────────────────────────────────────────────────
-# 2️⃣ Deploy (AZ-1, 타깃 결정 & 출력)
-# ──────────────────────────────────────────────────────────
+# ──────────────────────────────────────────────
+# 2️⃣ Deploy to AZ-1
+# ──────────────────────────────────────────────
   deploy-az1:
     needs: build
-    runs-on: [ self-hosted, linux, ec2-prod-runner ]   # EC2-1
+    runs-on: [ self-hosted, linux, ec2-prod-runner ]
     outputs:
       target: ${{ steps.decide.outputs.target }}
 
     steps:
-      # AWS 로그인 & ECR 로그인
       - uses: aws-actions/configure-aws-credentials@v2
         with:
           aws-access-key-id:     ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -72,7 +70,6 @@ jobs:
           aws ecr get-login-password --region ap-northeast-2 \
           | docker login --username AWS --password-stdin ${{ secrets.ECR_REGISTRY }}
 
-      # Infisical .env
       - name: Fetch .env
         run: |
           curl -Ls https://${{ secrets.AWS_CLOUDFRONT_URL }}/tools/infisical-linux-amd64 -o infisical
@@ -84,17 +81,23 @@ jobs:
             --format=dotenv \
             --domain=${{ secrets.INFISICAL_API_URL }} > /tmp/deploy.env
 
-      # 🔍 Blue/Green 결정(EC2 내부)
-      - name: Decide target
+      - name: Decide target (from SSM)
         id: decide
         run: |
-          if docker ps --format '{{.Names}}' | grep -q backend-blue; then
-               echo "target=green" >> "$GITHUB_OUTPUT"
-               echo "TARGET=green"  >> "$GITHUB_ENV"
-          else echo "target=blue"  >> "$GITHUB_OUTPUT"
-               echo "TARGET=blue"  >> "$GITHUB_ENV"; fi
+          CURRENT=$(aws ssm get-parameter \
+            --name "/newsum/activeColor" \
+            --region ap-northeast-2 \
+            --query 'Parameter.Value' \
+            --output text || echo "none")
 
-      # 배포
+          if [ "$CURRENT" = "blue" ]; then
+            echo "target=green" >> "$GITHUB_OUTPUT"
+            echo "TARGET=green"  >> "$GITHUB_ENV"
+          else
+            echo "target=blue"  >> "$GITHUB_OUTPUT"
+            echo "TARGET=blue"  >> "$GITHUB_ENV"
+          fi
+
       - name: Deploy to AZ-1
         run: |
           cd ${{ secrets.BACKEND_PATH_PROD }}
@@ -105,12 +108,12 @@ jobs:
 
           rm -f .env
 
-# ──────────────────────────────────────────────────────────
-# 3️⃣ Deploy (AZ-2, 동일 타깃)
-# ──────────────────────────────────────────────────────────
+# ──────────────────────────────────────────────
+# 3️⃣ Deploy to AZ-2
+# ──────────────────────────────────────────────
   deploy-az2:
-    needs: deploy-az1               # 타깃 값 받아오기
-    runs-on: [ self-hosted, linux, ec2-prod-runner ]   # EC2-2
+    needs: deploy-az1
+    runs-on: [ self-hosted, linux, ec2-prod-runner ]
     env:
       TARGET: ${{ needs.deploy-az1.outputs.target }}
 
@@ -147,9 +150,9 @@ jobs:
 
           rm -f .env
 
-# ──────────────────────────────────────────────────────────
-# 4️⃣ Switch ALB Listener  (Blue ⇄ Green)
-# ──────────────────────────────────────────────────────────
+# ──────────────────────────────────────────────
+# 4️⃣ Switch ALB + Update SSM
+# ──────────────────────────────────────────────
   switch-alb:
     needs: [ deploy-az2 ]
     runs-on: ubuntu-latest
@@ -164,12 +167,23 @@ jobs:
         id: pick
         run: |
           if [ "${{ needs.deploy-az1.outputs.target }}" = "blue" ]; then
-               echo "arn=${{ secrets.TG_BLUE_ARN }}"  >> "$GITHUB_OUTPUT"
-          else echo "arn=${{ secrets.TG_GREEN_ARN }}" >> "$GITHUB_OUTPUT"; fi
+            echo "arn=${{ secrets.TG_BLUE_ARN }}"  >> "$GITHUB_OUTPUT"
+          else
+            echo "arn=${{ secrets.TG_GREEN_ARN }}" >> "$GITHUB_OUTPUT"
+          fi
 
       - name: Switch ALB Listener
         run: |
           aws elbv2 modify-listener \
             --listener-arn ${{ secrets.ALB_LISTENER_ARN }} \
             --default-actions Type=forward,TargetGroupArn=${{ steps.pick.outputs.arn }} \
+            --region ap-northeast-2
+
+      - name: Update SSM activeColor
+        run: |
+          aws ssm put-parameter \
+            --name "/newsum/activeColor" \
+            --value "${{ needs.deploy-az1.outputs.target }}" \
+            --type String \
+            --overwrite \
             --region ap-northeast-2
