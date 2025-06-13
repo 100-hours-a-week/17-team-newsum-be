@@ -93,6 +93,11 @@ jobs:
             --format=dotenv \
             --domain=${{ secrets.INFISICAL_API_URL }} \
             > .env
+            
+      - name: Log in to Amazon ECR
+        run: |
+          aws ecr get-login-password --region ap-northeast-2 | \
+            docker login --username AWS --password-stdin ${{ secrets.ECR_REGISTRY }}
 
       - name: Pull and Deploy Docker
         run: |
@@ -130,6 +135,11 @@ jobs:
             --format=dotenv \
             --domain=${{ secrets.INFISICAL_API_URL }} \
             > .env
+            
+      - name: Log in to Amazon ECR
+        run: |
+          aws ecr get-login-password --region ap-northeast-2 | \
+            docker login --username AWS --password-stdin ${{ secrets.ECR_REGISTRY }}
 
       - name: Pull and Deploy Docker
         run: |
