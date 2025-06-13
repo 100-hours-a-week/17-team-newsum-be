@@ -491,7 +491,7 @@ public class WebtoonService {
 		);
 
 		List<WebtoonDetail> details = new ArrayList<>();
-		for (int i = 0; i < 4; i++) {
+		for (int i = 0; i < imageUrls.size(); i++) {
 			details.add(new WebtoonDetail(
 				webtoon,
 				imageUrls.get(i),
