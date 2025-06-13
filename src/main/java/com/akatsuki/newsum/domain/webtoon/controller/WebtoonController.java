@@ -61,17 +61,6 @@ public class WebtoonController {
 		);
 	}
 
-	@PostMapping
-	public ResponseEntity<ApiResponse> receiveImageLinks(
-		@RequestBody ImageGenerationCallbackRequest request
-	) {
-		webtoonService.ImageGenerationCallbackRequest(request);
-
-		return ResponseEntity.ok(
-			ApiResponse.success(ResponseCodeAndMessage.AI_WEBTOON_CREATED_SUCCESSFULLY, null)
-		);
-	}
-
 	@GetMapping("/{webtoonId}")
 	public ResponseEntity<ApiResponse<WebtoonResponse>> getWebtoon(
 		@PathVariable Long webtoonId,
@@ -94,26 +83,6 @@ public class WebtoonController {
 
 		return ResponseEntity.ok(
 			ApiResponse.success(ResponseCodeAndMessage.WEBTOON_DETAIL_SUCCESS, response)
-		);
-	}
-
-	// @PostMapping
-	// public ResponseEntity<ApiResponse> createWWebtoons(
-	// 	@RequestBody CreateWebtoonReqeust request
-	// ) {
-	// 	webtoonService.createWebtoon(request);
-	// 	return ResponseEntity.ok(
-	// 		ApiResponse.success(ResponseCodeAndMessage.WEBTOON_CREATE_SUCCESS, null)
-	// 	);
-	// }
-
-	@PostMapping("/prompts")
-	public ResponseEntity<ApiResponse> imageprompts(
-		@RequestBody ImageGenerationApiRequest request
-	) {
-		webtoonService.saveimageprompts(request);
-		return ResponseEntity.ok(
-			ApiResponse.success(ResponseCodeAndMessage.AI_IMAGE_PROMPT_SAVED_SUCCESS, null)
 		);
 	}
 
@@ -175,6 +144,27 @@ public class WebtoonController {
 		WebtoonSearchResponse response = WebtoonSearchResponse.of(page);
 		return ResponseEntity.ok(
 			ApiResponse.success(ResponseCodeAndMessage.WEBTOON_SEARCH_SUCCESS, response)
+		);
+	}
+
+	@PostMapping
+	public ResponseEntity<ApiResponse> receiveImageLinks(
+		@RequestBody ImageGenerationCallbackRequest request
+	) {
+		webtoonService.ImageGenerationCallbackRequest(request);
+
+		return ResponseEntity.ok(
+			ApiResponse.success(ResponseCodeAndMessage.AI_WEBTOON_CREATED_SUCCESSFULLY, null)
+		);
+	}
+
+	@PostMapping("/prompts")
+	public ResponseEntity<ApiResponse> imageprompts(
+		@RequestBody ImageGenerationApiRequest request
+	) {
+		webtoonService.saveimageprompts(request);
+		return ResponseEntity.ok(
+			ApiResponse.success(ResponseCodeAndMessage.AI_IMAGE_PROMPT_SAVED_SUCCESS, null)
 		);
 	}
 
