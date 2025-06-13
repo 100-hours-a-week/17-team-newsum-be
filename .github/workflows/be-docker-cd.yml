@@ -161,6 +161,8 @@ jobs:
   switch-alb:
     needs: [ deploy-az2 ]
     runs-on: ubuntu-latest
+    env:
+      TARGET: ${{ needs.deploy-az1.outputs.target }}
     steps:
       - uses: aws-actions/configure-aws-credentials@v2
         with:
