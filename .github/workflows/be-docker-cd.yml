@@ -99,14 +99,28 @@ jobs:
           aws ecr get-login-password --region ap-northeast-2 | \
             docker login --username AWS --password-stdin ${{ secrets.ECR_REGISTRY }}
 
+      - name: Determine deployment target (blue or green)
+        id: decide
+        run: |
+          if docker ps --format '{{.Names}}' | grep -q backend-blue; then
+            echo "Deploying to green"
+            echo "TARGET=green" >> $GITHUB_ENV
+          else
+            echo "Deploying to blue"
+            echo "TARGET=blue" >> $GITHUB_ENV
+          fi
+
       - name: Pull and Deploy Docker
         run: |
           cd ${{ secrets.BACKEND_PATH_PROD }}
           cp $GITHUB_WORKSPACE/.env .env
-          docker compose down || true
-          docker compose pull
-          docker compose up -d
+
+          docker compose -f docker-compose-${{ env.TARGET }}.yml down || true
+          docker compose -f docker-compose-${{ env.TARGET }}.yml pull
+          docker compose -f docker-compose-${{ env.TARGET }}.yml up -d
+
           rm -f .env
+
 
   deploy-prod-2:
     name: Deploy to EC2 AZ2
@@ -141,11 +155,25 @@ jobs:
           aws ecr get-login-password --region ap-northeast-2 | \
             docker login --username AWS --password-stdin ${{ secrets.ECR_REGISTRY }}
 
+      - name: Determine deployment target (blue or green)
+        id: decide
+        run: |
+          if docker ps --format '{{.Names}}' | grep -q backend-blue; then
+            echo "Deploying to green"
+            echo "TARGET=green" >> $GITHUB_ENV
+          else
+            echo "Deploying to blue"
+            echo "TARGET=blue" >> $GITHUB_ENV
+          fi
+
       - name: Pull and Deploy Docker
         run: |
           cd ${{ secrets.BACKEND_PATH_PROD }}
           cp $GITHUB_WORKSPACE/.env .env
-          docker compose down || true
-          docker compose pull
-          docker compose up -d
+
+          docker compose -f docker-compose-${{ env.TARGET }}.yml down || true
+          docker compose -f docker-compose-${{ env.TARGET }}.yml pull
+          docker compose -f docker-compose-${{ env.TARGET }}.yml up -d
+
           rm -f .env
+
