@@ -2,15 +2,17 @@ name: Backend Prod Docker CD
 
 on:
   push:
-    branches:
-      - dev
+    branches: [ dev ]
     paths-ignore:
       - '**/README.md'
       - '**/.gitignore'
 
 jobs:
-  deploy:
-    runs-on: [self-hosted, linux, dev]
+  build:
+    name: Build and Push Image
+    runs-on: ubuntu-latest # GitHub-hosted runner
+    outputs:
+      image: ${{ steps.export-image.outputs.image }}
 
     steps:
       - name: Checkout Repository
@@ -24,17 +26,12 @@ jobs:
           cache: 'gradle'
 
       - name: Build with Gradle
-        run: |
-          ./gradlew clean build
-          
-      - name: Check build output
-        run: |
-          ls -alh build/libs
-          
+        run: ./gradlew clean build
+
       - name: Copy JAR to root
         run: cp build/libs/newsum-0.0.1-SNAPSHOT.jar app.jar
-  
-      - name: Install Infisical CLI from CloudFront
+
+      - name: Install Infisical CLI
         run: |
           curl -L https://${{ secrets.AWS_CLOUDFRONT_URL }}/tools/infisical-linux-amd64 -o infisical
           chmod +x infisical
@@ -50,7 +47,6 @@ jobs:
             --domain=${{ secrets.INFISICAL_API_URL }} \
             > .env
 
-
       - name: Authenticate to AWS
         uses: aws-actions/configure-aws-credentials@v2
         with:
@@ -62,23 +58,84 @@ jobs:
         run: |
           aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS --password-stdin ${{ secrets.ECR_REGISTRY }}
 
-      - name: Show Dockerfile contents
-        run: cat Dockerfile
-
       - name: Build and Push Docker Image
+        id: export-image
         run: |
-          docker build -t ${{ secrets.ECR_REPO }}:latest .
-          docker tag ${{ secrets.ECR_REPO }}:latest ${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPO }}:latest
-          docker push ${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPO }}:latest
+          IMAGE="${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPO }}:latest"
+          docker build -t $IMAGE .
+          docker push $IMAGE
+          echo "image=$IMAGE" >> $GITHUB_OUTPUT
 
+  deploy-prod-1:
+    name: Deploy to EC2 AZ1
+    needs: build
+    runs-on: [self-hosted, linux, ec2-prod-runner]
+    steps:
+      - name: Authenticate to AWS
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-northeast-2
 
-
-      - name: Deploy Spring Boot app with Docker
+      - name: Install Infisical CLI
         run: |
-          cp .env ${{ secrets.BACKEND_PATH_PROD }}/.env
+          curl -L https://${{ secrets.AWS_CLOUDFRONT_URL }}/tools/infisical-linux-amd64 -o infisical
+          chmod +x infisical
+          sudo mv infisical /usr/local/bin/infisical
+
+      - name: Fetch .env from Infisical
+        run: |
+          infisical export \
+            --env=${{ secrets.INFISICAL_ENV_PROD }} \
+            --projectId=${{ secrets.INFISICAL_PROJECT_ID }} \
+            --token=${{ secrets.INFISICAL_TOKEN_PROD }} \
+            --format=dotenv \
+            --domain=${{ secrets.INFISICAL_API_URL }} \
+            > .env
+
+      - name: Pull and Deploy Docker
+        run: |
           cd ${{ secrets.BACKEND_PATH_PROD }}
+          cp $GITHUB_WORKSPACE/.env .env
           docker compose down || true
+          docker compose pull
           docker compose up -d
           rm -f .env
 
+  deploy-prod-2:
+    name: Deploy to EC2 AZ2
+    needs: build
+    runs-on: [self-hosted, linux, ec2-prod-runner]
+    steps:
+      - name: Authenticate to AWS
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-northeast-2
 
+      - name: Install Infisical CLI
+        run: |
+          curl -L https://${{ secrets.AWS_CLOUDFRONT_URL }}/tools/infisical-linux-amd64 -o infisical
+          chmod +x infisical
+          sudo mv infisical /usr/local/bin/infisical
+
+      - name: Fetch .env from Infisical
+        run: |
+          infisical export \
+            --env=${{ secrets.INFISICAL_ENV_PROD }} \
+            --projectId=${{ secrets.INFISICAL_PROJECT_ID }} \
+            --token=${{ secrets.INFISICAL_TOKEN_PROD }} \
+            --format=dotenv \
+            --domain=${{ secrets.INFISICAL_API_URL }} \
+            > .env
+
+      - name: Pull and Deploy Docker
+        run: |
+          cd ${{ secrets.BACKEND_PATH_PROD }}
+          cp $GITHUB_WORKSPACE/.env .env
+          docker compose down || true
+          docker compose pull
+          docker compose up -d
+          rm -f .env
