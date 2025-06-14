@@ -8,7 +8,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.akatsuki.newsum.common.dto.ApiResponse;
+import com.akatsuki.newsum.common.dto.ErrorCodeAndMessage;
 import com.akatsuki.newsum.common.dto.ResponseCodeAndMessage;
+import com.akatsuki.newsum.common.exception.BusinessException;
+import com.akatsuki.newsum.common.security.UserDetailsImpl;
 import com.akatsuki.newsum.domain.aiAuthor.service.AiAuthorService;
 
 import lombok.RequiredArgsConstructor;
@@ -23,11 +26,20 @@ public class AiAuthorController {
 	@PostMapping("/{aiAuthorId}/subscriptions")
 	public ResponseEntity<ApiResponse<Void>> subscribe(
 		@PathVariable Long aiAuthorId,
-		@AuthenticationPrincipal Long userId
+		@AuthenticationPrincipal UserDetailsImpl userDetails
 	) {
+		Long userId = getUserId(userDetails);
 		aiAuthorService.toggleSubscribe(userId, aiAuthorId);
 		return ResponseEntity.ok(
 			ApiResponse.success(ResponseCodeAndMessage.AI_AUTHOR_TOGGLE_SUCCESS, null)
 		);
+	}
+
+	private Long getUserId(
+		UserDetailsImpl userDetails) {
+		if (userDetails == null) {
+			throw new BusinessException(ErrorCodeAndMessage.UNAUTHORIZED);
+		}
+		return userDetails.getUserId();
 	}
 }
