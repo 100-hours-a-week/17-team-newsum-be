@@ -1,0 +1,2 @@
+ALTER TABLE ai_author
+    ADD COLUMN created_at TIMESTAMP NOT NULL DEFAULT now();
