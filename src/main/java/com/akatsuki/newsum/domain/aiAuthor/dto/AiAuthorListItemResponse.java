@@ -6,6 +6,7 @@ public record AiAuthorListItemResponse(
 	Long id,
 	String name,
 	String profileImageUrl,
-	LocalDateTime createdAt
+	LocalDateTime createdAt,
+	boolean subscribed
 ) {
 }

@@ -3,6 +3,8 @@ package com.akatsuki.newsum.domain.aiAuthor.repository;
 import static com.akatsuki.newsum.domain.aiAuthor.entity.QAiAuthor.*;
 
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Repository;
 
@@ -12,6 +14,7 @@ import com.akatsuki.newsum.common.pagination.model.query.QueryFragment;
 import com.akatsuki.newsum.common.pagination.query.registry.CursorPageQueryRegistry;
 import com.akatsuki.newsum.domain.aiAuthor.entity.AiAuthor;
 import com.akatsuki.newsum.domain.aiAuthor.entity.QAiAuthor;
+import com.akatsuki.newsum.domain.user.entity.QAuthorFavorite;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -39,5 +42,21 @@ public class AiAuthorQueryRepositoryImpl implements AiAuthorQueryRepository {
 			.orderBy((OrderSpecifier<?>[])fragment.orderByClause())
 			.limit(size + 1)
 			.fetch();
+	}
+
+	@Override
+	public Set<Long> findSubscribedAuthorIdsByUserId(Long userId, List<Long> aiAuthorIds) {
+		QAuthorFavorite af = QAuthorFavorite.authorFavorite;
+
+		return queryFactory
+			.select(af.aiAuthor.id)
+			.from(af)
+			.where(
+				af.userId.eq(userId),
+				af.aiAuthor.id.in(aiAuthorIds)
+			)
+			.fetch()
+			.stream()
+			.collect(Collectors.toSet());
 	}
 }

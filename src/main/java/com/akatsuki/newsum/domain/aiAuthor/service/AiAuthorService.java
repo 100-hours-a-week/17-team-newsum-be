@@ -3,6 +3,7 @@ package com.akatsuki.newsum.domain.aiAuthor.service;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,11 +13,13 @@ import com.akatsuki.newsum.common.exception.BusinessException;
 import com.akatsuki.newsum.common.pagination.CursorPaginationService;
 import com.akatsuki.newsum.common.pagination.model.cursor.Cursor;
 import com.akatsuki.newsum.common.pagination.model.page.CursorPage;
+import com.akatsuki.newsum.common.pagination.model.page.PageInfo;
 import com.akatsuki.newsum.domain.aiAuthor.dto.AiAuthorDetailResponse;
 import com.akatsuki.newsum.domain.aiAuthor.dto.AiAuthorListItemResponse;
 import com.akatsuki.newsum.domain.aiAuthor.dto.AiAuthorListResponse;
 import com.akatsuki.newsum.domain.aiAuthor.dto.AiAuthorWebtoonResponse;
 import com.akatsuki.newsum.domain.aiAuthor.entity.AiAuthor;
+import com.akatsuki.newsum.domain.aiAuthor.repository.AiAuthorQueryRepository;
 import com.akatsuki.newsum.domain.aiAuthor.repository.AiAuthorRepository;
 import com.akatsuki.newsum.domain.user.entity.AuthorFavorite;
 import com.akatsuki.newsum.domain.user.repository.AiAuthorFavoriteRepository;
@@ -31,6 +34,7 @@ public class AiAuthorService {
 
 	private final AiAuthorFavoriteRepository aiAuthorFavoriteRepository;
 	private final AiAuthorRepository aiAuthorRepository;
+	private final AiAuthorQueryRepository aiAuthorQueryRepository;
 	private final CursorPaginationService cursorPaginationService;
 
 	public void toggleSubscribe(Long userId, Long aiAuthorId) {
@@ -48,14 +52,9 @@ public class AiAuthorService {
 		return toDetailResponse(author, webtoons);
 	}
 
-	public AiAuthorListResponse getAuthorList(Cursor cursor, int size) {
+	public AiAuthorListResponse getAuthorList(Long userId, Cursor cursor, int size) {
 		CursorPage<AiAuthor> page = findAiAuthors(cursor, size);
-
-		List<AiAuthorListItemResponse> items = page.getItems().stream()
-			.map(this::mapToListItemResponse)
-			.toList();
-
-		return new AiAuthorListResponse(items, page.getPageInfo());
+		return buildAuthorListWithSubscribeStatus(userId, page.getItems(), page.getPageInfo());
 	}
 
 	private AiAuthor findAuthorById(Long aiAuthorId) {
@@ -93,17 +92,38 @@ public class AiAuthorService {
 			.toList();
 	}
 
-	private AiAuthorListItemResponse mapToListItemResponse(AiAuthor author) {
-		return new AiAuthorListItemResponse(
-			author.getId(),
-			author.getName(),
-			author.getProfileImageUrl(),
-			author.getCreatedAt()
-		);
+	private CursorPage<AiAuthor> findAiAuthors(Cursor cursor, int size) {
+		List<AiAuthor> authors = aiAuthorQueryRepository.findByCursorAndSize(cursor, size);
+		return cursorPaginationService.create(authors, size, cursor);
 	}
 
-	private CursorPage<AiAuthor> findAiAuthors(Cursor cursor, int size) {
-		List<AiAuthor> authors = aiAuthorRepository.findByCursorAndSize(cursor, size);
-		return cursorPaginationService.create(authors, size, cursor);
+	private Set<Long> getSubscribedAuthorIds(Long userId, List<Long> authorIds) {
+		if (userId == null) {
+			return Set.of();
+		}
+		return aiAuthorQueryRepository.findSubscribedAuthorIdsByUserId(userId, authorIds);
+	}
+
+	private AiAuthorListResponse buildAuthorListWithSubscribeStatus(
+		Long userId,
+		List<AiAuthor> authors,
+		PageInfo pageInfo
+	) {
+		List<Long> authorIds = authors.stream()
+			.map(AiAuthor::getId)
+			.toList();
+
+		Set<Long> subscribedIds = getSubscribedAuthorIds(userId, authorIds);
+
+		List<AiAuthorListItemResponse> items = authors.stream()
+			.map(author -> new AiAuthorListItemResponse(
+				author.getId(),
+				author.getName(),
+				author.getProfileImageUrl(),
+				author.getCreatedAt(),
+				subscribedIds.contains(author.getId()) // 구독 여부
+			)).toList();
+
+		return new AiAuthorListResponse(items, pageInfo);
 	}
 }

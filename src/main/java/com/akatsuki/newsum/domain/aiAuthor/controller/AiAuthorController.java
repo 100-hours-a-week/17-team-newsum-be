@@ -30,7 +30,7 @@ public class AiAuthorController {
 	private final AiAuthorService aiAuthorService;
 
 	@PostMapping("/{aiAuthorId}/subscriptions")
-	public ResponseEntity<ApiResponse<Void>> subscribe(
+	public ResponseEntity<ApiResponse> subscribe(
 		@PathVariable Long aiAuthorId,
 		@AuthenticationPrincipal UserDetailsImpl userDetails
 	) {
@@ -41,6 +41,7 @@ public class AiAuthorController {
 		);
 	}
 
+	//작가 상세페이지
 	@GetMapping("{aiAuthorId}")
 	public ResponseEntity<ApiResponse<AiAuthorDetailResponse>> getAuthorDetail(
 		@PathVariable Long aiAuthorId
@@ -51,12 +52,15 @@ public class AiAuthorController {
 		);
 	}
 
+	//작가리스트
 	@GetMapping
 	public ResponseEntity<ApiResponse<AiAuthorListResponse>> getAiAuthors(
 		@CursorParam Cursor cursor,
-		@RequestParam(defaultValue = "10", required = false) Integer size
+		@RequestParam(defaultValue = "10", required = false) Integer size,
+		@AuthenticationPrincipal UserDetailsImpl userDetails
 	) {
-		AiAuthorListResponse response = aiAuthorService.getAuthorList(cursor, size);
+		Long userId = (userDetails != null) ? userDetails.getUserId() : null; //비로그인유저도 접근 가능하도록
+		AiAuthorListResponse response = aiAuthorService.getAuthorList(userId, cursor, size);
 		return ResponseEntity.ok(
 			ApiResponse.success(ResponseCodeAndMessage.AI_AUTHOR_LIST_SUCCESS, response)
 		);

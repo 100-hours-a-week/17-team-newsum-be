@@ -11,4 +11,3 @@ public record AiAuthorDetailResponse(
 	List<AiAuthorWebtoonResponse> webtoons
 ) {
 }
-
