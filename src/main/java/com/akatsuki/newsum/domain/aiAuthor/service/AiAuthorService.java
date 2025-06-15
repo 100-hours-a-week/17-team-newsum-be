@@ -97,7 +97,8 @@ public class AiAuthorService {
 		return new AiAuthorListItemResponse(
 			author.getId(),
 			author.getName(),
-			author.getProfileImageUrl()
+			author.getProfileImageUrl(),
+			author.getCreatedAt()
 		);
 	}
 
