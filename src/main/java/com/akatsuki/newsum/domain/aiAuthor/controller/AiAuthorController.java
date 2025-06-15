@@ -44,9 +44,12 @@ public class AiAuthorController {
 	//작가 상세페이지
 	@GetMapping("{aiAuthorId}")
 	public ResponseEntity<ApiResponse<AiAuthorDetailResponse>> getAuthorDetail(
-		@PathVariable Long aiAuthorId
+		@PathVariable Long aiAuthorId,
+		@AuthenticationPrincipal UserDetailsImpl userDetails
+
 	) {
-		AiAuthorDetailResponse result = aiAuthorService.getAuthorDetail(aiAuthorId);
+		Long userId = (userDetails != null) ? userDetails.getUserId() : null; //비로그인유저도 접근 가능하도록
+		AiAuthorDetailResponse result = aiAuthorService.getAuthorDetail(userId, aiAuthorId);
 		return ResponseEntity.ok(
 			ApiResponse.success(ResponseCodeAndMessage.AI_AUTHOR_DETAIL_SUCCESS, result)
 		);

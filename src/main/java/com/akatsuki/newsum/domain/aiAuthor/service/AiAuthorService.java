@@ -46,10 +46,12 @@ public class AiAuthorService {
 	}
 
 	@Transactional(readOnly = true)
-	public AiAuthorDetailResponse getAuthorDetail(Long aiAuthorId) {
+	public AiAuthorDetailResponse getAuthorDetail(Long userId, Long aiAuthorId) {
 		AiAuthor author = findAuthorById(aiAuthorId);
 		List<AiAuthorWebtoonResponse> webtoons = getAuthorWebtoonsSortedByLatest(author);
-		return toDetailResponse(author, webtoons);
+		Boolean isSubscribed = isSubscribed(userId, aiAuthorId);
+
+		return toDetailResponse(author, webtoons, isSubscribed);
 	}
 
 	public AiAuthorListResponse getAuthorList(Long userId, Cursor cursor, int size) {
@@ -66,14 +68,16 @@ public class AiAuthorService {
 		return aiAuthorFavoriteRepository.findByUserIdAndAiAuthorId(userId, aiAuthorId);
 	}
 
-	private AiAuthorDetailResponse toDetailResponse(AiAuthor author, List<AiAuthorWebtoonResponse> webtoons) {
+	private AiAuthorDetailResponse toDetailResponse(AiAuthor author, List<AiAuthorWebtoonResponse> webtoons,
+		Boolean isSubscribed) {
 		return new AiAuthorDetailResponse(
 			author.getId(),
 			author.getName(),
 			author.getStyle(),
 			author.getIntroduction(),
 			author.getProfileImageUrl(),
-			webtoons
+			webtoons,
+			isSubscribed
 		);
 	}
 
@@ -125,5 +129,14 @@ public class AiAuthorService {
 			)).toList();
 
 		return new AiAuthorListResponse(items, pageInfo);
+	}
+
+	private boolean isSubscribed(Long userId, Long aiAuthorId) {
+		if (userId == null) {
+			return false;
+		}
+		return aiAuthorFavoriteRepository
+			.findByUserIdAndAiAuthorId(userId, aiAuthorId)
+			.isPresent();
 	}
 }

@@ -8,6 +8,7 @@ public record AiAuthorDetailResponse(
 	String style,
 	String introduction,
 	String profileImageUrl,
-	List<AiAuthorWebtoonResponse> webtoons
+	List<AiAuthorWebtoonResponse> webtoons,
+	boolean isSubscribed
 ) {
 }
